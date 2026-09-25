@@ -36,7 +36,7 @@ php bin/build-release.php --with-content --base-url=https://lotharprokop.com
 # → dist/release/htdocs (Webroot) + dist/release/lotharprokop (daneben) + LIES-MICH.txt
 ```
 
-Danach `https://DOMAIN/admin/setup` mit dem ausgegebenen Einrichtungsschlüssel aufrufen. Backup, Bildvarianten nachrechnen und Sichtbarkeitsabgleich laufen im Admin unter „System“. Details und die Variante für Hoster ohne Verzeichnis oberhalb des Webroots: [docs/INSTALL.md](docs/INSTALL.md).
+Danach `https://DOMAIN/check.php` aufrufen (prüft PHP, Erweiterungen, Limits, Pfade, Schreibrechte; anschließend löschen) und `https://DOMAIN/admin/setup` mit dem ausgegebenen Einrichtungsschlüssel. Backup, Bildvarianten nachrechnen und Sichtbarkeitsabgleich laufen im Admin unter „System“. Details und die Variante für Hoster ohne Verzeichnis oberhalb des Webroots: [docs/INSTALL.md](docs/INSTALL.md).
 
 ## Schnellstart (lokal)
 

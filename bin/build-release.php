@@ -188,7 +188,9 @@ UPLOAD PER FTP – Variante „getrennt“ (empfohlen)
 2. Den Ordner  $appDirName/  NEBEN das Webroot laden (eine Ebene höher als das Webroot, nicht hinein).
    Ergebnis z. B.:   /kunde/htdocs/index.php   und   /kunde/$appDirName/app/bootstrap.php
    Liegt der Ordner woanders, den Pfad in  htdocs/app-path.php  anpassen.
-3. Falls der Hoster es verlangt: Ordner  $appDirName/storage  (mit Unterordnern) und  htdocs/media  für PHP beschreibbar machen (chmod 755/775).
+3. https://DOMAIN/check.php aufrufen: zeigt, ob PHP-Version, Erweiterungen, Limits, Pfade und Schreibrechte passen.
+   Falls „NICHT beschreibbar“: Ordner  $appDirName/storage  (mit Unterordnern) und  htdocs/media  für PHP beschreibbar machen (chmod 755/775).
+   Danach check.php vom Server LÖSCHEN.
 4. https://DOMAIN/admin/setup aufrufen. Einrichtungsschlüssel: siehe  $appDirName/config/config.php  ('setup_key').
    Benutzername und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
 5. In  $appDirName/config/config.php  'base_url' prüfen (aktuell: $baseUrl).
@@ -202,7 +204,9 @@ UPLOAD PER FTP – Variante „ein Ordner“ (nur wenn das Webroot nicht änderb
    und sperrt app/, config/, storage/, templates/, bin/, data/ und docs/ (Apache mit mod_rewrite erforderlich).
 2. Nach dem Upload prüfen:  https://DOMAIN/config/config.php  und  https://DOMAIN/storage/  MÜSSEN 403 oder 404 liefern.
    Wenn stattdessen Inhalte oder ein Download erscheinen, ist mod_rewrite/AllowOverride nicht aktiv → Variante „getrennt“ verwenden.
-3. Falls der Hoster es verlangt: Ordner  storage  (mit Unterordnern) und  public/media  für PHP beschreibbar machen.
+3. https://DOMAIN/check.php aufrufen: zeigt, ob PHP-Version, Erweiterungen, Limits, Pfade und Schreibrechte passen.
+   Falls „NICHT beschreibbar“: Ordner  storage  (mit Unterordnern) und  public/media  für PHP beschreibbar machen.
+   Danach public/check.php vom Server LÖSCHEN.
 4. https://DOMAIN/admin/setup aufrufen. Einrichtungsschlüssel: siehe  config/config.php  ('setup_key').
    Benutzername und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
 5. In  config/config.php  'base_url' prüfen (aktuell: $baseUrl).
@@ -212,7 +216,7 @@ $readme .= $withContent
     ? "INHALTE: Datenbank, {$stats['originals']} Originale und Bildvarianten sind enthalten ({$stats['images']} Bilder). Beim ersten Aufruf der Website werden die öffentlichen\nBildvarianten automatisch angelegt (kann einige Sekunden dauern). Kontrolle: /admin → System → „Bilder ohne Varianten: keine“.\n"
     : "INHALTE: Dieses Paket enthält keine Galerien. Entweder ein Backup einspielen (docs/INSTALL.md) oder Inhalte im Admin anlegen.\n";
 $readme .= "\nVORAUSSETZUNGEN beim Hoster: PHP 8.1 oder neuer (im Hosting-Panel auswählen, getestet mit 8.3), Erweiterungen pdo_sqlite und imagick oder gd,\n"
-    . "Apache mit mod_rewrite und .htaccess (AllowOverride). Prüfung nach dem Upload: /admin → System.\n"
+    . "Apache mit mod_rewrite und .htaccess (AllowOverride). Prüfung: https://DOMAIN/check.php (danach löschen), später /admin → System.\n"
     . "\nVollständige Anleitung: docs/INSTALL.md im Anwendungsordner.\n";
 put("$out/LIES-MICH.txt", $readme);
 

@@ -27,6 +27,7 @@ deploy/       webroot.htaccess – Vorlage für die Variante „ein Ordner“ (s
 docs/         Dokumentation
 public/       EINZIGES öffentliches Verzeichnis (Document Root)
   index.php   Front-Controller
+  check.php   Server-Check (Voraussetzungen prüfen; nach der Installation löschen)
   app-path.example.php  Vorlage für app-path.php (Pfad zum Anwendungsordner bei FTP-Hosting)
   .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
@@ -81,7 +82,7 @@ Der Anwendungsordner liegt **neben** dem Webroot, also eine Ebene höher als all
 ```
 
    `htdocs/app-path.php` verweist auf `dirname(__DIR__) . '/lotharprokop'`. Liegt der Ordner woanders oder heißt anders, den Pfad dort anpassen (absolute Pfade sind erlaubt). Ohne Datei sucht `index.php` automatisch in `../`, `../lotharprokop` und `../lotharprokop-app`.
-3. Falls der Hoster es verlangt: `lotharprokop/storage/` (mit Unterordnern) und `htdocs/media/` für PHP beschreibbar machen (bei Shared Hosting läuft PHP meist als Kontobenutzer, dann reicht `755`).
+3. `https://DOMAIN/check.php` aufrufen. Der Server-Check zeigt PHP-Version, Erweiterungen, Upload-Limits, `mod_rewrite`, gefundenen Anwendungsordner, Konfiguration und Schreibrechte in einer Tabelle (OK / Hinweis / Fehlt). Meldet er „NICHT beschreibbar“: `lotharprokop/storage/` (mit Unterordnern) und `htdocs/media/` für PHP beschreibbar machen (bei Shared Hosting läuft PHP meist als Kontobenutzer, dann reicht `755`). **Danach `check.php` vom Server löschen** – die Seite gibt Details zur Serverumgebung preis.
 4. `https://DOMAIN/admin/setup` aufrufen, `setup_key` aus `lotharprokop/config/config.php` sowie Benutzername und Passwort (mindestens 12 Zeichen) eingeben. Danach ist `/admin/setup` dauerhaft deaktiviert (404); den `setup_key` in der Datei zusätzlich leeren.
 5. Unter `/admin` → **System** prüfen: PHP-Version, Bildbibliothek, Upload-Limits, Schreibrechte, „Bilder ohne Varianten: keine“.
 
@@ -94,7 +95,7 @@ Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot 
 1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
 2. Gesamten Inhalt von `htdocs/` inklusive versteckter Dateien in das Webroot laden.
 3. **Pflichtprüfung** nach dem Upload: `https://DOMAIN/config/config.php` und `https://DOMAIN/storage/database.sqlite` müssen `403` oder `404` liefern. Erscheint stattdessen Inhalt oder ein Download, ist `.htaccess` nicht aktiv – dann sofort die Dateien entfernen und Variante A verwenden.
-4. Weiter wie Variante A ab Schritt 3 (`storage/` und `public/media/` beschreibbar, `/admin/setup`, System-Seite).
+4. Weiter wie Variante A ab Schritt 3 (`/check.php` aufrufen und danach `public/check.php` löschen, `/admin/setup`, System-Seite).
 
 ### Ohne Release-Paket (Document Root änderbar)
 
@@ -106,6 +107,10 @@ Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot 
    - `setup_key`: langer zufälliger Wert, wenn das Adminkonto über den Browser angelegt werden soll (siehe unten).
 4. Schreibrechte: `storage/` und `public/media/` müssen für PHP beschreibbar sein.
 5. Website aufrufen. Beim ersten Aufruf werden Datenbank und Tabellen automatisch angelegt (`storage/database.sqlite`).
+
+### Server-Check
+
+`public/check.php` ist ein eigenständiges Skript ohne Abhängigkeit zur Anwendung. Es prüft PHP ≥ 8.1, `pdo_sqlite`, `fileinfo`, `mbstring`, `json`, SQLite ≥ 3.27, Imagick oder GD (mit WebP), `exif`, `zip`, die Upload-Limits, `file_uploads`, `mod_rewrite` (soweit abfragbar), HTTPS, den Anwendungsordner (`app-path.php` bzw. automatische Suche), `config/config.php` (`base_url` passend zur Domain, `debug` aus, `setup_key`), die Schreibrechte in `storage/*` und `media/` sowie, ob private Ordner im Webroot liegen. Aufruf im Browser (`https://DOMAIN/check.php`) oder per Shell (`php public/check.php`, Exit-Code 1 bei fehlenden Voraussetzungen). Vor dem Upload eines Pakets lässt es sich auch allein hochladen, um den Hoster vorab zu prüfen. Nach der Prüfung löschen.
 
 ### PHP-Einstellungen beim Hoster
 

@@ -122,6 +122,7 @@ Getestet mit Apache 2.4.58 + `mod_php` 8.3 (lokal, `AllowOverride All`, Document
 | System → „Fehlende Bildvarianten erzeugen“: 20 Ableitungsordner gelöscht → 1. Durchlauf 12 Bilder (Zeitbudget bei `max_execution_time 30`), Weiterleitung mit `?weiter=1`, Formular mit `data-autosubmit`; 2. Durchlauf 8 Bilder, „Alle Varianten vorhanden“; öffentliche Ordner wieder vollständig (8 Dateien je Bild) | ok |
 | System → „Datenbank herunterladen“: `application/vnd.sqlite3`, 360 KB, `PRAGMA integrity_check` = ok, 483 Bilder; temporäre Datei in `storage/backups/` entfernt; ohne Login 302 zum Login | ok |
 | Builder verweigert `--out` auf ein fremdes, nicht leeres Verzeichnis | ok |
+| `check.php`: per Shell im Repository (Hinweise zu 2M/8M-Limits und `debug`), im Browser unter Apache mit dem Split-Paket (`php_value`-Limits, `mod_rewrite aktiv`, `app-path.php` erkannt, alle Schreibrechte ok, Hinweis bei abweichender `base_url`), sowie in einem leeren Webroot ohne Anwendungsordner und ohne `config.php` (jeweils „Fehlt“ mit Handlungsanweisung) | ok |
 
 ## Nicht getestet
 
