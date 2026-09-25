@@ -99,6 +99,12 @@ Datenbasis: vollständiger Import der 52 Galerien / 480 Bilder aus `data/legacy/
 | Bildverarbeitung: 60-MP-Original (Pelmondo, 8926×6689) in ~4,4 s mit Imagick verarbeitet | Laufzeit gemessen |
 | EXIF-Orientierung und Metadaten: Testbild 1200×800 mit `Orientation=6`, GPS-Koordinaten und `Artist` (per exiftool gesetzt) → Varianten 800×1200 (korrekt gedreht, visuell verglichen), **keine** EXIF-/GPS-Tags mehr in JPEG-Ausgaben (exiftool); identisches Ergebnis mit Imagick und mit erzwungenem GD (`images.backend = 'gd'`) | ok |
 
+## Frische Installation
+
+| Prüfung | Ergebnis |
+|---|---|
+| Repository frisch geklont, `config.example.php` kopiert, `bin/create-user.php` ausgeführt, Server gestartet: Datenbank und `storage/`-Unterordner werden automatisch angelegt; alle öffentlichen Seiten 200 (leere Zustände), `/admin/setup` 404, keine PHP-Warnungen im Log | ok |
+
 ## Nicht getestet
 
 - Echter Mailversand des Kontaktformulars
