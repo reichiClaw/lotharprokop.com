@@ -15,7 +15,8 @@ Das Design tritt hinter die Fotografie zurück: warmer, gebrochener Off-White-Gr
 | `templates/` | HTML-Templates (öffentlich und Admin) |
 | `config/` | Konfiguration (Vorlage im Repository, echte Datei privat) |
 | `storage/` | privat: SQLite-Datenbank, Originale, Ableitungen, Sitzungen, Logs, Backups |
-| `bin/` | CLI: Benutzer anlegen, Backup, Import, Bilder neu verarbeiten |
+| `bin/` | CLI: Benutzer anlegen, Backup, Import, Bilder neu verarbeiten, Release-Paket für FTP-Upload bauen |
+| `deploy/` | `.htaccess`-Vorlage für die Installation als ein Ordner im Webroot |
 | `data/legacy/` | Manifest der geprüften Bestandsinhalte der alten Website |
 | `docs/` | Dokumentation |
 
@@ -25,6 +26,17 @@ Das Design tritt hinter die Fotografie zurück: warmer, gebrochener Off-White-Gr
 - [Übernommene Inhalte, fehlende Originale, benötigte Freigaben](docs/CONTENT.md)
 - [Weiterleitungen alter URLs](docs/REDIRECTS.md)
 - [Durchgeführte Tests](docs/TESTS.md)
+
+## Installation per FTP
+
+Kein Shell-Zugang nötig. Lokal einmal das Paket bauen, dann per FTP hochladen:
+
+```bash
+php bin/build-release.php --with-content --base-url=https://lotharprokop.com
+# → dist/release/htdocs (Webroot) + dist/release/lotharprokop (daneben) + LIES-MICH.txt
+```
+
+Danach `https://DOMAIN/admin/setup` mit dem ausgegebenen Einrichtungsschlüssel aufrufen. Backup, Bildvarianten nachrechnen und Sichtbarkeitsabgleich laufen im Admin unter „System“. Details und die Variante für Hoster ohne Verzeichnis oberhalb des Webroots: [docs/INSTALL.md](docs/INSTALL.md).
 
 ## Schnellstart (lokal)
 

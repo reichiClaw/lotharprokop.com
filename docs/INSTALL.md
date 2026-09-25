@@ -10,7 +10,7 @@
   - `imagick` **oder** `gd` (Bildverarbeitung) – eines davon erforderlich; Imagick wird bevorzugt (Farbprofile, bessere Qualität, geringerer Speicherbedarf bei großen Dateien)
   - `exif` – empfohlen (Ausrichtung mit GD; Imagick liest sie selbst)
   - `zip` – nur für `bin/backup.php`
-- Webserver mit Document Root auf `public/` (Apache mit `mod_rewrite` und `AllowOverride All`, alternativ nginx, siehe unten)
+- Webserver mit Document Root auf `public/` bzw. dem Inhalt von `public/` (Apache mit `mod_rewrite` und `AllowOverride All`, alternativ nginx, siehe unten); Shell-Zugang ist **nicht** erforderlich
 - Schreibrechte des PHP-Prozesses auf `storage/` und `public/media/`
 - Empfohlene PHP-Einstellungen: `upload_max_filesize` ≥ 40M, `post_max_size` ≥ 48M, `memory_limit` ≥ 256M (mit GD bei sehr großen Bildern 512M), `max_execution_time` ≥ 120
 
@@ -23,49 +23,135 @@ app/          Anwendungscode (Router, Controller, Modelle, Bildpipeline)
 bin/          Kommandozeilen-Werkzeuge (Benutzer, Backup, Import, Neuverarbeitung)
 config/       config.example.php (Vorlage) und config.php (privat, nicht im Repository)
 data/legacy/  Manifest der übernommenen Bestandsinhalte
+deploy/       webroot.htaccess – Vorlage für die Variante „ein Ordner“ (siehe unten)
 docs/         Dokumentation
 public/       EINZIGES öffentliches Verzeichnis (Document Root)
   index.php   Front-Controller
+  app-path.example.php  Vorlage für app-path.php (Pfad zum Anwendungsordner bei FTP-Hosting)
+  .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
   media/      veröffentlichte Bildvarianten (werden automatisch verwaltet)
 storage/      privat: database.sqlite, originals/, derivatives/, sessions/, logs/, backups/, cache/
 templates/    HTML-Templates (öffentlich und Admin)
+dist/         Ausgabe von bin/build-release.php (nicht im Repository)
 ```
 
 Datenbank, Originalbilder, Konfiguration, Sitzungen, Logs und Backups liegen außerhalb von `public/` und sind bei korrekt gesetztem Document Root nicht über HTTP erreichbar.
 
-## Einrichtung (Shared Hosting, Apache)
+## Installation per FTP (Shared Hosting ohne Shell)
+
+Die Website braucht auf dem Server weder Kommandozeile noch Composer. Alles, was für den Betrieb nötig ist, läuft über den Browser (`/admin`); die Dateien werden per FTP/SFTP hochgeladen.
+
+### Schritt 1: Paket bauen (lokal, einmalig)
+
+Auf dem eigenen Rechner (PHP 8.1+ vorhanden) im Projektordner:
+
+```bash
+php bin/build-release.php --with-content --base-url=https://lotharprokop.com
+# Varianten:
+#   --layout=single   alles in einem Ordner (siehe Variante B)
+#   --zip             zusätzlich ein ZIP-Archiv erzeugen
+#   --out=PFAD        anderes Zielverzeichnis (Standard: dist/release)
+```
+
+Das Skript legt unter `dist/release/` ein fertiges, upload-fähiges Paket an:
+
+- `htdocs/` – Inhalt des Webroots (`public/` plus `app-path.php`, `.htaccess`, `.user.ini`)
+- `lotharprokop/` – Anwendungsordner (`app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/`)
+- `LIES-MICH.txt` – Kurzanleitung für genau dieses Paket
+- eine fertige `config/config.php` mit `base_url`, deaktiviertem Mailversand und einem zufälligen, 48 Zeichen langen `setup_key` (wird am Ende ausgegeben)
+- mit `--with-content`: die Datenbank (ohne Benutzerkonten, Loginversuche und Kontaktformular-Daten), alle Originale und alle Bildvarianten. Beim ersten Aufruf auf dem Server werden die öffentlichen Varianten automatisch in `media/` angelegt (`storage/cache/needs-sync`).
+
+Mit den Bestandsinhalten ist das Paket etwa 1,1 GB groß (470 MB Originale, 630 MB Varianten). Ohne `--with-content` sind es unter 1 MB; Inhalte kommen dann per Backup-Wiederherstellung oder über den Admin.
+
+### Schritt 2: Hochladen – Variante A „getrennt“ (empfohlen)
+
+Der Anwendungsordner liegt **neben** dem Webroot, also eine Ebene höher als alles, was der Webserver ausliefert. So sind Datenbank, Originale, Konfiguration, Sessions, Logs und Backups über HTTP grundsätzlich nicht erreichbar – unabhängig von `.htaccess`.
+
+1. Inhalt von `dist/release/htdocs/` in das Webroot der Domain laden (beim Hoster z. B. `htdocs`, `public_html`, `html` oder `www`). Versteckte Dateien (`.htaccess`, `.user.ini`, `media/.htaccess`) mit übertragen – im FTP-Programm „versteckte Dateien anzeigen“ aktivieren.
+2. Ordner `dist/release/lotharprokop/` **neben** das Webroot laden. Ergebnis zum Beispiel:
+
+```
+/kunde/htdocs/index.php
+/kunde/htdocs/app-path.php
+/kunde/htdocs/media/
+/kunde/lotharprokop/app/bootstrap.php
+/kunde/lotharprokop/config/config.php
+/kunde/lotharprokop/storage/database.sqlite
+```
+
+   `htdocs/app-path.php` verweist auf `dirname(__DIR__) . '/lotharprokop'`. Liegt der Ordner woanders oder heißt anders, den Pfad dort anpassen (absolute Pfade sind erlaubt). Ohne Datei sucht `index.php` automatisch in `../`, `../lotharprokop` und `../lotharprokop-app`.
+3. Falls der Hoster es verlangt: `lotharprokop/storage/` (mit Unterordnern) und `htdocs/media/` für PHP beschreibbar machen (bei Shared Hosting läuft PHP meist als Kontobenutzer, dann reicht `755`).
+4. `https://DOMAIN/admin/setup` aufrufen, `setup_key` aus `lotharprokop/config/config.php` sowie Benutzername und Passwort (mindestens 12 Zeichen) eingeben. Danach ist `/admin/setup` dauerhaft deaktiviert (404); den `setup_key` in der Datei zusätzlich leeren.
+5. Unter `/admin` → **System** prüfen: PHP-Version, Bildbibliothek, Upload-Limits, Schreibrechte, „Bilder ohne Varianten: keine“.
+
+Hat der Hoster kein Verzeichnis oberhalb des Webroots (nur FTP-Zugang direkt ins Webroot): Variante B.
+
+### Schritt 2: Hochladen – Variante B „ein Ordner“
+
+Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot liegen darf. Erfordert Apache mit `mod_rewrite` und aktivem `.htaccess` (`AllowOverride All` bzw. mindestens `FileInfo Options Limit`).
+
+1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
+2. Gesamten Inhalt von `htdocs/` inklusive versteckter Dateien in das Webroot laden.
+3. **Pflichtprüfung** nach dem Upload: `https://DOMAIN/config/config.php` und `https://DOMAIN/storage/database.sqlite` müssen `403` oder `404` liefern. Erscheint stattdessen Inhalt oder ein Download, ist `.htaccess` nicht aktiv – dann sofort die Dateien entfernen und Variante A verwenden.
+4. Weiter wie Variante A ab Schritt 3 (`storage/` und `public/media/` beschreibbar, `/admin/setup`, System-Seite).
+
+### Ohne Release-Paket (Document Root änderbar)
 
 1. Repository-Inhalt auf den Server laden, z. B. nach `/home/kunde/lotharprokop/`.
 2. Document Root der Domain auf `/home/kunde/lotharprokop/public` setzen.
-   Falls der Hoster das Document Root nicht ändern lässt: Inhalt von `public/` in das Webroot legen und in `public/index.php` den Pfad zu `app/bootstrap.php` anpassen (`require '/home/kunde/lotharprokop/app/bootstrap.php';`). `app/`, `config/`, `storage/`, `templates/` bleiben außerhalb des Webroots.
 3. `config/config.example.php` nach `config/config.php` kopieren und anpassen:
    - `base_url` (z. B. `https://lotharprokop.com`)
    - `mail.enabled` nur auf `true`, wenn `mail()` auf dem Server nachweislich zustellt; `mail.from` muss zur Domain passen.
-   - `setup_key`: nur setzen, wenn das Adminkonto über den Browser angelegt werden soll (siehe unten).
-4. Schreibrechte: `storage/` und `public/media/` müssen für PHP beschreibbar sein (`chmod 750` bzw. `775` je nach Hosting-Setup; keine Weltschreibrechte nötig, wenn PHP als Kontobenutzer läuft).
+   - `setup_key`: langer zufälliger Wert, wenn das Adminkonto über den Browser angelegt werden soll (siehe unten).
+4. Schreibrechte: `storage/` und `public/media/` müssen für PHP beschreibbar sein.
 5. Website aufrufen. Beim ersten Aufruf werden Datenbank und Tabellen automatisch angelegt (`storage/database.sqlite`).
+
+### PHP-Einstellungen beim Hoster
+
+- Im Hosting-Panel PHP 8.1 oder neuer wählen (getestet: 8.3) und sicherstellen, dass `pdo_sqlite`, `fileinfo`, `mbstring` und `imagick` oder `gd` aktiv sind. `/admin` → **System** zeigt, was der Server tatsächlich bietet.
+- Upload-Limits: `public/.htaccess` setzt `upload_max_filesize 48M`, `post_max_size 50M`, `memory_limit 512M`, `max_execution_time 120` für `mod_php`; `public/.user.ini` dasselbe für PHP-FPM/FastCGI (greift je nach `user_ini.cache_ttl` nach bis zu fünf Minuten). Lässt der Hoster beides nicht zu, die Werte im Hosting-Panel setzen. Die Anwendung akzeptiert Uploads bis 40 MB pro Datei; liegen die Serverlimits darunter, meldet der Upload dies im Admin.
+- Ist `max_execution_time` klein (z. B. 30 s), verarbeitet „Fehlende Bildvarianten erzeugen“ entsprechend weniger Bilder pro Durchlauf und setzt automatisch fort.
 
 ### Adminkonto anlegen
 
 Es gibt keine Standardzugangsdaten. Zwei Wege:
 
-**A) Kommandozeile (empfohlen)**
+**A) Browser (bei FTP-Hosting)**
+
+In `config/config.php` steht ein langer, zufälliger `setup_key` (vom Release-Builder erzeugt oder selbst eingetragen). `https://…/admin/setup` aufrufen, Schlüssel und Zugangsdaten eingeben. Sobald ein Benutzer existiert, liefert `/admin/setup` dauerhaft 404. Danach den `setup_key` wieder leeren.
+
+**B) Kommandozeile (wenn vorhanden)**
 
 ```bash
 php bin/create-user.php lothar          # Passwort wird abgefragt
 LP_PASSWORD='…' php bin/create-user.php lothar   # nicht interaktiv
 ```
 
-**B) Browser**
-
-In `config/config.php` einen langen, zufälligen `setup_key` eintragen, dann `https://…/admin/setup` aufrufen, Schlüssel und Zugangsdaten eingeben. Sobald ein Benutzer existiert, liefert `/admin/setup` dauerhaft 404. Danach den `setup_key` wieder leeren.
-
 Passwörter: mindestens 12 Zeichen, Speicherung mit `password_hash()` (bcrypt). Nach 5 Fehlversuchen innerhalb von 15 Minuten wird die Kombination IP/Benutzername 15 Minuten gesperrt (persistent in der Datenbank).
+
+### Wartung ohne Kommandozeile
+
+Alles, was `bin/` per Shell erledigt, gibt es für FTP-Hosting auch im Browser unter `/admin` → **System**:
+
+| Aufgabe | Browser | Kommandozeile |
+|---|---|---|
+| Fehlende Bildvarianten erzeugen (nach Backup-Wiederherstellung oder Upload nur mit Originalen) | „Fehlende Bildvarianten erzeugen“ – arbeitet portionsweise innerhalb der Laufzeitgrenze und lädt die Seite automatisch neu, bis alles fertig ist | `php bin/reprocess-images.php` |
+| Öffentliche Bildvarianten mit dem Veröffentlichungsstatus abgleichen | „Sichtbarkeit aller Bilder abgleichen“ | `php bin/reprocess-images.php` |
+| Datenbank sichern | „Datenbank herunterladen“ (konsistente Kopie per `VACUUM INTO`) | `php bin/backup.php` |
+| Originale sichern | per FTP `storage/originals/` herunterladen | in `bin/backup.php` enthalten |
+| Adminkonto anlegen | `/admin/setup` mit `setup_key` | `php bin/create-user.php` |
+| Passwort ändern | `/admin/passwort` | – |
+
+Wird per FTP ein neuer `storage/`-Stand eingespielt (z. B. Backup), lässt sich eine leere Datei `storage/cache/needs-sync` anlegen: Beim nächsten Aufruf gleicht die Anwendung `media/` automatisch ab und löscht die Markierung.
+
+### Updates per FTP
+
+Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inhalt des Webroots (ohne `media/`, ohne `app-path.php`) überschreiben. `config/config.php`, `storage/` und `media/` bleiben unverändert. Datenbankänderungen werden beim ersten Aufruf automatisch angewendet (idempotente Migrationen).
 
 ### Apache
 
-`public/.htaccess` enthält Rewrite-Regeln (alle Anfragen auf nicht existierende Dateien gehen an `index.php`), Cache-Header und die Sperre versteckter Dateien. `public/media/.htaccess` verhindert jede Skriptausführung im Bildverzeichnis und liefert dort nur `.jpg`/`.webp` aus. Voraussetzung: `AllowOverride All` (bei Shared Hosting Standard).
+`public/.htaccess` enthält Rewrite-Regeln (alle Anfragen auf nicht existierende Dateien gehen an `index.php`), Cache-Header, PHP-Limits und die Sperre versteckter Dateien sowie von `app-path.php`. `public/media/.htaccess` verhindert jede Skriptausführung im Bildverzeichnis und liefert dort nur `.jpg`/`.webp` aus. `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/` und `docs/` enthalten jeweils eine `.htaccess` mit `Require all denied` als zweite Verteidigungslinie, falls sie doch einmal im Webroot landen. Voraussetzung: `AllowOverride All` (bei Shared Hosting Standard).
 
 ### nginx (Beispiel)
 
@@ -117,7 +203,7 @@ Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript 
 
 **Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte.
 
-**System** – Umgebungsinfos (PHP, Bildbibliothek, Upload-Limits, Speicherplatz) und „Sichtbarkeit abgleichen“ (stellt `public/media/` aus den privaten Varianten wieder her, z. B. nach einer Wiederherstellung).
+**System** – Umgebungsinfos (PHP, Bildbibliothek, Upload-Limits, Schreibrechte, Speicherplatz, Anzahl Bilder ohne Varianten), „Fehlende Bildvarianten erzeugen“ (portionsweise, mit automatischer Fortsetzung), „Sichtbarkeit aller Bilder abgleichen“ (stellt `public/media/` aus den privaten Varianten wieder her) und „Datenbank herunterladen“ (Backup ohne Kommandozeile).
 
 ## Bildverarbeitung
 
@@ -135,13 +221,15 @@ Mit `images.backend = 'gd'` in der Konfiguration lässt sich GD erzwingen, falls
 php bin/backup.php            # schreibt storage/backups/backup-JJJJMMTT-HHMMSS.zip
 ```
 
+Ohne Kommandozeile: `/admin` → **System** → „Datenbank herunterladen“ liefert dieselbe konsistente Kopie der Datenbank; `storage/originals/` und `config/config.php` zusätzlich per FTP herunterladen.
+
 Enthalten: konsistente Kopie der Datenbank (`VACUUM INTO`), alle Originalbilder, `config/config.php` (enthält den `setup_key`, daher Archiv vertraulich behandeln) und eine README. Die abgeleiteten Varianten sind nicht enthalten, sie lassen sich aus den Originalen neu berechnen. Das Archiv sollte regelmäßig vom Server weg kopiert werden (z. B. Cron + rsync); `storage/backups/` liegt außerhalb des Webroots.
 
 **Wiederherstellen**
 
 1. Anwendungscode installieren (siehe oben), noch nicht aufrufen.
 2. Aus dem Archiv `storage/database.sqlite`, `storage/originals/` und `config/config.php` an ihre Plätze legen.
-3. `php bin/reprocess-images.php` ausführen – erzeugt alle Varianten neu und veröffentlicht die Bilder der veröffentlichten Galerien.
+3. `php bin/reprocess-images.php` ausführen – erzeugt alle Varianten neu und veröffentlicht die Bilder der veröffentlichten Galerien. Ohne Kommandozeile: einloggen, `/admin` → **System** → „Fehlende Bildvarianten erzeugen“ (läuft in Portionen und setzt automatisch fort), danach „Sichtbarkeit aller Bilder abgleichen“.
 4. Website und `/admin` prüfen.
 
 Ein Backup lässt sich vorab ohne Anwendung prüfen: `sqlite3 storage/database.sqlite 'PRAGMA integrity_check;'`.

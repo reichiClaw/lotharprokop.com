@@ -105,7 +105,27 @@ Datenbasis: vollständiger Import der 52 Galerien / 480 Bilder aus `data/legacy/
 |---|---|
 | Repository frisch geklont, `config.example.php` kopiert, `bin/create-user.php` ausgeführt, Server gestartet: Datenbank und `storage/`-Unterordner werden automatisch angelegt; alle öffentlichen Seiten 200 (leere Zustände), `/admin/setup` 404, keine PHP-Warnungen im Log | ok |
 
+## FTP-Installation (Release-Paket)
+
+Getestet mit Apache 2.4.58 + `mod_php` 8.3 (lokal, `AllowOverride All`, Document Root auf das Paket) sowie mit dem PHP-Entwicklungsserver.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `php bin/build-release.php --with-content` → `dist/release/htdocs` + `dist/release/lotharprokop` (1,09 GB), `config/config.php` mit zufälligem `setup_key`, `LIES-MICH.txt`; Datenbank enthält 52 Galerien und 483 Bilder, aber 0 Benutzer, 0 Loginversuche, 0 Kontaktdaten | ok |
+| Variante „getrennt“ (Document Root = `htdocs`, Anwendungsordner daneben, Pfad über `app-path.php`): Start, Übersicht, Galerie, Film, Vita, Kontakt 200; beim ersten Aufruf wurden alle 483 öffentlichen Bildordner automatisch aus `needs-sync` angelegt, Bild-URL 200 `image/webp` | ok |
+| `/admin/setup` mit dem generierten Schlüssel: Konto angelegt, Weiterleitung zum Login, danach `/admin/setup` 404; Login funktioniert | ok |
+| `/.htaccess`, `/.user.ini`, `/app-path.php`, `/app-path.example.php`, `/media/.htaccess` → 403; `/public/`, `/public/index.php` → 404 (Apache); mit dem PHP-Entwicklungsserver ebenfalls 404 für versteckte Dateien | ok |
+| `php_value` aus `public/.htaccess` wirkt unter `mod_php`: System-Seite zeigt `upload_max_filesize 48M`, `post_max_size 50M`, `memory_limit 512M`, `max_execution_time 120` (ohne Eintrag im Server-Config) | ok |
+| Variante „ein Ordner“ (`--layout=single`, Document Root = gesamter Projektordner mit `.htaccess` aus `deploy/webroot.htaccess`): Seiten, Assets, `robots.txt`, `sitemap.xml` 200; `/config/config.php`, `/storage/`, `/storage/database.sqlite`, `/app/bootstrap.php`, `/templates/layout.php`, `/bin/…`, `/data/…`, `/docs/…` → 403; `/README.md`, `/.htaccess`, `/.git/HEAD`, `/public/…` → 404 | ok |
+| Variante „ein Ordner“ Ende-zu-Ende: Setup, Login, Galerie anlegen, Upload eines 3200×2133-JPEGs (8 Varianten in `storage/derivatives`), Veröffentlichen → Hardlinks in `public/media/`, Galerie-Seite 200, Bild-URL 200 `image/webp` | ok |
+| Repository-Layout (Document Root = `public/`) nach den Änderungen unverändert funktionsfähig | ok |
+| System → „Fehlende Bildvarianten erzeugen“: 20 Ableitungsordner gelöscht → 1. Durchlauf 12 Bilder (Zeitbudget bei `max_execution_time 30`), Weiterleitung mit `?weiter=1`, Formular mit `data-autosubmit`; 2. Durchlauf 8 Bilder, „Alle Varianten vorhanden“; öffentliche Ordner wieder vollständig (8 Dateien je Bild) | ok |
+| System → „Datenbank herunterladen“: `application/vnd.sqlite3`, 360 KB, `PRAGMA integrity_check` = ok, 483 Bilder; temporäre Datei in `storage/backups/` entfernt; ohne Login 302 zum Login | ok |
+| Builder verweigert `--out` auf ein fremdes, nicht leeres Verzeichnis | ok |
+
 ## Nicht getestet
+
+- Upload des Pakets auf einen echten Hoster per FTP (nur lokal mit Apache und PHP-Entwicklungsserver nachgestellt); Wirkung von `.user.ini` unter PHP-FPM
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)
