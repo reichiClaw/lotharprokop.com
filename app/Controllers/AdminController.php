@@ -446,7 +446,13 @@ final class AdminController
             'HTTPS' => is_https() ? 'ja' : 'nein',
             'Kontaktformular' => Config::get('mail.enabled') ? 'aktiv → ' . Config::get('mail.to') : 'deaktiviert',
         ];
-        self::render('system', ['checks' => $checks, 'meta' => ['title' => 'System']]);
+        $missing = self::imagesWithoutVariants();
+        self::render('system', [
+            'checks' => $checks,
+            'missingVariants' => count($missing),
+            'autoContinue' => isset($_GET['weiter']) && $missing !== [],
+            'meta' => ['title' => 'System'],
+        ]);
     }
 
     public static function systemSync(array $params): void
@@ -456,6 +462,81 @@ final class AdminController
         $n = Images::syncAll();
         self::flash('ok', 'Sichtbarkeit von ' . $n . ' Bildern abgeglichen.');
         redirect('/admin/system');
+    }
+
+    /**
+     * Erzeugt fehlende Bildvarianten in Portionen – für Hosting ohne Kommandozeile (statt
+     * bin/reprocess-images.php). Bricht vor Ablauf der max_execution_time ab; die Systemseite
+     * bietet dann „Weiter“ an bzw. setzt mit JavaScript automatisch fort.
+     */
+    public static function systemReprocess(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verify();
+        $limit = (int) ini_get('max_execution_time');
+        $budget = $limit > 0 ? max(5, min($limit - 8, 40)) : 40;
+        $start = microtime(true);
+        $pdo = Database::pdo();
+        $done = 0;
+        $errors = [];
+        foreach (self::imagesWithoutVariants() as $row) {
+            if ($done > 0 && microtime(true) - $start > $budget) {
+                break;
+            }
+            $original = Config::storage('originals') . '/' . $row['original_path'];
+            if (!is_file($original)) {
+                $errors[] = '#' . $row['id'] . ': Original fehlt (' . $row['original_path'] . ')';
+                continue;
+            }
+            try {
+                $result = ImageProcessor::generateVariants($original, Config::storage('derivatives') . '/' . $row['token']);
+                $pdo->prepare('UPDATE images SET width = ?, height = ?, variants = ? WHERE id = ?')
+                    ->execute([$result['width'], $result['height'], json_encode($result['variants']), $row['id']]);
+                Images::syncPublic((int) $row['id']);
+                $done++;
+            } catch (\Throwable $e) {
+                $errors[] = '#' . $row['id'] . ': ' . $e->getMessage();
+            }
+        }
+        $remaining = count(array_filter(self::imagesWithoutVariants(), fn($r) => is_file(Config::storage('originals') . '/' . $r['original_path'])));
+        $msg = $done . ' Bild(er) verarbeitet' . ($remaining > 0 ? ', noch ' . $remaining . ' offen.' : '. Alle Varianten vorhanden.');
+        if ($errors !== []) {
+            $msg .= ' Fehler: ' . implode('; ', array_slice($errors, 0, 5)) . (count($errors) > 5 ? ' …' : '');
+        }
+        self::flash($errors === [] ? 'ok' : 'warn', $msg);
+        redirect('/admin/system' . ($remaining > 0 && $done > 0 ? '?weiter=1' : '') . '#wartung');
+    }
+
+    /** Lädt eine konsistente Kopie der Datenbank herunter (Originale separat per FTP sichern). */
+    public static function systemBackup(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verify();
+        $tmp = Config::storage('backups') . '/download-' . bin2hex(random_bytes(6)) . '.sqlite';
+        try {
+            Database::pdo()->exec('VACUUM INTO ' . Database::pdo()->quote($tmp));
+            header('Content-Type: application/vnd.sqlite3');
+            header('Content-Disposition: attachment; filename="lotharprokop-db-' . date('Ymd-His') . '.sqlite"');
+            header('Content-Length: ' . filesize($tmp));
+            header('Cache-Control: no-store');
+            readfile($tmp);
+        } finally {
+            @unlink($tmp);
+        }
+        exit;
+    }
+
+    /** @return array<int,array{id:int,token:string,original_path:string}> */
+    private static function imagesWithoutVariants(): array
+    {
+        $out = [];
+        foreach (Database::pdo()->query('SELECT id, token, original_path FROM images ORDER BY id') as $row) {
+            $dir = Config::storage('derivatives') . '/' . $row['token'];
+            if (!is_dir($dir) || !glob($dir . '/w*.jpg')) {
+                $out[] = $row;
+            }
+        }
+        return $out;
     }
 
     private static function dirSize(string $dir): int

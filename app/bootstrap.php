@@ -56,3 +56,15 @@ foreach (['originals', 'derivatives', 'logs', 'backups', 'sessions', 'cache'] as
 }
 
 App\Database::migrate();
+
+// Nach einer Installation/Wiederherstellung per FTP: öffentliche Bildvarianten einmalig aus den
+// privaten Ableitungen erzeugen (Markerdatei wird vom Release-Builder bzw. Backup-Import angelegt).
+$syncMarker = App\Config::storage('cache') . '/needs-sync';
+if (is_file($syncMarker) && @unlink($syncMarker)) {
+    try {
+        App\Images::syncAll();
+    } catch (\Throwable $e) {
+        error_log('Abgleich der öffentlichen Bilder fehlgeschlagen: ' . $e->getMessage());
+    }
+}
+unset($syncMarker);

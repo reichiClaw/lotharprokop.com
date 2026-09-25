@@ -33,6 +33,12 @@
     });
   });
 
+  /* ---------- Automatisch fortsetzen (portionsweise Wartungsaufgaben) ---------- */
+  document.querySelectorAll('form[data-autosubmit]').forEach(function (form) {
+    var delay = parseInt(form.getAttribute('data-autosubmit'), 10) || 1500;
+    setTimeout(function () { if (form.isConnected) form.submit(); }, delay);
+  });
+
   /* ---------- Schutz vor Datenverlust ---------- */
   document.querySelectorAll('form[data-dirty-guard]').forEach(function (form) {
     var dirty = false;
