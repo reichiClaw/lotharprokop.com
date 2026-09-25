@@ -3,6 +3,11 @@
 Options -Indexes -MultiViews
 DirectoryIndex index.php
 
+# Versteckte Dateien (.htaccess, .git …) niemals ausliefern.
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
   RewriteEngine On
   # Vorhandene Dateien (Assets, Bildvarianten) direkt ausliefern, alles andere an den Front-Controller.
