@@ -1,0 +1,12 @@
+# Private Daten – niemals ins Repository
+/config/config.php
+/storage/*
+!/storage/.gitkeep
+/public/media/*
+!/public/media/.htaccess
+!/public/media/index.html
+
+# Lokales
+.DS_Store
+Thumbs.db
+*.log

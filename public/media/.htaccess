@@ -1,0 +1,9 @@
+# Nur Bilddateien ausliefern, keinerlei Skriptausführung.
+Options -Indexes -ExecCGI
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .phar .pl .py .cgi
+<FilesMatch "\.(?!(webp|jpg|jpeg)$)[^.]+$">
+  Require all denied
+</FilesMatch>

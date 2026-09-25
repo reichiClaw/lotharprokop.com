@@ -1,0 +1,5383 @@
+{
+ "source": "https://lotharprokop.com (WordPress, Stand der Analyse: 2026-09-25)",
+ "categories": [
+  {
+   "slug": "people",
+   "name": "People"
+  },
+  {
+   "slug": "portraits",
+   "name": "Portraits"
+  },
+  {
+   "slug": "beauty",
+   "name": "Beauty"
+  },
+  {
+   "slug": "fashion",
+   "name": "Fashion"
+  },
+  {
+   "slug": "produkt",
+   "name": "Produkt"
+  },
+  {
+   "slug": "food",
+   "name": "Food"
+  },
+  {
+   "slug": "architektur",
+   "name": "Architektur"
+  },
+  {
+   "slug": "interior",
+   "name": "Interior"
+  },
+  {
+   "slug": "industrie",
+   "name": "Industrie"
+  },
+  {
+   "slug": "landwirtschaft",
+   "name": "Landwirtschaft"
+  },
+  {
+   "slug": "landschaft",
+   "name": "Landschaft"
+  },
+  {
+   "slug": "reportage",
+   "name": "Reportage"
+  },
+  {
+   "slug": "konzert",
+   "name": "Konzert"
+  },
+  {
+   "slug": "sport",
+   "name": "Sport"
+  }
+ ],
+ "category_aliases": {
+  "children": "people",
+  "makeup": "beauty",
+  "jewellery": "produkt",
+  "agriculture": "landwirtschaft",
+  "landscape": "landschaft",
+  "magazine": "reportage",
+  "band": "konzert"
+ },
+ "featured": [
+  "pelmondo",
+  "polar",
+  "claas",
+  "ysl",
+  "eta",
+  "ff-ampflwang",
+  "anima-andre-heller",
+  "augen",
+  "beauty",
+  "volksschule-hohenzell",
+  "antonio-lupi",
+  "schmuck",
+  "wallace-roney"
+ ],
+ "hero": {
+  "gallery": "pelmondo",
+  "file": "Pelmondo59970"
+ },
+ "portrait": {
+  "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6521-1.jpg",
+  "alt": "Porträt Lothar Prokop"
+ },
+ "films": [
+  {
+   "title": "Monodual 721 – Wunderbar",
+   "provider": "youtube",
+   "video_id": "_kV8YQub7KQ",
+   "description": "Musikvideo für die Band Monodual 721.",
+   "client": "Monodual 721"
+  },
+  {
+   "title": "Making-of Junger",
+   "provider": "youtube",
+   "video_id": "L-tB8K0L6YY",
+   "description": "Making-of zum Fotoshooting mit der Band Junger.",
+   "client": "Junger"
+  },
+  {
+   "title": "Smartbow",
+   "provider": "youtube",
+   "video_id": "9P0SetxvwxI",
+   "description": "",
+   "client": "Smartbow"
+  },
+  {
+   "title": "Agrana",
+   "provider": "youtube",
+   "video_id": "J8nkeOIJpY8",
+   "description": "",
+   "client": "Agrana"
+  },
+  {
+   "title": "Havanna",
+   "provider": "youtube",
+   "video_id": "cYCADlM5vE8",
+   "description": "",
+   "client": ""
+  }
+ ],
+ "galleries": [
+  {
+   "legacy_slug": "film-noir",
+   "slug": "free-tree",
+   "title": "Free Tree",
+   "categories": [
+    "konzert"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1844.jpg",
+     "file": "Kirchner_Lederhose_DSF1844.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 543
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1795.jpg",
+     "file": "Kirchner_Lederhose_DSF1795.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 538
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF2223.jpg",
+     "file": "Kirchner_Lederhose_DSF2223.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 557
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF2094.jpg",
+     "file": "Kirchner_Lederhose_DSF2094.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 553
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF2072.jpg",
+     "file": "Kirchner_Lederhose_DSF2072.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 552
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF2154.jpg",
+     "file": "Kirchner_Lederhose_DSF2154.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 555
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF2069.jpg",
+     "file": "Kirchner_Lederhose_DSF2069.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 551
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1940.jpg",
+     "file": "Kirchner_Lederhose_DSF1940.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 548
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1930.jpg",
+     "file": "Kirchner_Lederhose_DSF1930.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 547
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1860.jpg",
+     "file": "Kirchner_Lederhose_DSF1860.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 545
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1856.jpg",
+     "file": "Kirchner_Lederhose_DSF1856.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 544
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1840.jpg",
+     "file": "Kirchner_Lederhose_DSF1840.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 542
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1806.jpg",
+     "file": "Kirchner_Lederhose_DSF1806.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 540
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/06/Kirchner_Lederhose_DSF1999.jpg",
+     "file": "Kirchner_Lederhose_DSF1999.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2448,
+     "height": 1632,
+     "legacy_id": 549
+    }
+   ],
+   "legacy_next": "kik-jazz",
+   "legacy_prev": "leonor"
+  },
+  {
+   "legacy_slug": "leonor",
+   "slug": "augen",
+   "title": "Augen",
+   "categories": [
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "augen_PLO5817-Kopie.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/augen_PLO5817-Kopie.jpg",
+     "file": "augen_PLO5817-Kopie.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2093,
+     "height": 2093,
+     "legacy_id": 599
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/PLO5808augen-Kopie.jpg",
+     "file": "PLO5808augen-Kopie.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1834,
+     "height": 1834,
+     "legacy_id": 598
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/PLO5774augen-1.jpg",
+     "file": "PLO5774augen-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1884,
+     "height": 1884,
+     "legacy_id": 597
+    }
+   ],
+   "legacy_next": "film-noir",
+   "legacy_prev": null
+  },
+  {
+   "legacy_slug": "kik-jazz",
+   "slug": "wallace-roney",
+   "title": "Wallace Roney",
+   "categories": [
+    "konzert"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": "KIK_Wallace-Roney_DSF4086.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF3899.jpg",
+     "file": "KIK_Wallace-Roney_DSF3899.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 521
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF4120.jpg",
+     "file": "KIK_Wallace-Roney_DSF4120.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 526
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF4177.jpg",
+     "file": "KIK_Wallace-Roney_DSF4177.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 527
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF4086.jpg",
+     "file": "KIK_Wallace-Roney_DSF4086.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 525
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF4063.jpg",
+     "file": "KIK_Wallace-Roney_DSF4063.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 524
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF3984.jpg",
+     "file": "KIK_Wallace-Roney_DSF3984.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 523
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF3958.jpg",
+     "file": "KIK_Wallace-Roney_DSF3958.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 522
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF3871.jpg",
+     "file": "KIK_Wallace-Roney_DSF3871.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 520
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/04/KIK_Wallace-Roney_DSF3834.jpg",
+     "file": "KIK_Wallace-Roney_DSF3834.jpg",
+     "alt": "Jazz",
+     "caption": "KIK Wallace Roney",
+     "width": 4896,
+     "height": 3264,
+     "legacy_id": 519
+    }
+   ],
+   "legacy_next": "573",
+   "legacy_prev": "film-noir"
+  },
+  {
+   "legacy_slug": "573",
+   "slug": "beauty",
+   "title": "Beauty",
+   "categories": [
+    "beauty",
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "Make-up: Anna Maria Künzl",
+   "cover_file": "Nina_02_16185-e1551987742413.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Nina_02_16185-e1551987742413.jpg",
+     "file": "Nina_02_16185-e1551987742413.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 903
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Vesa_02_15947.jpg",
+     "file": "Vesa_02_15947.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 906
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marion_0141061.jpg",
+     "file": "Marion_0141061.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 888
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Klaudia_01_41511.jpg",
+     "file": "Klaudia_01_41511.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 887
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Klaudia_01_41417.jpg",
+     "file": "Klaudia_01_41417.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 886
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marion_02_41272.jpg",
+     "file": "Marion_02_41272.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 885
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Katharina_02_1824.jpg",
+     "file": "Katharina_02_1824.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2102,
+     "height": 2968,
+     "legacy_id": 1196
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Anita_01_27725.jpg",
+     "file": "Anita_01_27725.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1202
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/nicole_01_22046.jpg",
+     "file": "nicole_01_22046.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1203
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Steffi_02_27041.jpg",
+     "file": "Steffi_02_27041.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1204
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/tanja_02_14358.jpg",
+     "file": "tanja_02_14358.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1997,
+     "height": 1003,
+     "legacy_id": 1205
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Saskia_0140609.jpg",
+     "file": "Saskia_0140609.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 884
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Brigitte_02_41125.jpg",
+     "file": "Brigitte_02_41125.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1901,
+     "height": 2537,
+     "legacy_id": 883
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Brigitte_02_41245.jpg",
+     "file": "Brigitte_02_41245.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 882
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Klaudia_02_42260.jpg",
+     "file": "Klaudia_02_42260.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 880
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Klaudia_02_42225.jpg",
+     "file": "Klaudia_02_42225.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 879
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Sandra_01_7557.jpg",
+     "file": "Sandra_01_7557.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 915
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Teresa_02_16153.jpg",
+     "file": "Teresa_02_16153.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 905
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Saskia_02_42005.jpg",
+     "file": "Saskia_02_42005.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 881
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Nina_01_15022ölfarbe.jpg",
+     "file": "Nina_01_15022ölfarbe.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 902
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Nika_02_16403.jpg",
+     "file": "Nika_02_16403.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3192,
+     "height": 3200,
+     "legacy_id": 901
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Michelle_02_9507.jpg",
+     "file": "Michelle_02_9507.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2933,
+     "legacy_id": 900
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Melissa_01_7758.jpg",
+     "file": "Melissa_01_7758.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 899
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lana_02_13131.jpg",
+     "file": "Lana_02_13131.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 898
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Isabella_02_0569.jpg",
+     "file": "Isabella_02_0569.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 897
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/anna_maria_55_2.jpg",
+     "file": "anna_maria_55_2.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2933,
+     "legacy_id": 895
+    }
+   ],
+   "legacy_next": "wernstein",
+   "legacy_prev": "kik-jazz"
+  },
+  {
+   "legacy_slug": "wernstein",
+   "slug": "wernstein",
+   "title": "Wernstein",
+   "categories": [
+    "landschaft"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Wernstein_DSCN7034.jpg",
+     "file": "Wernstein_DSCN7034.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2362,
+     "height": 1772,
+     "legacy_id": 965
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Wernstein_DSCN7023.jpg",
+     "file": "Wernstein_DSCN7023.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2362,
+     "height": 1772,
+     "legacy_id": 665
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Wernstein_DSCN7007.jpg",
+     "file": "Wernstein_DSCN7007.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2362,
+     "height": 1772,
+     "legacy_id": 663
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Wernstein_DSCN7004.jpg",
+     "file": "Wernstein_DSCN7004.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2362,
+     "height": 1187,
+     "legacy_id": 661
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Wernstein_DSCN6955.jpg",
+     "file": "Wernstein_DSCN6955.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2362,
+     "height": 1772,
+     "legacy_id": 660
+    }
+   ],
+   "legacy_next": "food",
+   "legacy_prev": "573"
+  },
+  {
+   "legacy_slug": "food",
+   "slug": "food",
+   "title": "Food",
+   "categories": [
+    "food"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Burgerketchup.jpg",
+     "file": "Burgerketchup.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 9804,
+     "height": 7465,
+     "legacy_id": 672
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/panoptikum_01_20131319.jpg",
+     "file": "panoptikum_01_20131319.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 7195,
+     "height": 4802,
+     "legacy_id": 673
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Panoptikum_2015_050488-1.jpg",
+     "file": "Panoptikum_2015_050488-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2933,
+     "legacy_id": 1445
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/04/panoptikum_01_20131494var-Kopie.jpg",
+     "file": "panoptikum_01_20131494var-Kopie.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 7360,
+     "height": 4912,
+     "legacy_id": 695
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Panoptikum_2015_050262.jpg",
+     "file": "Panoptikum_2015_050262.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1444
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/MariaTheresia6165.jpg",
+     "file": "MariaTheresia6165.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1437
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/MariaTheresia6235.jpg",
+     "file": "MariaTheresia6235.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1438
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/MariaTheresia6261.jpg",
+     "file": "MariaTheresia6261.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1439
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/04/bohnenbrioche_PLO6353-Kopie.jpg",
+     "file": "bohnenbrioche_PLO6353-Kopie.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4256,
+     "height": 2832,
+     "legacy_id": 691
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/04/panoptikum_01_20131481-Kopie.jpg",
+     "file": "panoptikum_01_20131481-Kopie.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 7360,
+     "height": 5267,
+     "legacy_id": 694
+    }
+   ],
+   "legacy_next": "schmuck",
+   "legacy_prev": "wernstein"
+  },
+  {
+   "legacy_slug": "schmuck",
+   "slug": "schmuck",
+   "title": "Schmuck",
+   "categories": [
+    "fashion",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Schmuck_Kettl-0313-1.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Kettl-0313-1.jpg",
+     "file": "Schmuck_Kettl-0313-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 866
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Kettl6.jpg",
+     "file": "Schmuck_Kettl6.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 870
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Kettl-0581.jpg",
+     "file": "Schmuck_Kettl-0581.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 868
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Kettl-0448.jpg",
+     "file": "Schmuck_Kettl-0448.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 867
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Kettl3.jpg",
+     "file": "Schmuck_Kettl3.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 869
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Schmollgruber_20142027.jpg",
+     "file": "Schmuck_Schmollgruber_20142027.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3049,
+     "height": 2286,
+     "legacy_id": 874
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Schmollgruber_20142003.jpg",
+     "file": "Schmuck_Schmollgruber_20142003.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 873
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Schmollgruber_20141943.jpg",
+     "file": "Schmuck_Schmollgruber_20141943.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 872
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Schmuck_Kettl-0218-1.jpg",
+     "file": "Schmuck_Kettl-0218-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2400,
+     "legacy_id": 865
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/schmuck-schmollgruber-0137-1.jpg",
+     "file": "schmuck-schmollgruber-0137-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2034,
+     "height": 1867,
+     "legacy_id": 864
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/schmuck-schmollgruber-0125-1.jpg",
+     "file": "schmuck-schmollgruber-0125-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1700,
+     "height": 1441,
+     "legacy_id": 863
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/schmuck-schmollgruber-0060-1-1.jpg",
+     "file": "schmuck-schmollgruber-0060-1-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3306,
+     "legacy_id": 862
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/schmuck-schmollgruber-0011-1.jpg",
+     "file": "schmuck-schmollgruber-0011-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 1378,
+     "legacy_id": 861
+    }
+   ],
+   "legacy_next": "tgw",
+   "legacy_prev": "food"
+  },
+  {
+   "legacy_slug": "tgw",
+   "slug": "tgw",
+   "title": "TGW",
+   "categories": [
+    "people",
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne8901.jpg",
+     "file": "TGW_Anzeigenkampagne8901.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 840
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne8798.jpg",
+     "file": "TGW_Anzeigenkampagne8798.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2135,
+     "legacy_id": 839
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne8740.jpg",
+     "file": "TGW_Anzeigenkampagne8740.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 838
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne8678.jpg",
+     "file": "TGW_Anzeigenkampagne8678.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 837
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne8640.jpg",
+     "file": "TGW_Anzeigenkampagne8640.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 836
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne_T2_Gruppe_9172.jpg",
+     "file": "TGW_Anzeigenkampagne_T2_Gruppe_9172.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 835
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne_T2_9046.jpg",
+     "file": "TGW_Anzeigenkampagne_T2_9046.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 834
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/TGW_Anzeigenkampagne_T2_8954.jpg",
+     "file": "TGW_Anzeigenkampagne_T2_8954.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 833
+    }
+   ],
+   "legacy_next": "samen-mayer",
+   "legacy_prev": "schmuck"
+  },
+  {
+   "legacy_slug": "mono-dual",
+   "slug": "monodual-721",
+   "title": "Monodual 721",
+   "categories": [
+    "konzert",
+    "portraits"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/MD_721__PLO1382.jpg",
+     "file": "MD_721__PLO1382.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 819
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/MD_721__PLO1398.jpg",
+     "file": "MD_721__PLO1398.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 820
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/MD_721__PLO1430.jpg",
+     "file": "MD_721__PLO1430.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 821
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/MD_721__PLO1460.jpg",
+     "file": "MD_721__PLO1460.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 822
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/MD721__PLO1282.jpg",
+     "file": "MD721__PLO1282.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 824
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/MD721__PLO1275.jpg",
+     "file": "MD721__PLO1275.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 823
+    }
+   ],
+   "legacy_next": "max-bogaloo",
+   "legacy_prev": "karl-ratzer"
+  },
+  {
+   "legacy_slug": "max-bogaloo",
+   "slug": "max-bogaloo",
+   "title": "Max Bogaloo",
+   "categories": [
+    "konzert",
+    "portraits"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Max_Boogaloos2980.jpg",
+     "file": "Max_Boogaloos2980.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 817
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Max_Boogaloos3288.jpg",
+     "file": "Max_Boogaloos3288.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 818
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Max_Boogaloos2803.jpg",
+     "file": "Max_Boogaloos2803.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 816
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Max_Boogaloos2635.jpg",
+     "file": "Max_Boogaloos2635.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 815
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Max_Boogaloos2409.jpg",
+     "file": "Max_Boogaloos2409.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 814
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Max_Boogaloos2165_ROT.jpg",
+     "file": "Max_Boogaloos2165_ROT.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 813
+    }
+   ],
+   "legacy_next": "biog",
+   "legacy_prev": "mono-dual"
+  },
+  {
+   "legacy_slug": "biog",
+   "slug": "biog",
+   "title": "BIOG",
+   "categories": [
+    "people",
+    "portraits",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835201.jpg",
+     "file": "BIO_G_201835201.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2398,
+     "height": 3200,
+     "legacy_id": 986
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835309.jpg",
+     "file": "BIO_G_201835309.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 987
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835365.jpg",
+     "file": "BIO_G_201835365.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 988
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835408.jpg",
+     "file": "BIO_G_201835408.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 989
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835443.jpg",
+     "file": "BIO_G_201835443.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 990
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835555.jpg",
+     "file": "BIO_G_201835555.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 991
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/BIO_G_201835582.jpg",
+     "file": "BIO_G_201835582.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 992
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2016/08/Biog_Pet_0431-1-Kopie-e1471646512105.jpg",
+     "file": "Biog_Pet_0431-1-Kopie-e1471646512105.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3194,
+     "height": 3194,
+     "legacy_id": 718
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/04/Bio_G__PLO2742-e1471646629204.jpg",
+     "file": "Bio_G__PLO2742-e1471646629204.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1996,
+     "height": 1996,
+     "legacy_id": 611
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/04/Bio_G__PLO2730-e1471646586349.jpg",
+     "file": "Bio_G__PLO2730-e1471646586349.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2500,
+     "height": 2500,
+     "legacy_id": 607
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2015/04/Bio_G__PLO2729-e1471646673122.jpg",
+     "file": "Bio_G__PLO2729-e1471646673122.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1996,
+     "height": 1996,
+     "legacy_id": 606
+    }
+   ],
+   "legacy_next": "antonio-lupi",
+   "legacy_prev": "max-bogaloo"
+  },
+  {
+   "legacy_slug": "antonio-lupi",
+   "slug": "antonio-lupi",
+   "title": "Antonio Lupi",
+   "categories": [
+    "interior",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1168.jpg",
+     "file": "Angerhofer_2016_1168.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2368,
+     "legacy_id": 997
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1171.jpg",
+     "file": "Angerhofer_2016_1171.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 998
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1173.jpg",
+     "file": "Angerhofer_2016_1173.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 999
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1205_1.jpg",
+     "file": "Angerhofer_2016_1205_1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2403,
+     "legacy_id": 1783
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1209.jpg",
+     "file": "Angerhofer_2016_1209.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1001
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1264.jpg",
+     "file": "Angerhofer_2016_1264.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1002
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_2016_1269.jpg",
+     "file": "Angerhofer_2016_1269.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1003
+    }
+   ],
+   "legacy_next": "niklas",
+   "legacy_prev": "biog"
+  },
+  {
+   "legacy_slug": "niklas",
+   "slug": "niklas",
+   "title": "Niklas",
+   "categories": [
+    "architektur",
+    "interior"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Niklas_20143262.jpg",
+     "file": "Niklas_20143262.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1024
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Niklas_20143288.jpg",
+     "file": "Niklas_20143288.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1023
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Niklas_20143311.jpg",
+     "file": "Niklas_20143311.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1022
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Niklas_20143319.jpg",
+     "file": "Niklas_20143319.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2150,
+     "legacy_id": 1021
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Niklas_20143356.jpg",
+     "file": "Niklas_20143356.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1020
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/wohnzimmer_PLO2740.jpg",
+     "file": "wohnzimmer_PLO2740.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1019
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Niklas_20143343.jpg",
+     "file": "Niklas_20143343.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3296,
+     "legacy_id": 1018
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/schrank_PLO2806.jpg",
+     "file": "schrank_PLO2806.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3306,
+     "legacy_id": 1017
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/bett_PLO2780.jpg",
+     "file": "bett_PLO2780.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1026
+    }
+   ],
+   "legacy_next": "angerhofer",
+   "legacy_prev": "antonio-lupi"
+  },
+  {
+   "legacy_slug": "angerhofer",
+   "slug": "angerhofer",
+   "title": "Angerhofer",
+   "categories": [
+    "architektur",
+    "industrie",
+    "people"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4907.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4907.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1050
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_Frauscher_PLO_5428.jpg",
+     "file": "Angerhofer_Frauscher_PLO_5428.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1037
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4816.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4816.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1046
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_Frauscher_PLO_5476.jpg",
+     "file": "Angerhofer_Frauscher_PLO_5476.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1038
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4904.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4904.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1049
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4871.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4871.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1048
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4771.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4771.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1045
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4869.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4869.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1047
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4739.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4739.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1044
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_Frauscher_PLO_5413.jpg",
+     "file": "Angerhofer_Frauscher_PLO_5413.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1035
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_Frauscher_PLO_5414.jpg",
+     "file": "Angerhofer_Frauscher_PLO_5414.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1036
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_Katzlberger_PLO_8130.jpg",
+     "file": "Angerhofer_Katzlberger_PLO_8130.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2059,
+     "legacy_id": 1042
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_Frauscher_PLO_5404.jpg",
+     "file": "Angerhofer_Frauscher_PLO_5404.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1033
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Angerhofer_MeisterBrezn_PLO_4926.jpg",
+     "file": "Angerhofer_MeisterBrezn_PLO_4926.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2090,
+     "legacy_id": 1051
+    }
+   ],
+   "legacy_next": "ktm",
+   "legacy_prev": "niklas"
+  },
+  {
+   "legacy_slug": "ktm",
+   "slug": "ktm",
+   "title": "KTM",
+   "categories": [
+    "architektur",
+    "industrie"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024276.jpg",
+     "file": "KTM_Entwicklung_2018_CF024276.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1065
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024306.jpg",
+     "file": "KTM_Entwicklung_2018_CF024306.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1070
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024299.jpg",
+     "file": "KTM_Entwicklung_2018_CF024299.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1073
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024295.jpg",
+     "file": "KTM_Entwicklung_2018_CF024295.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1068
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024278.jpg",
+     "file": "KTM_Entwicklung_2018_CF024278.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1067
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024277.jpg",
+     "file": "KTM_Entwicklung_2018_CF024277.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1066
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KTM_Entwicklung_2018_CF024272.jpg",
+     "file": "KTM_Entwicklung_2018_CF024272.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1064
+    }
+   ],
+   "legacy_next": "uvc",
+   "legacy_prev": "angerhofer"
+  },
+  {
+   "legacy_slug": "uvc",
+   "slug": "uvc",
+   "title": "UVC",
+   "categories": [
+    "people",
+    "sport"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/UVC_Sample.jpg",
+     "file": "UVC_Sample.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1920,
+     "height": 2325,
+     "legacy_id": 1729
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/UVC_Sample2.jpg",
+     "file": "UVC_Sample2.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2251,
+     "height": 2747,
+     "legacy_id": 1730
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/UVC10914test.jpg",
+     "file": "UVC10914test.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3296,
+     "legacy_id": 1076
+    }
+   ],
+   "legacy_next": "steyr",
+   "legacy_prev": "ktm"
+  },
+  {
+   "legacy_slug": "steyr",
+   "slug": "steyr",
+   "title": "Steyr",
+   "categories": [
+    "people",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1126.jpg",
+     "file": "SteyrCenterNord_1126.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1090
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1117.jpg",
+     "file": "SteyrCenterNord_1117.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1089
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_0546.jpg",
+     "file": "SteyrCenterNord_0546.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1081
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1233.jpg",
+     "file": "SteyrCenterNord_1233.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1093
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1184.jpg",
+     "file": "SteyrCenterNord_1184.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1092
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1147.jpg",
+     "file": "SteyrCenterNord_1147.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1091
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1495.jpg",
+     "file": "SteyrCenterNord_1495.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1097
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1479.jpg",
+     "file": "SteyrCenterNord_1479.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1096
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1416.jpg",
+     "file": "SteyrCenterNord_1416.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1095
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1040.jpg",
+     "file": "SteyrCenterNord_1040.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1086
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1082.jpg",
+     "file": "SteyrCenterNord_1082.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1087
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1086.jpg",
+     "file": "SteyrCenterNord_1086.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1088
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_0938.jpg",
+     "file": "SteyrCenterNord_0938.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1098
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SteyrCenterNord_1384.jpg",
+     "file": "SteyrCenterNord_1384.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1094
+    }
+   ],
+   "legacy_next": "fill",
+   "legacy_prev": "uvc"
+  },
+  {
+   "legacy_slug": "fill",
+   "slug": "fill",
+   "title": "Fill",
+   "categories": [
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Tumler-Moritz-1772-5697.jpg",
+     "file": "Tumler-Moritz-1772-5697.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1126
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Kern-Eva-1107-2431.jpg",
+     "file": "Kern-Eva-1107-2431.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2214,
+     "legacy_id": 2601
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Reichhartinger-Andreas-169-6398.jpg",
+     "file": "Reichhartinger-Andreas-169-6398.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1113
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Prey-Marie-Luise-7701-51684.jpg",
+     "file": "Prey-Marie-Luise-7701-51684.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 2600
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Strauß-Patrick-7703-1689.jpg",
+     "file": "Strauß-Patrick-7703-1689.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1117
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Zeillinger-Kerstin-Kulinario-54491.jpg",
+     "file": "Zeillinger-Kerstin-Kulinario-54491.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1114
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gruppe.jpg",
+     "file": "gruppe.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 4290,
+     "height": 2200,
+     "legacy_id": 1425
+    }
+   ],
+   "legacy_next": "ff-ampflwang",
+   "legacy_prev": "steyr"
+  },
+  {
+   "legacy_slug": "ff-ampflwang",
+   "slug": "ff-ampflwang",
+   "title": "FF Ampflwang",
+   "categories": [
+    "people",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "FF_Ampflwang32011.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_Ampflwang32011.jpg",
+     "file": "FF_Ampflwang32011.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1131
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_Ampflwang32064.jpg",
+     "file": "FF_Ampflwang32064.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1132
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_Ampflwang32077.jpg",
+     "file": "FF_Ampflwang32077.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2398,
+     "height": 3200,
+     "legacy_id": 1133
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_Ampflwang32122.jpg",
+     "file": "FF_Ampflwang32122.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1134
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_Ampflwang7322.jpg",
+     "file": "FF_Ampflwang7322.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1130
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8679.jpg",
+     "file": "FF_AmpflwangPLO_8679.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1135
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8703.jpg",
+     "file": "FF_AmpflwangPLO_8703.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1136
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8718.jpg",
+     "file": "FF_AmpflwangPLO_8718.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1137
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8744.jpg",
+     "file": "FF_AmpflwangPLO_8744.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1138
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8772.jpg",
+     "file": "FF_AmpflwangPLO_8772.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1139
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8896-1.jpg",
+     "file": "FF_AmpflwangPLO_8896-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2561,
+     "height": 1709,
+     "legacy_id": 1147
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8904.jpg",
+     "file": "FF_AmpflwangPLO_8904.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1141
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8913.jpg",
+     "file": "FF_AmpflwangPLO_8913.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1142
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/FF_AmpflwangPLO_8985.jpg",
+     "file": "FF_AmpflwangPLO_8985.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1143
+    }
+   ],
+   "legacy_next": "agrana",
+   "legacy_prev": "fill"
+  },
+  {
+   "legacy_slug": "agrana",
+   "slug": "agrana",
+   "title": "Agrana",
+   "categories": [
+    "landwirtschaft",
+    "people",
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036122.jpg",
+     "file": "Agrana_CF036122.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1150
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036281.jpg",
+     "file": "Agrana_CF036281.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1151
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036377.jpg",
+     "file": "Agrana_CF036377.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1152
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036466.jpg",
+     "file": "Agrana_CF036466.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1153
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036515.jpg",
+     "file": "Agrana_CF036515.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1154
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036533.jpg",
+     "file": "Agrana_CF036533.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1155
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036573.jpg",
+     "file": "Agrana_CF036573.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1156
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Agrana_CF036601.jpg",
+     "file": "Agrana_CF036601.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1157
+    }
+   ],
+   "legacy_next": "austrian-wear",
+   "legacy_prev": "ff-ampflwang"
+  },
+  {
+   "legacy_slug": "austrian-wear",
+   "slug": "austrian-wear",
+   "title": "Austrian Wear",
+   "categories": [
+    "fashion",
+    "people"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF036696.jpg",
+     "file": "AUSTRIANWEAR_CF036696.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1160
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF036833.jpg",
+     "file": "AUSTRIANWEAR_CF036833.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1162
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF036841.jpg",
+     "file": "AUSTRIANWEAR_CF036841.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1163
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF036879.jpg",
+     "file": "AUSTRIANWEAR_CF036879.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1164
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF036896.jpg",
+     "file": "AUSTRIANWEAR_CF036896.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1169
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF037266.jpg",
+     "file": "AUSTRIANWEAR_CF037266.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1170
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF037351.jpg",
+     "file": "AUSTRIANWEAR_CF037351.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1166
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF037020.jpg",
+     "file": "AUSTRIANWEAR_CF037020.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1165
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/AUSTRIANWEAR_CF036735.jpg",
+     "file": "AUSTRIANWEAR_CF036735.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1161
+    }
+   ],
+   "legacy_next": "deutz-fahr",
+   "legacy_prev": "agrana"
+  },
+  {
+   "legacy_slug": "eta",
+   "slug": "eta",
+   "title": "ETA",
+   "categories": [
+    "architektur",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "EHACK_0654neu.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/EHACK_0654neu.jpg",
+     "file": "EHACK_0654neu.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 952
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SH_11271offen.jpg",
+     "file": "SH_11271offen.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 953
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SH_11343.jpg",
+     "file": "SH_11343.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 954
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA13503AbdeckungModul.jpg",
+     "file": "ETA13503AbdeckungModul.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2095,
+     "height": 3139,
+     "legacy_id": 955
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA_Referenzanlagen29567-1.jpg",
+     "file": "ETA_Referenzanlagen29567-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 963
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA_Referenzanlagen29594-1.jpg",
+     "file": "ETA_Referenzanlagen29594-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 962
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA_Referenzanlagen29629_offen-1.jpg",
+     "file": "ETA_Referenzanlagen29629_offen-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 961
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA_Referenzanlagen29649-1.jpg",
+     "file": "ETA_Referenzanlagen29649-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 960
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA_Panorama_Nacht_neu_final-1.jpg",
+     "file": "ETA_Panorama_Nacht_neu_final-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 5209,
+     "height": 2200,
+     "legacy_id": 973
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/ETA_aussen__PLO6721.jpg",
+     "file": "ETA_aussen__PLO6721.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2260,
+     "legacy_id": 936
+    }
+   ],
+   "legacy_next": "ordination-dr-huber",
+   "legacy_prev": "muehltalhof"
+  },
+  {
+   "legacy_slug": "deutz-fahr",
+   "slug": "deutz-fahr",
+   "title": "Deutz-Fahr",
+   "categories": [
+    "people",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015498.jpg",
+     "file": "lotharprokop_CF015498.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1190
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015801.jpg",
+     "file": "lotharprokop_CF015801.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1180
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015773.jpg",
+     "file": "lotharprokop_CF015773.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1193
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015736.jpg",
+     "file": "lotharprokop_CF015736.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1182
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015732.jpg",
+     "file": "lotharprokop_CF015732.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1183
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015715.jpg",
+     "file": "lotharprokop_CF015715.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1185
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015579.jpg",
+     "file": "lotharprokop_CF015579.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1189
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/lotharprokop_CF015620.jpg",
+     "file": "lotharprokop_CF015620.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1187
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/DeutzFahr_JCB_Wien_0211.jpg",
+     "file": "DeutzFahr_JCB_Wien_0211.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1198
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/DeutzFahr_JCB_Wien_0526.jpg",
+     "file": "DeutzFahr_JCB_Wien_0526.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2936,
+     "height": 2200,
+     "legacy_id": 1199
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/DeutzFahr_JCB_Wien_0573.jpg",
+     "file": "DeutzFahr_JCB_Wien_0573.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2936,
+     "height": 2200,
+     "legacy_id": 1200
+    }
+   ],
+   "legacy_next": "wolfgang-schalk-quartet",
+   "legacy_prev": "austrian-wear"
+  },
+  {
+   "legacy_slug": "horsch",
+   "slug": "horsch",
+   "title": "Horsch",
+   "categories": [
+    "landwirtschaft"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/B_Ried_Lask_PLO_2303.jpg",
+     "file": "B_Ried_Lask_PLO_2303.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1212
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/B_Ried_Lask_PLO_2426.jpg",
+     "file": "B_Ried_Lask_PLO_2426.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1213
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/B_Ried_Lask_PLO_2436.jpg",
+     "file": "B_Ried_Lask_PLO_2436.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1214
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/B_Ried_Lask_PLO_2527.jpg",
+     "file": "B_Ried_Lask_PLO_2527.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1215
+    }
+   ],
+   "legacy_next": "gusto-gemuese",
+   "legacy_prev": "samen-mayer"
+  },
+  {
+   "legacy_slug": "bernhofer",
+   "slug": "bernhofer",
+   "title": "Bernhofer",
+   "categories": [
+    "industrie",
+    "people",
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO0135_1.jpg",
+     "file": "Bernhofer__PLO0135_1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1286
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO0385.jpg",
+     "file": "Bernhofer__PLO0385.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1244
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO0263.jpg",
+     "file": "Bernhofer__PLO0263.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1235
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO1052.jpg",
+     "file": "Bernhofer__PLO1052.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1240
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO0568.jpg",
+     "file": "Bernhofer__PLO0568.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1237
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO0768.jpg",
+     "file": "Bernhofer__PLO0768.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1239
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bernhofer__PLO1153-1.jpg",
+     "file": "Bernhofer__PLO1153-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1296
+    }
+   ],
+   "legacy_next": "lentos",
+   "legacy_prev": "emil"
+  },
+  {
+   "legacy_slug": "bierregion",
+   "slug": "bierregion",
+   "title": "Bierregion",
+   "categories": [
+    "food",
+    "produkt"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_einzel.jpg",
+     "file": "Bierregion_einzel.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1262
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_Flasche.jpg",
+     "file": "Bierregion_Flasche.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3296,
+     "legacy_id": 1263
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162047.jpg",
+     "file": "Bierregion_11_20162047.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1250
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162131.jpg",
+     "file": "Bierregion_11_20162131.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1251
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162164.jpg",
+     "file": "Bierregion_11_20162164.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1252
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162177.jpg",
+     "file": "Bierregion_11_20162177.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1253
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162204.jpg",
+     "file": "Bierregion_11_20162204.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1254
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162215.jpg",
+     "file": "Bierregion_11_20162215.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1255
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162218.jpg",
+     "file": "Bierregion_11_20162218.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1256
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162339.jpg",
+     "file": "Bierregion_11_20162339.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1257
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Bierregion_11_20162541.jpg",
+     "file": "Bierregion_11_20162541.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1260
+    }
+   ],
+   "legacy_next": "case",
+   "legacy_prev": "wolfgang-schalk-quartet"
+  },
+  {
+   "legacy_slug": "case",
+   "slug": "case",
+   "title": "Case",
+   "categories": [
+    "landwirtschaft",
+    "people"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/CASE_Construction__PLO8981_1.jpg",
+     "file": "CASE_Construction__PLO8981_1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1453
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/CASE_Construction__PLO9146.jpg",
+     "file": "CASE_Construction__PLO9146.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1270
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/CASE_Construction__PLO9022.jpg",
+     "file": "CASE_Construction__PLO9022.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1269
+    }
+   ],
+   "legacy_next": "claas",
+   "legacy_prev": "bierregion"
+  },
+  {
+   "legacy_slug": "claas",
+   "slug": "claas",
+   "title": "Claas",
+   "categories": [
+    "landwirtschaft",
+    "people"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "CLAAS_Holler_2813.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/CLAAS_Holler_2813.jpg",
+     "file": "CLAAS_Holler_2813.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1277
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/CLAAS_ErhartHannesWalter_3001.jpg",
+     "file": "CLAAS_ErhartHannesWalter_3001.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1276
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/CLAAS_Mrak_ArbatowskiJürgen2871.jpg",
+     "file": "CLAAS_Mrak_ArbatowskiJürgen2871.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1279
+    }
+   ],
+   "legacy_next": "rifa",
+   "legacy_prev": "case"
+  },
+  {
+   "legacy_slug": "vs-hohenzell",
+   "slug": "volksschule-hohenzell",
+   "title": "Volksschule Hohenzell",
+   "categories": [
+    "people",
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "LotharProkopCF016277.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkopCF016277.jpg",
+     "file": "LotharProkopCF016277.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1312
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkopCF016318.jpg",
+     "file": "LotharProkopCF016318.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1302
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkopCF016338.jpg",
+     "file": "LotharProkopCF016338.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1304
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkopCF016393.jpg",
+     "file": "LotharProkopCF016393.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1306
+    }
+   ],
+   "legacy_next": "thermal-motors",
+   "legacy_prev": "rifa"
+  },
+  {
+   "legacy_slug": "sportunion",
+   "slug": "sportunion",
+   "title": "Sportunion",
+   "categories": [
+    "people",
+    "portraits",
+    "sport"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SportUnion_201839040.jpg",
+     "file": "SportUnion_201839040.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1322
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SportUnion_201839001.jpg",
+     "file": "SportUnion_201839001.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1319
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/SportUnion_201839033.jpg",
+     "file": "SportUnion_201839033.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1321
+    }
+   ],
+   "legacy_next": "technogym",
+   "legacy_prev": "ethel-calhoun"
+  },
+  {
+   "legacy_slug": "thermal-motors",
+   "slug": "thermal-motors",
+   "title": "Thermal Motors",
+   "categories": [
+    "architektur",
+    "industrie",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Arch_CF017774.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Arch_CF017774.jpg",
+     "file": "Arch_CF017774.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 1728,
+     "legacy_id": 1327
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Arch_CF017783.jpg",
+     "file": "Arch_CF017783.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2596,
+     "legacy_id": 1328
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Arch_CF017789.jpg",
+     "file": "Arch_CF017789.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1329
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_201820458.jpg",
+     "file": "Frauscher_201820458.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1330
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_201820488.jpg",
+     "file": "Frauscher_201820488.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2359,
+     "legacy_id": 1331
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_Thermal_2018_0936058.jpg",
+     "file": "Frauscher_Thermal_2018_0936058.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1333
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_201820579.jpg",
+     "file": "Frauscher_201820579.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1332
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_thermal_PLO_6852.jpg",
+     "file": "Frauscher_thermal_PLO_6852.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1340
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_thermal_CF015963.jpg",
+     "file": "Frauscher_thermal_CF015963.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1334
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_thermal_CF015966.jpg",
+     "file": "Frauscher_thermal_CF015966.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2419,
+     "legacy_id": 1335
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_thermal_CF015969.jpg",
+     "file": "Frauscher_thermal_CF015969.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1336
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_thermal_CF015973.jpg",
+     "file": "Frauscher_thermal_CF015973.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2403,
+     "legacy_id": 1337
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Frauscher_thermal_PLO_6843.jpg",
+     "file": "Frauscher_thermal_PLO_6843.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1338
+    }
+   ],
+   "legacy_next": "muehltalhof",
+   "legacy_prev": "vs-hohenzell"
+  },
+  {
+   "legacy_slug": "muehltalhof",
+   "slug": "muehltalhof",
+   "title": "Mühltalhof",
+   "categories": [
+    "food",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "muehltalhof_DSF7002.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7002.jpg",
+     "file": "muehltalhof_DSF7002.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1348
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF6989.jpg",
+     "file": "muehltalhof_DSF6989.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1347
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7012.jpg",
+     "file": "muehltalhof_DSF7012.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1349
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2437.jpg",
+     "file": "muehltalhof_PLO2437.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1363
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2375.jpg",
+     "file": "muehltalhof_PLO2375.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1361
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2417.jpg",
+     "file": "muehltalhof_PLO2417.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1362
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7027.jpg",
+     "file": "muehltalhof_DSF7027.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1351
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2513.jpg",
+     "file": "muehltalhof_PLO2513.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1364
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7028.jpg",
+     "file": "muehltalhof_DSF7028.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1352
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7035.jpg",
+     "file": "muehltalhof_DSF7035.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1353
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7047.jpg",
+     "file": "muehltalhof_DSF7047.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1354
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7061.jpg",
+     "file": "muehltalhof_DSF7061.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1355
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7023.jpg",
+     "file": "muehltalhof_DSF7023.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1350
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7194.jpg",
+     "file": "muehltalhof_DSF7194.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2798,
+     "legacy_id": 1356
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7203.jpg",
+     "file": "muehltalhof_DSF7203.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1357
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7206.jpg",
+     "file": "muehltalhof_DSF7206.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1358
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7208.jpg",
+     "file": "muehltalhof_DSF7208.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1359
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_DSF7210.jpg",
+     "file": "muehltalhof_DSF7210.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1360
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2557.jpg",
+     "file": "muehltalhof_PLO2557.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1366
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2560.jpg",
+     "file": "muehltalhof_PLO2560.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1367
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2561.jpg",
+     "file": "muehltalhof_PLO2561.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1368
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/muehltalhof_PLO2565.jpg",
+     "file": "muehltalhof_PLO2565.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1369
+    }
+   ],
+   "legacy_next": "eta",
+   "legacy_prev": "thermal-motors"
+  },
+  {
+   "legacy_slug": "ordination-dr-huber",
+   "slug": "ordination-dr-huber",
+   "title": "Ordination Dr. Huber",
+   "categories": [
+    "architektur"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Lothar_ProkopCF029314.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopCF029314.jpg",
+     "file": "Lothar_ProkopCF029314.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1387
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopCF029324.jpg",
+     "file": "Lothar_ProkopCF029324.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1379
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopCF029331.jpg",
+     "file": "Lothar_ProkopCF029331.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1380
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopCF029333.jpg",
+     "file": "Lothar_ProkopCF029333.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 2936,
+     "legacy_id": 1381
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopCF029339.jpg",
+     "file": "Lothar_ProkopCF029339.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1391
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopCF029369.jpg",
+     "file": "Lothar_ProkopCF029369.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1383
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Lothar_ProkopPLO_3904.jpg",
+     "file": "Lothar_ProkopPLO_3904.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1384
+    }
+   ],
+   "legacy_next": "junger",
+   "legacy_prev": "eta"
+  },
+  {
+   "legacy_slug": "gusto-gemuese",
+   "slug": "gusto-gemuese",
+   "title": "Gusto Gemüse",
+   "categories": [
+    "landwirtschaft",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO3025.jpg",
+     "file": "gemüsebauerin__PLO3025.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1404
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2870.jpg",
+     "file": "gemüsebauerin__PLO2870.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1397
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2833.jpg",
+     "file": "gemüsebauerin__PLO2833.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1396
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2996.jpg",
+     "file": "gemüsebauerin__PLO2996.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1403
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2991.jpg",
+     "file": "gemüsebauerin__PLO2991.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1402
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2891.jpg",
+     "file": "gemüsebauerin__PLO2891.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1398
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2984.jpg",
+     "file": "gemüsebauerin__PLO2984.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1401
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2947.jpg",
+     "file": "gemüsebauerin__PLO2947.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1400
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2923.jpg",
+     "file": "gemüsebauerin__PLO2923.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1399
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/gemüsebauerin__PLO2815.jpg",
+     "file": "gemüsebauerin__PLO2815.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2136,
+     "height": 3200,
+     "legacy_id": 1395
+    }
+   ],
+   "legacy_next": "stiftsbaeckerei-st-peter",
+   "legacy_prev": "horsch"
+  },
+  {
+   "legacy_slug": "junger",
+   "slug": "junger",
+   "title": "Junger",
+   "categories": [
+    "konzert",
+    "people",
+    "portraits"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": "band7.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/band7.jpg",
+     "file": "band7.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2348,
+     "legacy_id": 1817
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/band8.jpg",
+     "file": "band8.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2348,
+     "legacy_id": 1818
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/band.jpg",
+     "file": "band.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2348,
+     "legacy_id": 1459
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/band5.jpg",
+     "file": "band5.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2800,
+     "height": 2054,
+     "legacy_id": 1816
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/band2.jpg",
+     "file": "band2.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2348,
+     "legacy_id": 1460
+    }
+   ],
+   "legacy_next": "anima-andre-heller",
+   "legacy_prev": "ordination-dr-huber"
+  },
+  {
+   "legacy_slug": "anima-andre-heller",
+   "slug": "anima-andre-heller",
+   "title": "Anima Andre Heller",
+   "categories": [
+    "architektur",
+    "landschaft"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Marokko_2017__DSF1855.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1855.jpg",
+     "file": "Marokko_2017__DSF1855.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1479
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1794-1.jpg",
+     "file": "Marokko_2017__DSF1794-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3299,
+     "legacy_id": 1475
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1769.jpg",
+     "file": "Marokko_2017__DSF1769.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1485
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1806.jpg",
+     "file": "Marokko_2017__DSF1806.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1473
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1844.jpg",
+     "file": "Marokko_2017__DSF1844.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2117,
+     "legacy_id": 1480
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1717.jpg",
+     "file": "Marokko_2017__DSF1717.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1494
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1882.jpg",
+     "file": "Marokko_2017__DSF1882.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1477
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1787.jpg",
+     "file": "Marokko_2017__DSF1787.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1484
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1904.jpg",
+     "file": "Marokko_2017__DSF1904.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1476
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1869.jpg",
+     "file": "Marokko_2017__DSF1869.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1478
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1832.jpg",
+     "file": "Marokko_2017__DSF1832.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1472
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1840.jpg",
+     "file": "Marokko_2017__DSF1840.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1482
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1847-1.jpg",
+     "file": "Marokko_2017__DSF1847-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1474
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1698.jpg",
+     "file": "Marokko_2017__DSF1698.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1496
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1726.jpg",
+     "file": "Marokko_2017__DSF1726.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1495
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1732.jpg",
+     "file": "Marokko_2017__DSF1732.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3324,
+     "legacy_id": 1493
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1745.jpg",
+     "file": "Marokko_2017__DSF1745.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3299,
+     "legacy_id": 1492
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF1897.jpg",
+     "file": "Marokko_2017__DSF1897.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2317,
+     "legacy_id": 1491
+    }
+   ],
+   "legacy_next": "ysl",
+   "legacy_prev": "junger"
+  },
+  {
+   "legacy_slug": "ysl",
+   "slug": "ysl",
+   "title": "YSL",
+   "categories": [
+    "architektur",
+    "landschaft"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Marokko_2017__DSF9752-1.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9752-1.jpg",
+     "file": "Marokko_2017__DSF9752-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1632
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9683.jpg",
+     "file": "Marokko_2017__DSF9683.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1513
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9689.jpg",
+     "file": "Marokko_2017__DSF9689.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1502
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9686.jpg",
+     "file": "Marokko_2017__DSF9686.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1512
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9722.jpg",
+     "file": "Marokko_2017__DSF9722.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1511
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9766.jpg",
+     "file": "Marokko_2017__DSF9766.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2345,
+     "legacy_id": 1509
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9736.jpg",
+     "file": "Marokko_2017__DSF9736.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3735,
+     "legacy_id": 1500
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9898.jpg",
+     "file": "Marokko_2017__DSF9898.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1503
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9886.jpg",
+     "file": "Marokko_2017__DSF9886.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1504
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9876.jpg",
+     "file": "Marokko_2017__DSF9876.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1505
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9828.jpg",
+     "file": "Marokko_2017__DSF9828.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1508
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9853.jpg",
+     "file": "Marokko_2017__DSF9853.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1506
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9833.jpg",
+     "file": "Marokko_2017__DSF9833.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1507
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Marokko_2017__DSF9870.jpg",
+     "file": "Marokko_2017__DSF9870.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1499
+    }
+   ],
+   "legacy_next": "forks",
+   "legacy_prev": "anima-andre-heller"
+  },
+  {
+   "legacy_slug": "technogym",
+   "slug": "technogym",
+   "title": "Technogym",
+   "categories": [
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8__DSF7706.jpg",
+     "file": "LotharProkop_8__DSF7706.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1525
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8__DSF7698.jpg",
+     "file": "LotharProkop_8__DSF7698.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1524
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8__DSF7691.jpg",
+     "file": "LotharProkop_8__DSF7691.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2151,
+     "legacy_id": 1523
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8__DSF7690.jpg",
+     "file": "LotharProkop_8__DSF7690.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1522
+    }
+   ],
+   "legacy_next": "emil",
+   "legacy_prev": "sportunion"
+  },
+  {
+   "legacy_slug": "lentos",
+   "slug": "lentos",
+   "title": "Lentos",
+   "categories": [
+    "architektur"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6546.jpg",
+     "file": "LotharProkop_8_PLO_6546.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1531
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6551.jpg",
+     "file": "LotharProkop_8_PLO_6551.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1533
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6552.jpg",
+     "file": "LotharProkop_8_PLO_6552.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 1619,
+     "legacy_id": 1534
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6548.jpg",
+     "file": "LotharProkop_8_PLO_6548.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1532
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6504.jpg",
+     "file": "LotharProkop_8_PLO_6504.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1529
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6502.jpg",
+     "file": "LotharProkop_8_PLO_6502.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1528
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6493.jpg",
+     "file": "LotharProkop_8_PLO_6493.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3411,
+     "legacy_id": 1527
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_8_PLO_6491.jpg",
+     "file": "LotharProkop_8_PLO_6491.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3296,
+     "legacy_id": 1526
+    }
+   ],
+   "legacy_next": "karl-ratzer",
+   "legacy_prev": "bernhofer"
+  },
+  {
+   "legacy_slug": "stiftsbaeckerei-st-peter",
+   "slug": "stiftsbaeckerei-st-peter",
+   "title": "Stiftsbäckerei St. Peter",
+   "categories": [
+    "food",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_4964.jpg",
+     "file": "Gusto_BaeckerreiPLO_4964.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1543
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_4994.jpg",
+     "file": "Gusto_BaeckerreiPLO_4994.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1544
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_4999.jpg",
+     "file": "Gusto_BaeckerreiPLO_4999.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1545
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5033.jpg",
+     "file": "Gusto_BaeckerreiPLO_5033.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1546
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5041.jpg",
+     "file": "Gusto_BaeckerreiPLO_5041.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1547
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5081.jpg",
+     "file": "Gusto_BaeckerreiPLO_5081.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1548
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5213.jpg",
+     "file": "Gusto_BaeckerreiPLO_5213.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1554
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5104.jpg",
+     "file": "Gusto_BaeckerreiPLO_5104.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1549
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5144.jpg",
+     "file": "Gusto_BaeckerreiPLO_5144.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3296,
+     "legacy_id": 1550
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5161.jpg",
+     "file": "Gusto_BaeckerreiPLO_5161.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1551
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5178.jpg",
+     "file": "Gusto_BaeckerreiPLO_5178.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1552
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_BaeckerreiPLO_5200.jpg",
+     "file": "Gusto_BaeckerreiPLO_5200.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1553
+    }
+   ],
+   "legacy_next": "ziegenkaese",
+   "legacy_prev": "gusto-gemuese"
+  },
+  {
+   "legacy_slug": "ziegenkaese",
+   "slug": "ziegenkaese",
+   "title": "Ziegenkäse",
+   "categories": [
+    "landwirtschaft",
+    "food",
+    "reportage"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2850-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2850-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1569
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2824-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2824-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1567
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2575-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2575-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1570
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2591-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2591-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1571
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2594-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2594-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1572
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2620-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2620-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1573
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2627-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2627-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1574
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2643-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2643-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1576
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2652-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2652-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 1577
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Gusto_Ziegen_PLO_2792-1.jpg",
+     "file": "Gusto_Ziegen_PLO_2792-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3296,
+     "legacy_id": 1568
+    }
+   ],
+   "legacy_next": "ian-siegal-jimbo-mathus",
+   "legacy_prev": "stiftsbaeckerei-st-peter"
+  },
+  {
+   "legacy_slug": "samen-mayer",
+   "slug": "samen-maier",
+   "title": "Samen Maier",
+   "categories": [
+    "produkt"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/01/Samen-Maier43578.jpg",
+     "file": "Samen-Maier43578.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3186,
+     "height": 3200,
+     "legacy_id": 1786
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Samen-Maier43776.jpg",
+     "file": "Samen-Maier43776.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1623
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/Samen-Maier43815.jpg",
+     "file": "Samen-Maier43815.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1624
+    }
+   ],
+   "legacy_next": "horsch",
+   "legacy_prev": "tgw"
+  },
+  {
+   "legacy_slug": "wolfgang-schalk-quartet",
+   "slug": "wolfgang-schalk-quartet",
+   "title": "Wolfgang Schalk Quartet",
+   "categories": [
+    "konzert"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9802-1.jpg",
+     "file": "LotharProkop_PLO_9802-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1653
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9937-1.jpg",
+     "file": "LotharProkop_PLO_9937-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1650
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9920-1.jpg",
+     "file": "LotharProkop_PLO_9920-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1651
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9404-1.jpg",
+     "file": "LotharProkop_PLO_9404-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1661
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9908-1.jpg",
+     "file": "LotharProkop_PLO_9908-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1652
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9746-1.jpg",
+     "file": "LotharProkop_PLO_9746-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1654
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9659-1.jpg",
+     "file": "LotharProkop_PLO_9659-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1655
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9643-1.jpg",
+     "file": "LotharProkop_PLO_9643-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1656
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9634-1.jpg",
+     "file": "LotharProkop_PLO_9634-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1657
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9529-1.jpg",
+     "file": "LotharProkop_PLO_9529-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1787,
+     "height": 1189,
+     "legacy_id": 1658
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9466-1.jpg",
+     "file": "LotharProkop_PLO_9466-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1659
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9423-1.jpg",
+     "file": "LotharProkop_PLO_9423-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1660
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/LotharProkop_PLO_9274-1.jpg",
+     "file": "LotharProkop_PLO_9274-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1663
+    }
+   ],
+   "legacy_next": "bierregion",
+   "legacy_prev": "deutz-fahr"
+  },
+  {
+   "legacy_slug": "ian-siegal-jimbo-mathus",
+   "slug": "ian-siegal-jimbo-mathus",
+   "title": "Ian Siegal & Jimbo Mathus",
+   "categories": [
+    "konzert"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2522-1.jpg",
+     "file": "KIK_Siegal_Jimbo_2522-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3300,
+     "height": 2200,
+     "legacy_id": 1682
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2531.jpg",
+     "file": "KIK_Siegal_Jimbo_2531.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1676
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2525.jpg",
+     "file": "KIK_Siegal_Jimbo_2525.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1678
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2537.jpg",
+     "file": "KIK_Siegal_Jimbo_2537.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1675
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2529.jpg",
+     "file": "KIK_Siegal_Jimbo_2529.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1677
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2549.jpg",
+     "file": "KIK_Siegal_Jimbo_2549.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1672
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2539.jpg",
+     "file": "KIK_Siegal_Jimbo_2539.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2258,
+     "legacy_id": 1674
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2544.jpg",
+     "file": "KIK_Siegal_Jimbo_2544.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1673
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2553.jpg",
+     "file": "KIK_Siegal_Jimbo_2553.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1671
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2572.jpg",
+     "file": "KIK_Siegal_Jimbo_2572.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1670
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2573.jpg",
+     "file": "KIK_Siegal_Jimbo_2573.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1669
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_Siegal_Jimbo_2563.jpg",
+     "file": "KIK_Siegal_Jimbo_2563.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2200,
+     "height": 3300,
+     "legacy_id": 1668
+    }
+   ],
+   "legacy_next": "ethel-calhoun",
+   "legacy_prev": "ziegenkaese"
+  },
+  {
+   "legacy_slug": "ethel-calhoun",
+   "slug": "ethel-calhoun",
+   "title": "Ethel Calhoun",
+   "categories": [
+    "konzert"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5721.jpg",
+     "file": "KIK_ETHEL__DSF5721.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1692
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF6032.jpg",
+     "file": "KIK_ETHEL__DSF6032.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1702
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5784.jpg",
+     "file": "KIK_ETHEL__DSF5784.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1693
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5801.jpg",
+     "file": "KIK_ETHEL__DSF5801.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1694
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5946.jpg",
+     "file": "KIK_ETHEL__DSF5946.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1698
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5518.jpg",
+     "file": "KIK_ETHEL__DSF5518.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1689
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5562.jpg",
+     "file": "KIK_ETHEL__DSF5562.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2889,
+     "legacy_id": 1690
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5654.jpg",
+     "file": "KIK_ETHEL__DSF5654.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1691
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5881.jpg",
+     "file": "KIK_ETHEL__DSF5881.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1695
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5940.jpg",
+     "file": "KIK_ETHEL__DSF5940.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1697
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF6015.jpg",
+     "file": "KIK_ETHEL__DSF6015.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1699
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF5505.jpg",
+     "file": "KIK_ETHEL__DSF5505.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1688
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF6024.jpg",
+     "file": "KIK_ETHEL__DSF6024.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1700
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF6128.jpg",
+     "file": "KIK_ETHEL__DSF6128.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1703
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF6132.jpg",
+     "file": "KIK_ETHEL__DSF6132.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2097,
+     "height": 2944,
+     "legacy_id": 1704
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_ETHEL__DSF6159.jpg",
+     "file": "KIK_ETHEL__DSF6159.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2133,
+     "legacy_id": 1705
+    }
+   ],
+   "legacy_next": "sportunion",
+   "legacy_prev": "ian-siegal-jimbo-mathus"
+  },
+  {
+   "legacy_slug": "karl-ratzer",
+   "slug": "karl-ratzer",
+   "title": "Karl Ratzer",
+   "categories": [
+    "konzert"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1408.jpg",
+     "file": "KIK_LotharProkop_PLO_1408.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2616,
+     "height": 2616,
+     "legacy_id": 1716
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1484-1.jpg",
+     "file": "KIK_LotharProkop_PLO_1484-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1720
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1331.jpg",
+     "file": "KIK_LotharProkop_PLO_1331.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1718
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1385.jpg",
+     "file": "KIK_LotharProkop_PLO_1385.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1717
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1622.jpg",
+     "file": "KIK_LotharProkop_PLO_1622.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1713
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1605.jpg",
+     "file": "KIK_LotharProkop_PLO_1605.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1714
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1388.jpg",
+     "file": "KIK_LotharProkop_PLO_1388.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1884,
+     "height": 2832,
+     "legacy_id": 1711
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/KIK_LotharProkop_PLO_1725.jpg",
+     "file": "KIK_LotharProkop_PLO_1725.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2129,
+     "legacy_id": 1712
+    }
+   ],
+   "legacy_next": "mono-dual",
+   "legacy_prev": "lentos"
+  },
+  {
+   "legacy_slug": "rifa",
+   "slug": "rifa",
+   "title": "Rifa",
+   "categories": [
+    "people",
+    "portraits"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/rifa_2017_-2.jpg",
+     "file": "rifa_2017_-2.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1808
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/rifa_2017_-1.jpg",
+     "file": "rifa_2017_-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1807
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/rifa_2017_-4.jpg",
+     "file": "rifa_2017_-4.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1810
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/rifa_2017_-5.jpg",
+     "file": "rifa_2017_-5.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1811
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/03/rifa_2017_-3.jpg",
+     "file": "rifa_2017_-3.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 1809
+    }
+   ],
+   "legacy_next": "vs-hohenzell",
+   "legacy_prev": "claas"
+  },
+  {
+   "legacy_slug": "emil",
+   "slug": "emil",
+   "title": "Emil",
+   "categories": [
+    "food",
+    "produkt"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": null,
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/04/Stegmüller_Test0882.jpg",
+     "file": "Stegmüller_Test0882.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 2593
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/04/Stegmüller_Test0750.jpg",
+     "file": "Stegmüller_Test0750.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2136,
+     "legacy_id": 2594
+    }
+   ],
+   "legacy_next": "bernhofer",
+   "legacy_prev": "technogym"
+  },
+  {
+   "legacy_slug": "forks",
+   "slug": "forks",
+   "title": "Forks",
+   "categories": [
+    "food",
+    "produkt"
+   ],
+   "layout": "grid",
+   "description": "",
+   "credits": "",
+   "cover_file": "Gabeln54696.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54696.jpg",
+     "file": "Gabeln54696.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2625
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Scan-3-1.jpg",
+     "file": "Scan-3-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2612
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln55361.jpg",
+     "file": "Gabeln55361.jpg",
+     "alt": "",
+     "caption": "plastik gabeln",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2616
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54728.jpg",
+     "file": "Gabeln54728.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2626
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln55325.jpg",
+     "file": "Gabeln55325.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1535,
+     "height": 2048,
+     "legacy_id": 2617
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54831.jpg",
+     "file": "Gabeln54831.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 1535,
+     "legacy_id": 2619
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54696-1.jpg",
+     "file": "Gabeln54696-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2623
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54822.jpg",
+     "file": "Gabeln54822.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 1258,
+     "legacy_id": 2620
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln55397.jpg",
+     "file": "Gabeln55397.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 1535,
+     "height": 2048,
+     "legacy_id": 2615
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54751.jpg",
+     "file": "Gabeln54751.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2624
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln55404.jpg",
+     "file": "Gabeln55404.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 1535,
+     "legacy_id": 2614
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54756.jpg",
+     "file": "Gabeln54756.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2622
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2019/10/Gabeln54728-Kopie.jpg",
+     "file": "Gabeln54728-Kopie.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 2048,
+     "height": 2048,
+     "legacy_id": 2613
+    }
+   ],
+   "legacy_next": "glasses",
+   "legacy_prev": "ysl"
+  },
+  {
+   "legacy_slug": "glasses",
+   "slug": "glasses",
+   "title": "Glasses",
+   "categories": [
+    "fashion",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Brillen_Muster57081-1.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster57081-1.jpg",
+     "file": "Brillen_Muster57081-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2657
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster57051-1.jpg",
+     "file": "Brillen_Muster57051-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2658
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster56911-1.jpg",
+     "file": "Brillen_Muster56911-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2664
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster57014-1.jpg",
+     "file": "Brillen_Muster57014-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2659
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster56958-1.jpg",
+     "file": "Brillen_Muster56958-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2660
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster56945-1.jpg",
+     "file": "Brillen_Muster56945-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2661
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster56921-1.jpg",
+     "file": "Brillen_Muster56921-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2662
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Brillen_Muster56917-1.jpg",
+     "file": "Brillen_Muster56917-1.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 3200,
+     "legacy_id": 2663
+    }
+   ],
+   "legacy_next": "polar",
+   "legacy_prev": "forks"
+  },
+  {
+   "legacy_slug": "polar",
+   "slug": "polar",
+   "title": "Polar",
+   "categories": [
+    "fashion",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Cocktail_schatten50600.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Cocktail_schatten50600.jpg",
+     "file": "Cocktail_schatten50600.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 3200,
+     "height": 2398,
+     "legacy_id": 2668
+    }
+   ],
+   "legacy_next": "pelmondo",
+   "legacy_prev": "glasses"
+  },
+  {
+   "legacy_slug": "pelmondo",
+   "slug": "pelmondo",
+   "title": "Pelmondo",
+   "categories": [
+    "people",
+    "produkt"
+   ],
+   "layout": "editorial",
+   "description": "",
+   "credits": "",
+   "cover_file": "Pelmondo59970.jpg",
+   "images": [
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59970.jpg",
+     "file": "Pelmondo59970.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8926,
+     "height": 6689,
+     "legacy_id": 2690
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo60001.jpg",
+     "file": "Pelmondo60001.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8945,
+     "height": 6703,
+     "legacy_id": 2691
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59248.jpg",
+     "file": "Pelmondo59248.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8612,
+     "height": 6541,
+     "legacy_id": 2673
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59257.jpg",
+     "file": "Pelmondo59257.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2674
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59267.jpg",
+     "file": "Pelmondo59267.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2675
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59362.jpg",
+     "file": "Pelmondo59362.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8715,
+     "height": 6486,
+     "legacy_id": 2676
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59376.jpg",
+     "file": "Pelmondo59376.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2677
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59411.jpg",
+     "file": "Pelmondo59411.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8872,
+     "height": 6648,
+     "legacy_id": 2678
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59501.jpg",
+     "file": "Pelmondo59501.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2680
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59487.jpg",
+     "file": "Pelmondo59487.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2679
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59581.jpg",
+     "file": "Pelmondo59581.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2681
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59681.jpg",
+     "file": "Pelmondo59681.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8501,
+     "height": 6370,
+     "legacy_id": 2683
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59698.jpg",
+     "file": "Pelmondo59698.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2684
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59086.jpg",
+     "file": "Pelmondo59086.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8909,
+     "height": 6676,
+     "legacy_id": 2672
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo58987.jpg",
+     "file": "Pelmondo58987.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2671
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59814.jpg",
+     "file": "Pelmondo59814.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8984,
+     "height": 6732,
+     "legacy_id": 2688
+    },
+    {
+     "url": "https://lotharprokop.com/wp-content/uploads/2020/01/Pelmondo59942.jpg",
+     "file": "Pelmondo59942.jpg",
+     "alt": "",
+     "caption": "",
+     "width": 8772,
+     "height": 6573,
+     "legacy_id": 2689
+    }
+   ],
+   "legacy_next": null,
+   "legacy_prev": "polar"
+  }
+ ],
+ "order": [
+  "pelmondo",
+  "polar",
+  "claas",
+  "ysl",
+  "eta",
+  "ff-ampflwang",
+  "anima-andre-heller",
+  "augen",
+  "beauty",
+  "volksschule-hohenzell",
+  "antonio-lupi",
+  "schmuck",
+  "wallace-roney",
+  "free-tree",
+  "wernstein",
+  "food",
+  "tgw",
+  "monodual-721",
+  "max-bogaloo",
+  "biog",
+  "niklas",
+  "angerhofer",
+  "ktm",
+  "uvc",
+  "steyr",
+  "fill",
+  "agrana",
+  "austrian-wear",
+  "deutz-fahr",
+  "horsch",
+  "bernhofer",
+  "bierregion",
+  "case",
+  "sportunion",
+  "thermal-motors",
+  "muehltalhof",
+  "ordination-dr-huber",
+  "gusto-gemuese",
+  "junger",
+  "technogym",
+  "lentos",
+  "stiftsbaeckerei-st-peter",
+  "ziegenkaese",
+  "samen-maier",
+  "wolfgang-schalk-quartet",
+  "ian-siegal-jimbo-mathus",
+  "ethel-calhoun",
+  "karl-ratzer",
+  "rifa",
+  "emil",
+  "forks",
+  "glasses"
+ ]
+}

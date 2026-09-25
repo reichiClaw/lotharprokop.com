@@ -1,0 +1,30 @@
+# Apache-Konfiguration für das öffentliche Verzeichnis (Document Root = public/)
+
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Vorhandene Dateien (Assets, Bildvarianten) direkt ausliefern, alles andere an den Front-Controller.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Bildvarianten und Assets tragen eindeutige Namen (Token/Version) und dürfen lange gecacht werden.
+  <FilesMatch "\.(webp|jpg|jpeg|png|woff2|css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>
