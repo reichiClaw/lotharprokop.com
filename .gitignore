@@ -1,7 +1,10 @@
 # Private Daten – niemals ins Repository
 /config/config.php
+/public/app-path.php
+/dist/
 /storage/*
 !/storage/.gitkeep
+!/storage/.htaccess
 /public/media/*
 !/public/media/.htaccess
 !/public/media/index.html

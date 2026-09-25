@@ -7,12 +7,29 @@ DirectoryIndex index.php
 <FilesMatch "^\.">
   Require all denied
 </FilesMatch>
+# Pfad-Konfiguration nur intern einbinden, nicht direkt aufrufbar.
+<FilesMatch "^app-path(\.example)?\.php$">
+  Require all denied
+</FilesMatch>
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Direktzugriff über /public/… (wenn der Projektordner selbst das Webroot ist) nicht anbieten.
+  # Interne Weiterleitungen aus der übergeordneten .htaccess (REDIRECT_STATUS gesetzt) sind davon ausgenommen.
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} ^/public(/|$)
+  RewriteRule ^ - [R=404,L]
   # Vorhandene Dateien (Assets, Bildvarianten) direkt ausliefern, alles andere an den Front-Controller.
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+# PHP-Limits für Uploads (wirkt bei mod_php; bei PHP-FPM/FastCGI siehe .user.ini bzw. Hoster-Einstellungen).
+<IfModule mod_php.c>
+  php_value upload_max_filesize 48M
+  php_value post_max_size 50M
+  php_value memory_limit 512M
+  php_value max_execution_time 120
 </IfModule>
 
 <IfModule mod_headers.c>

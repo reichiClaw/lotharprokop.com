@@ -18,10 +18,14 @@ return [
     // Alternativ: php bin/create-user.php (empfohlen, dann kann dieser Wert leer bleiben).
     'setup_key' => '',
 
-    // Pfade (Standard: relativ zum Projektverzeichnis). Nur ändern, wenn das Hosting es verlangt.
+    // Pfade. 'storage' liegt standardmäßig im Anwendungsordner; 'public_media' im tatsächlich
+    // ausgelieferten öffentlichen Verzeichnis (bei Web-Aufrufen automatisch erkannt).
+    // Bei getrennter FTP-Installation (htdocs neben dem Anwendungsordner) 'public_media' hier
+    // ausdrücklich setzen, damit auch die Kommandozeilen-Skripte den richtigen Ordner nutzen,
+    // z. B. dirname(__DIR__, 2) . '/htdocs/media'.
     'paths' => [
         'storage' => dirname(__DIR__) . '/storage',
-        'public_media' => dirname(__DIR__) . '/public/media',
+        'public_media' => (defined('PUBLIC_ROOT') ? PUBLIC_ROOT : dirname(__DIR__) . '/public') . '/media',
     ],
 
     // Sitzungen

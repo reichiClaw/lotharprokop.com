@@ -8,12 +8,38 @@ declare(strict_types=1);
 // Eingebauter PHP-Entwicklungsserver (php -S … index.php): vorhandene Dateien direkt ausliefern.
 if (PHP_SAPI === 'cli-server') {
     $staticPath = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
-    if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !str_ends_with($staticPath, '.php')) {
+    $isDotfile = preg_match('~(^|/)\.~', substr($staticPath, strlen(__DIR__))) === 1;
+    if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !$isDotfile && !str_ends_with($staticPath, '.php')) {
         return false;
     }
 }
 
-require dirname(__DIR__) . '/app/bootstrap.php';
+define('PUBLIC_ROOT', __DIR__);
+
+/*
+ * Anwendungsverzeichnis finden. Standard: eine Ebene über public/ (Repository-Struktur).
+ * Bei FTP-Hosting ohne änderbares Document Root liegt dieses Verzeichnis (htdocs) neben dem
+ * Anwendungsordner; dann den Pfad in public/app-path.php hinterlegen (Vorlage: app-path.example.php).
+ */
+$appRoot = null;
+if (is_file(__DIR__ . '/app-path.php')) {
+    $appRoot = rtrim((string) require __DIR__ . '/app-path.php', '/');
+}
+if ($appRoot === null || !is_file($appRoot . '/app/bootstrap.php')) {
+    foreach ([dirname(__DIR__), dirname(__DIR__) . '/lotharprokop', dirname(__DIR__) . '/lotharprokop-app'] as $candidate) {
+        if (is_file($candidate . '/app/bootstrap.php')) {
+            $appRoot = $candidate;
+            break;
+        }
+    }
+}
+if ($appRoot === null || !is_file($appRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    header('Content-Type: text/plain; charset=utf-8');
+    exit("Anwendungsverzeichnis nicht gefunden. Pfad in public/app-path.php eintragen (siehe docs/INSTALL.md).\n");
+}
+require $appRoot . '/app/bootstrap.php';
+unset($appRoot);
 
 use App\Controllers\AdminController;
 use App\Controllers\AdminGalleryController;
@@ -109,6 +135,8 @@ $router->get('/admin/einstellungen', [AdminController::class, 'settings']);
 $router->post('/admin/einstellungen', [AdminController::class, 'settingsSave']);
 $router->get('/admin/system', [AdminController::class, 'system']);
 $router->post('/admin/system/sync', [AdminController::class, 'systemSync']);
+$router->post('/admin/system/reprocess', [AdminController::class, 'systemReprocess']);
+$router->post('/admin/system/backup', [AdminController::class, 'systemBackup']);
 
 $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
 // Abschließende Schrägstriche vereinheitlichen (301), außer bei der Startseite.
