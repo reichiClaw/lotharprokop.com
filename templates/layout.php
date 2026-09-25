@@ -46,7 +46,7 @@ $linkedin = (string) App\Settings::get('social_linkedin', '');
 <link rel="preload" href="/assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/site.css?v=<?= e(App\Config::get('asset_version', '1')) ?>">
-<script>document.documentElement.classList.add('js');</script>
+<script><?= App\View::JS_BOOT ?></script>
 </head>
 <body class="<?= $isHome ? 'is-home' : '' ?>">
 <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>

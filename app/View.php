@@ -5,6 +5,17 @@ namespace App;
 
 final class View
 {
+    /**
+     * Einziges Inline-Skript: setzt die Klasse „js“, bevor gerendert wird (kein Aufblitzen der
+     * Einblend-Animation). Wird per Hash in der Content-Security-Policy freigegeben.
+     */
+    public const JS_BOOT = "document.documentElement.classList.add('js');";
+
+    public static function jsBootHash(): string
+    {
+        return "'sha256-" . base64_encode(hash('sha256', self::JS_BOOT, true)) . "'";
+    }
+
     /** Rendert ein Template innerhalb des öffentlichen Layouts. */
     public static function render(string $template, array $data = [], string $layout = 'layout'): void
     {
