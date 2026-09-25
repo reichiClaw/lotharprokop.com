@@ -9,7 +9,8 @@ declare(strict_types=1);
 if (PHP_SAPI === 'cli-server') {
     $staticPath = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
     $isDotfile = preg_match('~(^|/)\.~', substr($staticPath, strlen(__DIR__))) === 1;
-    if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !$isDotfile && !str_ends_with($staticPath, '.php')) {
+    $isScript = str_ends_with($staticPath, '.php') && $staticPath !== __DIR__ . '/check.php';
+    if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !$isDotfile && !$isScript) {
         return false;
     }
 }
