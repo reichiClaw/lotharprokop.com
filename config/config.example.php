@@ -40,6 +40,8 @@ return [
 
     // Bildverarbeitung
     'images' => [
+        // 'auto' nutzt Imagick, wenn vorhanden, sonst GD. 'gd' erzwingt GD (z. B. bei fehlerhafter Imagick-Installation).
+        'backend' => 'auto',
         'max_upload_bytes' => 40 * 1024 * 1024, // 40 MB – muss unter upload_max_filesize/post_max_size liegen
         'max_pixels' => 100_000_000,            // maximal 100 Megapixel (mit GD zusätzlich durch memory_limit begrenzt)
         'allowed_mime' => ['image/jpeg', 'image/png', 'image/webp'],

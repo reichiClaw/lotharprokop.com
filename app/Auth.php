@@ -81,6 +81,11 @@ final class Auth
             throw new \InvalidArgumentException('Benutzername: 3–40 Zeichen, nur Buchstaben, Ziffern, Punkt, Bindestrich, Unterstrich.');
         }
         self::validatePassword($password);
+        $exists = Database::pdo()->prepare('SELECT 1 FROM users WHERE username = ?');
+        $exists->execute([$username]);
+        if ($exists->fetchColumn()) {
+            throw new \InvalidArgumentException('Dieser Benutzername ist bereits vergeben.');
+        }
         Database::pdo()->prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)')
             ->execute([$username, password_hash($password, PASSWORD_DEFAULT)]);
     }

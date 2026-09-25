@@ -12,7 +12,11 @@ final class ImageProcessor
 {
     public static function backend(): string
     {
-        if (class_exists('Imagick')) {
+        $preferred = (string) Config::get('images.backend', 'auto');
+        if ($preferred === 'gd' && function_exists('imagecreatetruecolor')) {
+            return 'gd';
+        }
+        if ($preferred !== 'gd' && class_exists('Imagick')) {
             return 'imagick';
         }
         if (function_exists('imagecreatetruecolor')) {
