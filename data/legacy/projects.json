@@ -95,24 +95,27 @@
    "title": "Monodual 721 – Wunderbar",
    "provider": "youtube",
    "video_id": "_kV8YQub7KQ",
-   "description": "Musikvideo für die Band Monodual 721.",
+   "description": "",
    "client": "Monodual 721",
-   "poster_gallery": "monodual-721"
+   "poster_gallery": "monodual-721",
+   "legacy_youtube_title": "MONODUAL 721 WUNDERBAR"
   },
   {
    "title": "Making-of Junger",
    "provider": "youtube",
    "video_id": "L-tB8K0L6YY",
-   "description": "Making-of zum Fotoshooting mit der Band Junger.",
+   "description": "",
    "client": "Junger",
-   "poster_gallery": "junger"
+   "poster_gallery": "junger",
+   "legacy_youtube_title": "Making of Video Junger"
   },
   {
    "title": "Smartbow",
    "provider": "youtube",
    "video_id": "9P0SetxvwxI",
    "description": "",
-   "client": "Smartbow"
+   "client": "Smartbow",
+   "legacy_youtube_title": "SMARTBOW"
   },
   {
    "title": "Agrana",
@@ -120,14 +123,16 @@
    "video_id": "J8nkeOIJpY8",
    "description": "",
    "client": "Agrana",
-   "poster_gallery": "agrana"
+   "poster_gallery": "agrana",
+   "legacy_youtube_title": "Agrana"
   },
   {
    "title": "Havanna",
    "provider": "youtube",
    "video_id": "cYCADlM5vE8",
    "description": "",
-   "client": ""
+   "client": "",
+   "legacy_youtube_title": "Havanna"
   }
  ],
  "galleries": [
@@ -271,7 +276,8 @@
     }
    ],
    "legacy_next": "kik-jazz",
-   "legacy_prev": "leonor"
+   "legacy_prev": "leonor",
+   "legacy_title": "free Tree"
   },
   {
    "legacy_slug": "leonor",
@@ -1123,7 +1129,8 @@
     }
    ],
    "legacy_next": "max-bogaloo",
-   "legacy_prev": "karl-ratzer"
+   "legacy_prev": "karl-ratzer",
+   "legacy_title": "MONO DUAL 721"
   },
   {
    "legacy_slug": "max-bogaloo",
@@ -1194,7 +1201,8 @@
     }
    ],
    "legacy_next": "biog",
-   "legacy_prev": "mono-dual"
+   "legacy_prev": "mono-dual",
+   "legacy_title": "MAX Bogaloo"
   },
   {
    "legacy_slug": "biog",
@@ -1391,7 +1399,8 @@
     }
    ],
    "legacy_next": "niklas",
-   "legacy_prev": "biog"
+   "legacy_prev": "biog",
+   "legacy_title": "ANTONIO LUPI"
   },
   {
    "legacy_slug": "niklas",
@@ -1489,7 +1498,8 @@
     }
    ],
    "legacy_next": "angerhofer",
-   "legacy_prev": "antonio-lupi"
+   "legacy_prev": "antonio-lupi",
+   "legacy_title": "NIKLAS"
   },
   {
    "legacy_slug": "angerhofer",
@@ -1633,7 +1643,8 @@
     }
    ],
    "legacy_next": "ktm",
-   "legacy_prev": "niklas"
+   "legacy_prev": "niklas",
+   "legacy_title": "ANGERHOFER"
   },
   {
    "legacy_slug": "ktm",
@@ -1900,7 +1911,8 @@
     }
    ],
    "legacy_next": "fill",
-   "legacy_prev": "uvc"
+   "legacy_prev": "uvc",
+   "legacy_title": "STEYR"
   },
   {
    "legacy_slug": "fill",
@@ -1979,12 +1991,13 @@
     }
    ],
    "legacy_next": "ff-ampflwang",
-   "legacy_prev": "steyr"
+   "legacy_prev": "steyr",
+   "legacy_title": "FILL"
   },
   {
    "legacy_slug": "ff-ampflwang",
    "slug": "ff-ampflwang",
-   "title": "FF Ampflwang",
+   "title": "FF",
    "categories": [
     "people",
     "reportage"
@@ -2122,7 +2135,8 @@
     }
    ],
    "legacy_next": "agrana",
-   "legacy_prev": "fill"
+   "legacy_prev": "fill",
+   "legacy_title": "FF"
   },
   {
    "legacy_slug": "agrana",
@@ -2212,7 +2226,8 @@
     }
    ],
    "legacy_next": "austrian-wear",
-   "legacy_prev": "ff-ampflwang"
+   "legacy_prev": "ff-ampflwang",
+   "legacy_title": "AGRANA"
   },
   {
    "legacy_slug": "austrian-wear",
@@ -2310,7 +2325,8 @@
     }
    ],
    "legacy_next": "deutz-fahr",
-   "legacy_prev": "agrana"
+   "legacy_prev": "agrana",
+   "legacy_title": "AUSTRIAN WEAR"
   },
   {
    "legacy_slug": "eta",
@@ -2422,7 +2438,7 @@
   {
    "legacy_slug": "deutz-fahr",
    "slug": "deutz-fahr",
-   "title": "Deutz-Fahr",
+   "title": "Deutz Fahr",
    "categories": [
     "people",
     "produkt"
@@ -2533,7 +2549,8 @@
     }
    ],
    "legacy_next": "wolfgang-schalk-quartet",
-   "legacy_prev": "austrian-wear"
+   "legacy_prev": "austrian-wear",
+   "legacy_title": "DEUTZ FAHR"
   },
   {
    "legacy_slug": "horsch",
@@ -2585,7 +2602,8 @@
     }
    ],
    "legacy_next": "gusto-gemuese",
-   "legacy_prev": "samen-mayer"
+   "legacy_prev": "samen-mayer",
+   "legacy_title": "HORSCH"
   },
   {
    "legacy_slug": "bernhofer",
@@ -2875,7 +2893,7 @@
   {
    "legacy_slug": "vs-hohenzell",
    "slug": "volksschule-hohenzell",
-   "title": "Volksschule Hohenzell",
+   "title": "Schule",
    "categories": [
     "people",
     "portraits"
@@ -2923,7 +2941,8 @@
     }
    ],
    "legacy_next": "thermal-motors",
-   "legacy_prev": "rifa"
+   "legacy_prev": "rifa",
+   "legacy_title": "Schule"
   },
   {
    "legacy_slug": "sportunion",
@@ -3323,7 +3342,7 @@
   {
    "legacy_slug": "ordination-dr-huber",
    "slug": "ordination-dr-huber",
-   "title": "Ordination Dr. Huber",
+   "title": "Dr. Huber",
    "categories": [
     "architektur"
    ],
@@ -3397,7 +3416,8 @@
     }
    ],
    "legacy_next": "junger",
-   "legacy_prev": "eta"
+   "legacy_prev": "eta",
+   "legacy_title": "Dr. Huber"
   },
   {
    "legacy_slug": "gusto-gemuese",
@@ -4443,7 +4463,7 @@
   {
    "legacy_slug": "ian-siegal-jimbo-mathus",
    "slug": "ian-siegal-jimbo-mathus",
-   "title": "Ian Siegal & Jimbo Mathus",
+   "title": "Ian Siegal/Jimbo Mathus",
    "categories": [
     "konzert"
    ],
@@ -4562,7 +4582,8 @@
     }
    ],
    "legacy_next": "ethel-calhoun",
-   "legacy_prev": "ziegenkaese"
+   "legacy_prev": "ziegenkaese",
+   "legacy_title": "Ian Siegal/Jimbo Mathus"
   },
   {
    "legacy_slug": "ethel-calhoun",
