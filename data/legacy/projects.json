@@ -96,14 +96,16 @@
    "provider": "youtube",
    "video_id": "_kV8YQub7KQ",
    "description": "Musikvideo für die Band Monodual 721.",
-   "client": "Monodual 721"
+   "client": "Monodual 721",
+   "poster_gallery": "monodual-721"
   },
   {
    "title": "Making-of Junger",
    "provider": "youtube",
    "video_id": "L-tB8K0L6YY",
    "description": "Making-of zum Fotoshooting mit der Band Junger.",
-   "client": "Junger"
+   "client": "Junger",
+   "poster_gallery": "junger"
   },
   {
    "title": "Smartbow",
@@ -117,7 +119,8 @@
    "provider": "youtube",
    "video_id": "J8nkeOIJpY8",
    "description": "",
-   "client": "Agrana"
+   "client": "Agrana",
+   "poster_gallery": "agrana"
   },
   {
    "title": "Havanna",

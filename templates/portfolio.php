@@ -25,12 +25,13 @@ use App\Layout;
   <div class="portfolio__grid" id="projekte" data-filter-target aria-live="polite">
     <?php
     // Reihen gleicher Höhe aus Titelbildern: Hochformate 4:5, Querformate 3:2.
+    // Abwechselnd lockere (2) und dichtere (3–4) Reihen, damit kein gleichförmiges Kachelraster entsteht.
     $normalized = array_map(static function ($g) {
         $cover = $g['cover'];
         $portrait = $cover && $cover['height'] > $cover['width'];
         return ['gallery' => $g, 'width' => $portrait ? 4 : 3, 'height' => $portrait ? 5 : 2];
     }, $galleries);
-    foreach (Layout::justified($normalized, 2.6, 3) as $row):
+    foreach (Layout::justified($normalized, [2.6, 4.2], 4) as $row):
     ?>
     <div class="row <?= !empty($row['last']) ? 'row--last' : '' ?>" style="--row-ratio: <?= round($row['ratio'], 4) ?>; --n: <?= count($row['items']) ?>">
       <?php foreach ($row['items'] as $item): $g = $item['gallery']; $ratio = $item['width'] / $item['height']; ?>

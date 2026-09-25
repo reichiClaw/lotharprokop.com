@@ -60,7 +60,7 @@ $count = count($images);
     <?php $i = 0; foreach (Layout::editorial($images) as $block): ?>
       <div class="ed ed--<?= e($block['type']) ?> reveal">
         <?php foreach ($block['items'] as $img): ?>
-          <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => match ($block['type']) { 'wide' => '(min-width: 1500px) 1400px, 100vw', 'pair' => '(min-width: 800px) 50vw, 100vw', default => '(min-width: 800px) 60vw, 100vw' }, 'admin' => $preview, 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
+          <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => match ($block['type']) { 'wide' => '(min-width: 1500px) 1400px, 100vw', 'pair', 'pair-landscape' => '(min-width: 700px) 50vw, 100vw', 'inset' => '(min-width: 700px) 72vw, 100vw', default => '(min-width: 700px) 60vw, 100vw' }, 'admin' => $preview, 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
           <?php $i++; ?>
         <?php endforeach; ?>
       </div>

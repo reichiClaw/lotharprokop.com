@@ -5,6 +5,14 @@ declare(strict_types=1);
  * Front-Controller: alle Anfragen (außer vorhandene Dateien) landen hier.
  */
 
+// Eingebauter PHP-Entwicklungsserver (php -S … index.php): vorhandene Dateien direkt ausliefern.
+if (PHP_SAPI === 'cli-server') {
+    $staticPath = __DIR__ . parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
+    if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !str_ends_with($staticPath, '.php')) {
+        return false;
+    }
+}
+
 require dirname(__DIR__) . '/app/bootstrap.php';
 
 use App\Controllers\AdminController;

@@ -249,13 +249,21 @@ if (Settings::getInt('hero_image_id') === 0 && !empty($manifest['hero'])) {
 
 /* ---------- Filme ---------- */
 foreach ($manifest['films'] as $i => $f) {
-    $exists = $pdo->prepare('SELECT id FROM films WHERE provider = ? AND video_id = ?');
+    $exists = $pdo->prepare('SELECT id, poster_image_id FROM films WHERE provider = ? AND video_id = ?');
     $exists->execute([$f['provider'], $f['video_id']]);
-    if ($exists->fetch()) {
+    $existing = $exists->fetch();
+    if ($existing && $existing['poster_image_id']) {
         continue;
     }
     $posterId = null;
-    if ($youtubePosters && $f['provider'] === 'youtube' && $fromDir === null) {
+    // Bevorzugt: Titelbild der zugehörigen Fotogalerie (eigenes, geprüftes Bild).
+    if (!empty($f['poster_gallery'])) {
+        $related = Galleries::findBySlug((string) $f['poster_gallery']);
+        if ($related && $related['cover_image_id']) {
+            $posterId = (int) $related['cover_image_id'];
+        }
+    }
+    if ($posterId === null && $youtubePosters && $f['provider'] === 'youtube') {
         foreach (['maxresdefault', 'hqdefault'] as $variant) {
             $file = fetchFile('https://i.ytimg.com/vi/' . $f['video_id'] . '/' . $variant . '.jpg', $f['video_id'] . '-' . $variant . '.jpg', null, $tmpDir);
             if ($file !== null) {
@@ -272,8 +280,19 @@ foreach ($manifest['films'] as $i => $f) {
             }
         }
     }
+    $posterNote = $posterId === null ? ' (ohne Vorschaubild)'
+        : (!empty($f['poster_gallery']) ? ' (Vorschaubild: Titelbild der Galerie ' . $f['poster_gallery'] . ')' : ' (Vorschaubild von YouTube – bitte durch eigenes Standbild ersetzen)');
+    if ($existing) {
+        if ($posterId !== null) {
+            $pdo->prepare('UPDATE films SET poster_image_id = ? WHERE id = ?')->execute([$posterId, (int) $existing['id']]);
+            Images::syncPublic($posterId);
+            echo "Film „{$f['title']}“: Vorschaubild ergänzt$posterNote.\n";
+        }
+        continue;
+    }
+    unset($f['poster_gallery']);
     Films::save(null, $f + ['status' => 'published', 'poster_image_id' => $posterId, 'year' => '']);
-    echo "Film „{$f['title']}“ angelegt" . ($posterId ? ' (Vorschaubild von YouTube – bitte durch eigenes Standbild ersetzen)' : ' (ohne Vorschaubild)') . ".\n";
+    echo "Film „{$f['title']}“ angelegt$posterNote.\n";
 }
 
 Images::syncAll();

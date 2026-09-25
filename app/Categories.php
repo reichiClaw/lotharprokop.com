@@ -36,6 +36,7 @@ final class Categories
         if ($name === '') {
             throw new \InvalidArgumentException('Bitte einen Namen angeben.');
         }
+        self::assertNameUnique($name);
         $pdo = Database::pdo();
         $max = (int) $pdo->query('SELECT COALESCE(MAX(sort_order), 0) FROM categories')->fetchColumn();
         $pdo->prepare('INSERT INTO categories (name, slug, sort_order) VALUES (?, ?, ?)')
@@ -49,8 +50,18 @@ final class Categories
         if ($name === '') {
             throw new \InvalidArgumentException('Bitte einen Namen angeben.');
         }
+        self::assertNameUnique($name, $id);
         Database::pdo()->prepare('UPDATE categories SET name = ?, slug = ? WHERE id = ?')
             ->execute([$name, self::uniqueSlug($slug !== '' ? $slug : $name, $id), $id]);
+    }
+
+    private static function assertNameUnique(string $name, ?int $ignoreId = null): void
+    {
+        $stmt = Database::pdo()->prepare('SELECT id FROM categories WHERE lower(name) = lower(?) AND (? IS NULL OR id != ?)');
+        $stmt->execute([$name, $ignoreId, $ignoreId]);
+        if ($stmt->fetch()) {
+            throw new \InvalidArgumentException('Eine Kategorie mit diesem Namen existiert bereits.');
+        }
     }
 
     public static function delete(int $id): void

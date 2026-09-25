@@ -223,10 +223,16 @@ final class Images
             }
             foreach (glob($privateDir . '/*') ?: [] as $file) {
                 $target = $publicDir . '/' . basename($file);
-                if (!is_file($target) || filesize($target) !== filesize($file)) {
-                    copy($file, $target);
-                    @chmod($target, 0644);
+                if (is_file($target) && (fileinode($target) === fileinode($file)
+                    || (filesize($target) === filesize($file) && filemtime($target) === filemtime($file)))) {
+                    continue;
                 }
+                @unlink($target);
+                // Hardlink spart Speicherplatz; wenn das Dateisystem das nicht erlaubt, wird kopiert.
+                if (!@link($file, $target)) {
+                    copy($file, $target);
+                }
+                @chmod($target, 0644);
             }
         } else {
             self::removeDir($publicDir);

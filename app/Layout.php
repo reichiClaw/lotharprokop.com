@@ -14,63 +14,74 @@ final class Layout
      * Seitenverhältnis – kein Beschnitt, keine Lücken.
      *
      * @param array<int,array> $images  Bilddatensätze mit width/height
-     * @param float $targetRatio        Summe der Seitenverhältnisse pro Reihe (Breite/Höhe des Rahmens)
+     * @param float|float[] $targetRatio Summe der Seitenverhältnisse pro Reihe (Breite/Höhe des Rahmens);
+     *                                   eine Liste wird zyklisch durchlaufen und erzeugt so einen Rhythmus
+     *                                   aus unterschiedlich dichten Reihen.
      * @return array<int,array{items:array,ratio:float}>
      */
-    public static function justified(array $images, float $targetRatio = 3.0, int $maxPerRow = 4): array
+    public static function justified(array $images, float|array $targetRatio = 3.0, int $maxPerRow = 4): array
     {
+        $targets = array_values((array) $targetRatio) ?: [3.0];
         $rows = [];
         $current = [];
         $sum = 0.0;
+        $target = $targets[0];
         foreach ($images as $img) {
             $r = self::ratioOf($img);
             // Sehr breite Panoramen stehen allein.
-            if ($r >= $targetRatio * 0.8 && $current === []) {
+            if ($r >= $target * 0.8 && $current === []) {
                 $rows[] = ['items' => [$img], 'ratio' => $r];
+                $target = $targets[count($rows) % count($targets)];
                 continue;
             }
             $current[] = $img;
             $sum += $r;
-            if ($sum >= $targetRatio || count($current) >= $maxPerRow) {
+            if ($sum >= $target || count($current) >= $maxPerRow) {
                 $rows[] = ['items' => $current, 'ratio' => $sum];
                 $current = [];
                 $sum = 0.0;
+                $target = $targets[count($rows) % count($targets)];
             }
         }
         if ($current !== []) {
             // Letzte Reihe: nicht überdehnen – Höhe an vorherige Reihen angleichen.
-            $rows[] = ['items' => $current, 'ratio' => max($sum, $targetRatio * 0.75), 'last' => true];
+            $rows[] = ['items' => $current, 'ratio' => max($sum, $target * 0.75), 'last' => true];
         }
         return $rows;
     }
 
     /**
-     * Editorial-Layout: Querformate stehen breit, aufeinanderfolgende Hochformate bilden Paare,
-     * ein einzelnes Hochformat steht eingerückt.
+     * Editorial-Layout: aufeinanderfolgende Hochformate bilden Paare, ein einzelnes Hochformat
+     * steht eingerückt. Querformate wechseln im Rhythmus breit – zwei nebeneinander – eingerückt,
+     * damit auch reine Querformat-Serien nicht zur gleichförmigen Einzelspalte werden.
      * @return array<int,array{type:string,items:array}>
      */
     public static function editorial(array $images): array
     {
+        $images = array_values($images);
         $blocks = [];
-        $pending = null;
-        foreach ($images as $img) {
+        $landscapeStep = 0;
+        for ($i = 0, $n = count($images); $i < $n; $i++) {
+            $img = $images[$i];
+            $next = $images[$i + 1] ?? null;
             if (Picture::isPortrait($img)) {
-                if ($pending !== null) {
-                    $blocks[] = ['type' => 'pair', 'items' => [$pending, $img]];
-                    $pending = null;
+                if ($next !== null && Picture::isPortrait($next)) {
+                    $blocks[] = ['type' => 'pair', 'items' => [$img, $next]];
+                    $i++;
                 } else {
-                    $pending = $img;
+                    $blocks[] = ['type' => 'single-portrait', 'items' => [$img]];
                 }
                 continue;
             }
-            if ($pending !== null) {
-                $blocks[] = ['type' => 'single-portrait', 'items' => [$pending]];
-                $pending = null;
+            $step = $landscapeStep++ % 3;
+            if ($step === 1 && $next !== null && !Picture::isPortrait($next)) {
+                $blocks[] = ['type' => 'pair-landscape', 'items' => [$img, $next]];
+                $i++;
+            } elseif ($step === 2) {
+                $blocks[] = ['type' => 'inset', 'items' => [$img]];
+            } else {
+                $blocks[] = ['type' => 'wide', 'items' => [$img]];
             }
-            $blocks[] = ['type' => 'wide', 'items' => [$img]];
-        }
-        if ($pending !== null) {
-            $blocks[] = ['type' => 'single-portrait', 'items' => [$pending]];
         }
         return $blocks;
     }
