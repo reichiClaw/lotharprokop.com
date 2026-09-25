@@ -1,0 +1,19 @@
+# Vorlage für die Variante „ein Ordner“ (docs/INSTALL.md): der GESAMTE Projektordner liegt im Webroot.
+# Diese Datei muss dann als  .htaccess  im Webroot liegen (bin/build-release.php --layout=single erledigt das).
+# Sie leitet alle Anfragen in public/ und sperrt die privaten Verzeichnisse.
+# Bei der empfohlenen Installation (Webroot = public/ bzw. htdocs) wird sie nicht benötigt.
+
+Options -Indexes -MultiViews
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Private Ordner und versteckte Dateien: nicht vorhanden melden.
+  RewriteRule ^(app|config|storage|templates|bin|data|docs|deploy|dist)(/|$) - [R=404,L]
+  RewriteRule (^|/)\.(?!well-known/) - [R=404,L]
+  # Alles andere aus public/ bedienen; nicht existierende Pfade an den Front-Controller.
+  RewriteCond %{REQUEST_URI} !^/public/
+  RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Ohne mod_rewrite funktioniert diese Variante nicht – dann Variante „getrennt“ verwenden
+# (Prüfung nach dem Upload: /config/config.php und /storage/ müssen 403 oder 404 liefern).
