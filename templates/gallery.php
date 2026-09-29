@@ -51,7 +51,7 @@ $count = count($images);
   <div class="series series--column">
     <?php foreach ($images as $i => $img): ?>
       <div class="series__item <?= $img['height'] > $img['width'] ? 'series__item--portrait' : '' ?> reveal">
-        <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => $img['height'] > $img['width'] ? '(min-width: 900px) 56vw, 100vw' : '(min-width: 1500px) 1400px, 100vw', 'admin' => $preview, 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
+        <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => $img['height'] > $img['width'] ? '(min-width: 900px) 54vw, 100vw' : '(min-width: 1740px) 1560px, 92vw', 'admin' => $preview, 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
       </div>
     <?php endforeach; ?>
   </div>
@@ -60,7 +60,7 @@ $count = count($images);
     <?php $i = 0; foreach (Layout::editorial($images) as $block): ?>
       <div class="ed ed--<?= e($block['type']) ?> reveal">
         <?php foreach ($block['items'] as $img): ?>
-          <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => match ($block['type']) { 'wide' => '(min-width: 1500px) 1400px, 100vw', 'pair', 'pair-landscape' => '(min-width: 700px) 50vw, 100vw', 'inset' => '(min-width: 700px) 72vw, 100vw', default => '(min-width: 700px) 60vw, 100vw' }, 'admin' => $preview, 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
+          <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => match ($block['type']) { 'wide' => '(min-width: 1740px) 1560px, 92vw', 'pair', 'pair-landscape' => '(min-width: 700px) 46vw, 100vw', 'inset' => '(min-width: 700px) 66vw, 100vw', default => '(min-width: 700px) 52vw, 100vw' }, 'admin' => $preview, 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
           <?php $i++; ?>
         <?php endforeach; ?>
       </div>
@@ -68,11 +68,12 @@ $count = count($images);
   </div>
   <?php else: ?>
   <div class="series series--grid">
-    <?php $i = 0; foreach (Layout::justified($images, 3.4, 4) as $row): ?>
+    <?php // Wenige, dafür große Bilder pro Reihe – Ausstellungscharakter statt Kachelraster. ?>
+    <?php $i = 0; foreach (Layout::justified($images, [2.3, 3.2], 3) as $row): ?>
       <div class="row <?= !empty($row['last']) ? 'row--last' : '' ?>" style="--row-ratio: <?= round($row['ratio'], 4) ?>; --n: <?= count($row['items']) ?>">
         <?php foreach ($row['items'] as $img): $r = Layout::ratioOf($img); ?>
           <div class="row__item reveal" style="--flex: <?= round($r, 4) ?>">
-            <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => '(min-width: 700px) ' . round(100 * $r / $row['ratio']) . 'vw, 100vw', 'admin' => $preview, 'loading' => $i < 2 ? 'eager' : 'lazy']) ?>
+            <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => '(min-width: 700px) ' . round(92 * $r / $row['ratio']) . 'vw, 100vw', 'admin' => $preview, 'loading' => $i < 2 ? 'eager' : 'lazy']) ?>
           </div>
           <?php $i++; ?>
         <?php endforeach; ?>

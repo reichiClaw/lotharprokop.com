@@ -11,6 +11,13 @@ final class View
      */
     public const JS_BOOT = "document.documentElement.classList.add('js');";
 
+    /**
+     * Voreinstellung für die Cache-Kennung von CSS/JS. Wird bei Gestaltungsänderungen erhöht,
+     * damit Besucher ohne Eingriff in config/config.php die neuen Dateien erhalten.
+     * Ein Wert in der Konfiguration ('asset_version') hat Vorrang.
+     */
+    public const ASSET_VERSION = '2';
+
     public static function jsBootHash(): string
     {
         return "'sha256-" . base64_encode(hash('sha256', self::JS_BOOT, true)) . "'";

@@ -43,9 +43,8 @@ $linkedin = (string) App\Settings::get('social_linkedin', '');
 <?php endif; ?>
 <link rel="icon" href="/assets/img/favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
-<link rel="preload" href="/assets/fonts/cormorant-garamond.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/ibm-plex-sans.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/site.css?v=<?= e(App\Config::get('asset_version', '1')) ?>">
+<link rel="preload" href="/assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v=<?= e(App\Config::get('asset_version', App\View::ASSET_VERSION)) ?>">
 <script><?= App\View::JS_BOOT ?></script>
 </head>
 <body class="<?= $isHome ? 'is-home' : '' ?>">
@@ -95,6 +94,6 @@ $linkedin = (string) App\Settings::get('social_linkedin', '');
   </div>
   <p class="site-footer__copy">© <?= date('Y') ?> Lothar Prokop. Alle Fotografien urheberrechtlich geschützt.</p>
 </footer>
-<script src="/assets/js/site.js?v=<?= e(App\Config::get('asset_version', '1')) ?>" defer></script>
+<script src="/assets/js/site.js?v=<?= e(App\Config::get('asset_version', App\View::ASSET_VERSION)) ?>" defer></script>
 </body>
 </html>

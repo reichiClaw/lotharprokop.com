@@ -24,20 +24,26 @@ use App\Layout;
   <?php else: ?>
   <div class="portfolio__grid" id="projekte" data-filter-target aria-live="polite">
     <?php
-    // Reihen gleicher Höhe aus Titelbildern: Hochformate 4:5, Querformate 3:2.
-    // Abwechselnd lockere (2) und dichtere (3–4) Reihen, damit kein gleichförmiges Kachelraster entsteht.
+    // Editorialer Rhythmus statt gleichförmigem Kachelraster: volle Breite, zwei nebeneinander,
+    // eingerücktes Einzelbild, Hochformatpaare. Titelbilder werden dafür auf 3:2 bzw. 4:5 normalisiert.
     $normalized = array_map(static function ($g) {
         $cover = $g['cover'];
         $portrait = $cover && $cover['height'] > $cover['width'];
         return ['gallery' => $g, 'width' => $portrait ? 4 : 3, 'height' => $portrait ? 5 : 2];
     }, $galleries);
-    foreach (Layout::justified($normalized, [2.6, 4.2], 4) as $row):
+    $i = 0;
+    foreach (Layout::editorial($normalized) as $block):
+        $sizes = match ($block['type']) {
+            'pair', 'pair-landscape' => '(min-width: 700px) 45vw, 100vw',
+            'inset' => '(min-width: 700px) 60vw, 100vw',
+            'single-portrait' => '(min-width: 700px) 42vw, 100vw',
+            default => '(min-width: 700px) 90vw, 100vw',
+        };
     ?>
-    <div class="row <?= !empty($row['last']) ? 'row--last' : '' ?>" style="--row-ratio: <?= round($row['ratio'], 4) ?>; --n: <?= count($row['items']) ?>">
-      <?php foreach ($row['items'] as $item): $g = $item['gallery']; $ratio = $item['width'] / $item['height']; ?>
-      <div class="row__item reveal" style="--ratio: <?= $item['width'] ?> / <?= $item['height'] ?>; --flex: <?= round($ratio, 4) ?>">
-        <?= App\View::partial('partials/gallery-card', ['gallery' => $g, 'sizes' => '(min-width: 700px) ' . round(100 * $ratio / $row['ratio']) . 'vw, 100vw']) ?>
-      </div>
+    <div class="ed ed--<?= e($block['type']) ?> reveal">
+      <?php foreach ($block['items'] as $item): ?>
+        <?= App\View::partial('partials/gallery-card', ['gallery' => $item['gallery'], 'sizes' => $sizes, 'loading' => $i < 2 ? 'eager' : 'lazy']) ?>
+        <?php $i++; ?>
       <?php endforeach; ?>
     </div>
     <?php endforeach; ?>

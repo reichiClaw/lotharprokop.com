@@ -5,6 +5,24 @@
 
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---------- Kopfbereich: nach dem ersten Scrollen kompakter ---------- */
+  function initHeader() {
+    var root = document.documentElement;
+    if (!document.querySelector('.site-header')) return;
+    var ticking = false;
+    function update() {
+      ticking = false;
+      var y = window.pageYOffset || root.scrollTop || 0;
+      root.classList.toggle('is-scrolled', y > 24);
+    }
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
+    }, { passive: true });
+    update();
+  }
+
   /* ---------- Einblenden beim Scrollen ---------- */
   function initReveal() {
     var items = document.querySelectorAll('.reveal');
@@ -267,6 +285,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
+    initHeader();
     initReveal();
     initFilter();
     initVideos();

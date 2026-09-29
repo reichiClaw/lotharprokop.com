@@ -11,7 +11,7 @@ $intro = (string) Settings::get('intro_text', '');
 $aboutShort = (string) Settings::get('about_short', '');
 $email = (string) Settings::get('contact_email', '');
 ?>
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero <?= $hero ? 'hero--media' : '' ?>" aria-labelledby="hero-title">
   <?php if ($hero): ?>
   <div class="hero__media">
     <?php if ($heroGallery): ?><a href="/fotografie/<?= eurl($heroGallery['slug']) ?>" class="hero__link" aria-label="Zum Projekt <?= e($heroGallery['title']) ?>"><?php endif; ?>
@@ -36,14 +36,12 @@ $email = (string) Settings::get('contact_email', '');
   <div class="featured__grid">
     <?php foreach ($featured as $i => $g): ?>
       <?php
-      // Rhythmus: Muster aus fünf Positionen mit unterschiedlichen Breiten.
+      // Editorialer Rhythmus: volle Breite – kleiner rechts – zwei nebeneinander – volle Breite.
       $pattern = ['a', 'b', 'c', 'd', 'e'][$i % 5];
       $sizes = match ($pattern) {
-          'a' => '(min-width: 1000px) 58vw, 100vw',
-          'b' => '(min-width: 1000px) 34vw, 100vw',
-          'c' => '(min-width: 1000px) 42vw, 100vw',
-          'd' => '(min-width: 1000px) 50vw, 100vw',
-          default => '(min-width: 1000px) 66vw, 100vw',
+          'b' => '(min-width: 1000px) 38vw, 100vw',
+          'c', 'd' => '(min-width: 1000px) 45vw, 100vw',
+          default => '(min-width: 1000px) 90vw, 100vw',
       };
       ?>
       <div class="featured__item featured__item--<?= $pattern ?> reveal">
