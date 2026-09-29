@@ -9,7 +9,7 @@ Stand der Analyse der bestehenden Website (WordPress, Theme mit Jetpack-Portfoli
 | Galerien | 52 Projekte, 480 Bilder | alle Bilder in der auf der alten Site hinterlegten Originalgröße (`wp-content/uploads/…`, nicht die skalierten WordPress-Varianten) |
 | Kategorien | 14 (aus 19 zusammengeführt) | siehe unten |
 | Reihenfolge | Projektreihenfolge der alten Übersicht (`/works`) | im Admin änderbar |
-| Startseite | Ausgewählte Projekte = die ersten 13 Projekte der alten Übersicht; Startbild aus „Pelmondo“ | im Admin änderbar |
+| Startseite | Ausgewählte Projekte = die ersten 13 Projekte der alten Übersicht; Kopfbereich mit einem Bild aus „Pelmondo“ | im Admin änderbar, Kopfbereich auch als Bildfolge mehrerer Projekte |
 | Filme | 5 YouTube-Videos der Seite `/filme` | Titel aus dem eigenen YouTube-Kanal übernommen (siehe unten) |
 | Vita | Text der alten Startseite („Hallo …“), Porträtfoto, drei Kundenstimmen | Text sprachlich überarbeitet, Inhalt unverändert |
 | Kontakt | Name, Adresse (Hauptplatz 35, 4910 Ried im Innkreis), E-Mail, Telefon, UID, Kartenlink | siehe Hinweis zur Telefonnummer |

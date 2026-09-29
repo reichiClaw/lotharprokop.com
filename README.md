@@ -4,7 +4,7 @@ Relaunch der Website des Fotografen Lothar Prokop als eigenständige, schlanke W
 
 ## Idee
 
-Das Design tritt hinter die Fotografie zurück: warmer Off-White-Grund, reduzierte Palette aus hellstem Grau, Anthrazit und Schwarz – Farbe kommt ausschließlich aus den Bildern. Typografie ist Inter als neutrale Grotesk (Navigation, Text, sehr große versale Headlines), Cormorant Garamond nur für einzelne große Aussagen; beide lokal, OFL-lizenziert. Haarlinien statt Rahmen, viel Weißraum, keine Kacheln, Schatten, Rundungen oder Verläufe in der Oberfläche. Die Bilder bestimmen die Anordnung: nahezu bildschirmfüllendes Hero, editoriale Wechsel aus breiten, paarweisen und eingerückten Bildern, Reihen gleicher Höhe ohne Beschnitt, Titelbilder mit redaktionell gesetztem Fokuspunkt.
+Das Design tritt hinter die Fotografie zurück: warmer Off-White-Grund, reduzierte Palette aus hellstem Grau, Anthrazit und Schwarz – Farbe kommt ausschließlich aus den Bildern. Typografie ist Inter als neutrale Grotesk (Navigation, Text, sehr große versale Headlines), Cormorant Garamond nur für einzelne große Aussagen; beide lokal, OFL-lizenziert. Haarlinien statt Rahmen, viel Weißraum, keine Kacheln, Schatten, Rundungen oder Verläufe in der Oberfläche. Die Bilder bestimmen die Anordnung: nahezu bildschirmfüllender Kopfbereich – auf Wunsch als ruhige Bildfolge mehrerer Projekte, editoriale Wechsel aus breiten, paarweisen und eingerückten Bildern, Reihen gleicher Höhe ohne Beschnitt, Titelbilder mit redaktionell gesetztem Fokuspunkt.
 
 ## Aufbau
 

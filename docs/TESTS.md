@@ -147,9 +147,40 @@ Alle Prüfungen wurden am 29.09.2026 in der Entwicklungsumgebung tatsächlich au
 | `php -l` für alle geänderten Templates und `app/View.php`, `node --check public/assets/js/site.js` | keine Fehler |
 | `php bin/build-release.php` in beiden Varianten (`split`, `single`): Paket wird gebaut, `inter.woff2` und `inter-italic.woff2` enthalten | ok |
 
+## Bildfolge im Kopfbereich der Startseite (29.09.2026)
+
+Gleiche Umgebung wie beim Redesign (PHP 8.3.6 mit `php -S`, Chrome 148 headless über das DevTools-Protokoll), wieder mit den lokal erzeugten neutralen Testbildern. Für die Prüfung standen fünf Einträge (Titelbilder von Pelmondo, Polar, Claas, YSL, ETA) mit einer Wechselzeit von 4 s in der Bildfolge.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Migration: Datenbank auf Schemastand 1 zurückgesetzt, `hero_image_id` = 217 und `hero_gallery_id` = 112 gesetzt, `Database::migrate()` ausgeführt | genau ein Eintrag mit Bild 217 und Projekt „Pelmondo“; Startseite unverändert |
+| Migration ohne vorhandenes Startbild | kein Eintrag angelegt (0 Zeilen) |
+| Migration mit Startbild, aber gelöschtem Projekt (`hero_gallery_id` = 99999) | ein Eintrag mit `gallery_id = NULL`, kein Fremdschlüsselfehler |
+| Ein Eintrag: kein `data-hero`, keine Bedienelemente, kein `<template>` | verhält sich wie das frühere feste Startbild |
+| Kein Eintrag: `/` liefert 200, `hero--media` fehlt, Seite beginnt mit der Typografie | ok |
+| Fünf Einträge, 1680×1050: nach dem Laden nur 2 Folien im DOM (3 weitere in `<template>`), je Wechsel kommt genau eine hinzu | Bilder werden erst geladen, wenn sie gebraucht werden |
+| Automatischer Wechsel nach 4 s: aktive Folie, Bildnachweis und Strich wandern gemeinsam weiter, `aria-current` folgt | ok |
+| Verborgene Folien und Bildnachweise: `aria-hidden="true"`, deren Links `tabindex="-1"`; über alle Zustände immer genau 2 erreichbare Links (Bild und Nachweis der aktiven Folie) | ok |
+| Klick auf den fünften Strich: springt zur fünften Folie, Überblendung sichtbar (Zwischenwert `opacity: 0.39`) | ok |
+| Pause-Taste: nach 5,2 s kein Wechsel, Beschriftung wechselt auf „Bildwechsel fortsetzen“; nach erneutem Klick läuft der Wechsel weiter | ok |
+| Tastaturfokus im Kopfbereich: Wechsel hält an (4,5 s ohne Wechsel), nach Verlassen läuft er weiter | ok |
+| `prefers-reduced-motion: reduce`: kein automatischer Wechsel (über 20 s beobachtet), Pause-Taste ausgeblendet, Striche schalten weiterhin um, Wechsel ohne Überblendung | ok |
+| Ohne JavaScript (1680 px): genau eine Folie, `opacity: 1`, Bild geladen, Projektlink `/fotografie/pelmondo`, Bedienelemente `display: none`, erster Bildnachweis sichtbar, alle 14 Einblend-Elemente sichtbar | ok |
+| Kein horizontaler Überlauf bei 320, 360, 390, 414, 768, 834, 1024, 1280, 1680, 2560 px – auch mit 13 Einträgen (Striche brechen dann um) | kein Überlauf |
+| Kopfbereich weiterhin Viewporthöhe minus Kopfleiste (390×844 → 734 px, 1680×1000 → 916 px); Bedienelemente überlagern den Text nicht (ab 1024 px rechts in der Zeile, darunter in eigener Zeile) | ok |
+| Klickfläche der Striche: 44 px bei ≤ 860 px bzw. `pointer: coarse`, 25 px am Zeigegerät | ok |
+| Admin, angemeldet: Umsortieren per Pfeil, Projektverweis auf „kein Verweis“ stellen, letzten Eintrag entfernen und Wechselzeit auf 9 s – alles in einem Speichervorgang | Reihenfolge, Verweis und Wechselzeit übernommen, Meldung „1 Bild(er) entfernt“ |
+| Entfernter Eintrag, dessen Bild Titelbild einer Galerie ist | Bild bleibt erhalten und öffentlich |
+| Eigenes Bild (2400×1350) über das Formular hochgeladen, dann wieder entfernt | Eintrag angelegt und Bild öffentlich; nach dem Entfernen Datenbankeintrag und Dateien in `public/media/` gelöscht |
+| „Projekt übernehmen“ mit Titelbild; leeres Formular abschicken | Eintrag angelegt bzw. Meldung „Kein Projekt gewählt und keine Datei hochgeladen“ |
+| „Alle ausgewählten Projekte übernehmen“: 8 fehlende Titelbilder ergänzt (13 Einträge), Schaltfläche danach nicht mehr vorhanden | keine Doppelungen |
+| `php -l` für alle geänderten PHP-Dateien, `node --check public/assets/js/site.js` | keine Fehler |
+
 ## Nicht getestet
 
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
+- Bildfolge mit den echten Fotografien (nur neutrale Testbilder), Wischen auf echten Touchgeräten
+- Ladezeiten der Bildfolge (nur geprüft, dass Folgebilder erst bei Bedarf im DOM landen; keine Messwerte)
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)

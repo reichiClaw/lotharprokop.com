@@ -196,11 +196,11 @@ Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript 
 
 **Galerien** – anlegen, bearbeiten, sortieren (Drag-and-drop oder Pfeile), Status `Entwurf` / `Veröffentlicht` / `Archiviert`, Löschen nur nach Eingabe des Slugs. Pro Galerie: Titel, URL-Slug (wird aus dem Titel vorgeschlagen; reservierte Wörter und Doppelungen werden abgefangen), Beschreibung, Kunde/Jahr/Credits (optional), Kategorien, Titelbild, Layout (`Ruhiges Raster` / `Einzelspalte` / `Editorial`), Startseite (hervorheben).
 
-**Bilder** – Mehrfachupload per Drag-and-drop oder Dateidialog (JPEG, PNG, WebP; bis 40 MB und 100 Megapixel; Prüfung des echten Dateityps; SVG und ausführbare Dateien werden abgelehnt). Pro Bild: Alt-Text, Bildunterschrift, Fokuspunkt (Klick ins Bild) für Zuschnitte auf Startseite/Übersicht, Ersetzen (neue Datei, Metadaten bleiben), Löschen mit Bestätigung. Wird ein Bild an mehreren Stellen genutzt (mehrere Galerien, Startbild, Porträt, Filmposter), zeigt die Bildseite alle Verwendungen an und verlangt eine ausdrückliche Zusatzbestätigung.
+**Bilder** – Mehrfachupload per Drag-and-drop oder Dateidialog (JPEG, PNG, WebP; bis 40 MB und 100 Megapixel; Prüfung des echten Dateityps; SVG und ausführbare Dateien werden abgelehnt). Pro Bild: Alt-Text, Bildunterschrift, Fokuspunkt (Klick ins Bild) für Zuschnitte auf Startseite/Übersicht, Ersetzen (neue Datei, Metadaten bleiben), Löschen mit Bestätigung. Wird ein Bild an mehreren Stellen genutzt (mehrere Galerien, Bildfolge der Startseite, Porträt, Filmposter), zeigt die Bildseite alle Verwendungen an und verlangt eine ausdrückliche Zusatzbestätigung.
 
 **Entwürfe** sind öffentlich nicht erreichbar (404, nicht in Sitemap/Übersicht), ihre Bildvarianten liegen nicht in `public/media/`. Eingeloggt lässt sich ein Entwurf unter seiner späteren URL als Vorschau ansehen (Banner „Vorschau“, `noindex`).
 
-**Startseite** – Reihenfolge der hervorgehobenen Projekte, Startbild (Upload oder ein vorhandenes Titelbild) und optional die zugehörige Galerie für den Bildnachweis.
+**Startseite** – Reihenfolge der hervorgehobenen Projekte sowie die Bildfolge im Kopfbereich: mehrere Bilder in frei sortierbarer Reihenfolge, je Bild optional das verknüpfte Projekt (macht das Bild anklickbar und erscheint als Bildnachweis), Wechselzeit in Sekunden. Bilder lassen sich einzeln hochladen, als Titelbild eines Projekts übernehmen oder in einem Schritt aus allen hervorgehobenen Projekten übernehmen. Bei einem einzelnen Bild wechselt nichts – der Kopfbereich verhält sich wie ein festes Startbild; ohne JavaScript zeigt er immer das erste Bild.
 
 **Kategorien** – anlegen, umbenennen, sortieren, löschen (Galerien bleiben erhalten). Doppelte Namen werden abgewiesen.
 
