@@ -26,6 +26,7 @@ use App\Config;
 use App\Database;
 use App\Films;
 use App\Galleries;
+use App\HeroSlides;
 use App\Images;
 use App\Settings;
 
@@ -231,15 +232,13 @@ if ($featuredIds !== []) {
     Galleries::reorderFeatured($featuredIds);
 }
 
-// Startbild
-if (Settings::getInt('hero_image_id') === 0 && !empty($manifest['hero'])) {
+// Kopfbereich der Startseite (ein Bild; weitere lassen sich im Admin ergänzen)
+if (HeroSlides::count() === 0 && !empty($manifest['hero'])) {
     $heroGallery = Galleries::findBySlug($manifest['hero']['gallery']);
     if ($heroGallery) {
         foreach (Galleries::images($heroGallery['id']) as $img) {
             if (str_contains($img['original_name'], $manifest['hero']['file'])) {
-                Settings::set('hero_image_id', (string) $img['id']);
-                Settings::set('hero_gallery_id', (string) $heroGallery['id']);
-                Images::syncPublic($img['id']);
+                HeroSlides::add($img['id'], $heroGallery['id']);
                 echo "Startbild gesetzt: {$img['original_name']}\n";
                 break;
             }

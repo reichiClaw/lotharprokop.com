@@ -152,8 +152,9 @@ final class Images
         $galleries = $stmt->fetchAll();
         $pdo = Database::pdo();
         $other = [];
-        if (Settings::getInt('hero_image_id') === $id) {
-            $other[] = 'Startbild';
+        $slides = HeroSlides::usesImage($id);
+        if ($slides > 0) {
+            $other[] = $slides > 1 ? 'Bildfolge Startseite (' . $slides . '×)' : 'Bildfolge Startseite';
         }
         if (Settings::getInt('portrait_image_id') === $id) {
             $other[] = 'Porträt (Vita)';
@@ -204,7 +205,7 @@ final class Images
         if ($stmt->fetchColumn()) {
             return true;
         }
-        return Settings::getInt('hero_image_id') === $id || Settings::getInt('portrait_image_id') === $id;
+        return HeroSlides::usesImage($id) > 0 || Settings::getInt('portrait_image_id') === $id;
     }
 
     /** Gleicht den öffentlichen Ordner eines Bildes mit seinem Soll-Zustand ab. */

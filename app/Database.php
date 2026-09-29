@@ -156,6 +156,27 @@ CREATE TABLE contact_submissions (
     created_at INTEGER NOT NULL
 );
 SQL,
+            // Bildfolge im Kopfbereich der Startseite. Ein bereits gesetztes Startbild wird
+            // als erster Eintrag übernommen, damit die Startseite unverändert aussieht.
+            2 => <<<'SQL'
+CREATE TABLE hero_slides (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    image_id INTEGER NOT NULL REFERENCES images(id) ON DELETE CASCADE,
+    gallery_id INTEGER REFERENCES galleries(id) ON DELETE SET NULL,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_hero_slides_order ON hero_slides (sort_order, id);
+INSERT INTO hero_slides (image_id, gallery_id, sort_order)
+SELECT CAST(s.value AS INTEGER),
+       (SELECT CAST(g.value AS INTEGER) FROM settings g
+         WHERE g.key = 'hero_gallery_id'
+           AND CAST(g.value AS INTEGER) IN (SELECT id FROM galleries)),
+       1
+  FROM settings s
+ WHERE s.key = 'hero_image_id'
+   AND CAST(s.value AS INTEGER) IN (SELECT id FROM images)
+SQL,
         ];
     }
 }
