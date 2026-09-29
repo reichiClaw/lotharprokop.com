@@ -123,10 +123,11 @@ Getestet mit Apache 2.4.58 + `mod_php` 8.3 (lokal, `AllowOverride All`, Document
 | System → „Datenbank herunterladen“: `application/vnd.sqlite3`, 360 KB, `PRAGMA integrity_check` = ok, 483 Bilder; temporäre Datei in `storage/backups/` entfernt; ohne Login 302 zum Login | ok |
 | Builder verweigert `--out` auf ein fremdes, nicht leeres Verzeichnis | ok |
 | `check.php`: per Shell im Repository (Hinweise zu 2M/8M-Limits und `debug`), im Browser unter Apache mit dem Split-Paket (`php_value`-Limits, `mod_rewrite aktiv`, `app-path.php` erkannt, alle Schreibrechte ok, Hinweis bei abweichender `base_url`), sowie in einem leeren Webroot ohne Anwendungsordner und ohne `config.php` (jeweils „Fehlt“ mit Handlungsanweisung) | ok |
+| Echter Hoster `lothar.drve.at` (Apache + PHP-FPM als `cgi-fcgi`, Kontobenutzer `drve`), Variante „ein Ordner“ per FTP: Nach dem FTP-Upload fehlten die Punktdateien in `public/` → Apache 404 für alle Routen; nach dem Nachladen Seiten 200. Bilder zunächst 404, Ursache: der Hoster lehnt die `Options`-Direktive in `public/media/.htaccess` ab; nach dem Entfernen von `Options` (Commit ecd9bd3) Bild-URLs 200 `image/jpeg` | ok (nach Korrektur) |
 
 ## Nicht getestet
 
-- Upload des Pakets auf einen echten Hoster per FTP (nur lokal mit Apache und PHP-Entwicklungsserver nachgestellt); Wirkung von `.user.ini` unter PHP-FPM
+- Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)

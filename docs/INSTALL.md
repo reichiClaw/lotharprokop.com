@@ -110,7 +110,7 @@ Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot 
 
 ### Server-Check
 
-`public/check.php` ist ein eigenständiges Skript ohne Abhängigkeit zur Anwendung. Es prüft PHP ≥ 8.1, `pdo_sqlite`, `fileinfo`, `mbstring`, `json`, SQLite ≥ 3.27, Imagick oder GD (mit WebP), `exif`, `zip`, die Upload-Limits, `file_uploads`, `mod_rewrite` (soweit abfragbar), HTTPS, den Anwendungsordner (`app-path.php` bzw. automatische Suche), `config/config.php` (`base_url` passend zur Domain, `debug` aus, `setup_key`), die Schreibrechte in `storage/*` und `media/` sowie, ob private Ordner im Webroot liegen. Aufruf im Browser (`https://DOMAIN/check.php`) oder per Shell (`php public/check.php`, Exit-Code 1 bei fehlenden Voraussetzungen). Vor dem Upload eines Pakets lässt es sich auch allein hochladen, um den Hoster vorab zu prüfen. Nach der Prüfung löschen.
+`public/check.php` ist ein eigenständiges Skript ohne Abhängigkeit zur Anwendung. Es prüft PHP ≥ 8.1, `pdo_sqlite`, `fileinfo`, `mbstring`, `json`, SQLite ≥ 3.27, Imagick oder GD (mit WebP), `exif`, `zip`, die Upload-Limits, `file_uploads`, `mod_rewrite` (soweit abfragbar), HTTPS, den Anwendungsordner (`app-path.php` bzw. automatische Suche), `config/config.php` (`base_url` passend zur Domain, `debug` aus, `setup_key`), die Schreibrechte in `storage/*` und `media/` sowie, ob private Ordner im Webroot liegen. Aufruf im Browser (`https://DOMAIN/check.php`) oder per Shell (`php public/check.php`, Exit-Code 1 bei fehlenden Voraussetzungen). Vor dem Upload eines Pakets lässt es sich auch allein hochladen, um den Hoster vorab zu prüfen. Als Auslieferungstest legt es `media/checkprobe/w1.jpg` an, das im Browser unter `/media/checkprobe/w1.jpg` ein Bild (nicht die 404-Seite) liefern muss. Nach der Prüfung `check.php` und den Ordner `media/checkprobe/` löschen.
 
 ### PHP-Einstellungen beim Hoster
 
@@ -156,7 +156,7 @@ Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inh
 
 ### Apache
 
-`public/.htaccess` enthält Rewrite-Regeln (alle Anfragen auf nicht existierende Dateien gehen an `index.php`), Cache-Header, PHP-Limits und die Sperre versteckter Dateien sowie von `app-path.php`. `public/media/.htaccess` verhindert jede Skriptausführung im Bildverzeichnis und liefert dort nur `.jpg`/`.webp` aus. `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/` und `docs/` enthalten jeweils eine `.htaccess` mit `Require all denied` als zweite Verteidigungslinie, falls sie doch einmal im Webroot landen. Voraussetzung: `AllowOverride All` (bei Shared Hosting Standard).
+`public/.htaccess` enthält Rewrite-Regeln (alle Anfragen auf nicht existierende Dateien gehen an `index.php`), Cache-Header, PHP-Limits und die Sperre versteckter Dateien sowie von `app-path.php`. `public/media/.htaccess` verhindert jede Skriptausführung im Bildverzeichnis und liefert dort nur `.jpg`/`.webp` aus; sie enthält bewusst keine `Options`-Direktive, weil manche Hoster `Options` in `.htaccess` nicht erlauben und dann alle Bilder mit Fehler 500 beantworten (das Verzeichnislisting ist bereits in `public/.htaccess` abgeschaltet und wird vererbt). `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/` und `docs/` enthalten jeweils eine `.htaccess` mit `Require all denied` als zweite Verteidigungslinie, falls sie doch einmal im Webroot landen. Voraussetzung: `AllowOverride All` (bei Shared Hosting Standard).
 
 ### nginx (Beispiel)
 
