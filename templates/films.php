@@ -17,7 +17,7 @@ use App\Picture;
       <div class="film__player" data-video data-embed="<?= e(Films::embedUrl($f)) ?>" data-title="<?= e($f['title']) ?>">
         <div class="film__poster">
           <?php if ($f['poster']): ?>
-            <?= Picture::render($f['poster'], ['sizes' => '(min-width: 1200px) 1100px, 100vw', 'cover' => true, 'alt' => $f['poster']['alt'] !== '' ? $f['poster']['alt'] : 'Vorschaubild ' . $f['title'], 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
+            <?= Picture::render($f['poster'], ['sizes' => '(min-width: 1600px) 1416px, 92vw', 'cover' => true, 'alt' => $f['poster']['alt'] !== '' ? $f['poster']['alt'] : 'Vorschaubild ' . $f['title'], 'loading' => $i === 0 ? 'eager' : 'lazy']) ?>
           <?php else: ?>
             <div class="film__poster-empty" aria-hidden="true"></div>
           <?php endif; ?>

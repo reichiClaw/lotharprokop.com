@@ -30,7 +30,7 @@ $email = (string) Settings::get('contact_email', '');
   <div class="vita__body">
     <?php if ($portrait): ?>
     <div class="vita__portrait reveal">
-      <?= Picture::render($portrait, ['sizes' => '(min-width: 900px) 40vw, 100vw', 'max' => 1600, 'alt' => $portrait['alt'] !== '' ? $portrait['alt'] : 'Porträt Lothar Prokop', 'loading' => 'eager']) ?>
+      <?= Picture::render($portrait, ['sizes' => '(min-width: 861px) 38vw, 92vw', 'max' => 1600, 'alt' => $portrait['alt'] !== '' ? $portrait['alt'] : 'Porträt Lothar Prokop', 'loading' => 'eager']) ?>
     </div>
     <?php endif; ?>
     <div class="vita__text">

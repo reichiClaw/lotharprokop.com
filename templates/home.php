@@ -55,7 +55,7 @@ $email = (string) Settings::get('contact_email', '');
 <section class="about-teaser reveal" aria-labelledby="about-title">
   <?php if ($portrait): ?>
   <div class="about-teaser__media">
-    <?= Picture::render($portrait, ['sizes' => '(min-width: 800px) 30vw, 60vw', 'max' => 960, 'alt' => $portrait['alt'] !== '' ? $portrait['alt'] : 'Porträt Lothar Prokop']) ?>
+    <?= Picture::render($portrait, ['sizes' => '(min-width: 861px) 34rem, 92vw', 'max' => 960, 'alt' => $portrait['alt'] !== '' ? $portrait['alt'] : 'Porträt Lothar Prokop']) ?>
   </div>
   <?php endif; ?>
   <div class="about-teaser__text">

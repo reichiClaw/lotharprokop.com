@@ -88,14 +88,14 @@ $count = count($images);
     <a class="project-nav__item project-nav__item--prev" href="/fotografie/<?= eurl($p['slug']) ?>" rel="prev">
       <span class="project-nav__label">Vorheriges Projekt</span>
       <span class="project-nav__title"><?= e($p['title']) ?></span>
-      <?php if ($p['cover']): ?><span class="project-nav__media"><?= App\Picture::render($p['cover'], ['sizes' => '(min-width: 800px) 30vw, 45vw', 'cover' => true, 'max' => 960, 'alt' => '']) ?></span><?php endif; ?>
+      <?php if ($p['cover']): ?><span class="project-nav__media"><?= App\Picture::render($p['cover'], ['sizes' => '(min-width: 700px) 27vw, 45vw', 'cover' => true, 'max' => 960, 'alt' => '']) ?></span><?php endif; ?>
     </a>
     <?php endif; ?>
     <?php if ($neighbours['next']): $n = $neighbours['next']; ?>
     <a class="project-nav__item project-nav__item--next" href="/fotografie/<?= eurl($n['slug']) ?>" rel="next">
       <span class="project-nav__label">Nächstes Projekt</span>
       <span class="project-nav__title"><?= e($n['title']) ?></span>
-      <?php if ($n['cover']): ?><span class="project-nav__media"><?= App\Picture::render($n['cover'], ['sizes' => '(min-width: 800px) 30vw, 45vw', 'cover' => true, 'max' => 960, 'alt' => '']) ?></span><?php endif; ?>
+      <?php if ($n['cover']): ?><span class="project-nav__media"><?= App\Picture::render($n['cover'], ['sizes' => '(min-width: 700px) 27vw, 45vw', 'cover' => true, 'max' => 960, 'alt' => '']) ?></span><?php endif; ?>
     </a>
     <?php endif; ?>
     <a class="project-nav__all link-arrow" href="/fotografie">Alle Projekte</a>
