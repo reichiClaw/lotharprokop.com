@@ -231,6 +231,8 @@ final class Images
                 // Hardlink spart Speicherplatz; wenn das Dateisystem das nicht erlaubt, wird kopiert.
                 if (!@link($file, $target)) {
                     copy($file, $target);
+                    // Änderungszeit übernehmen, damit der nächste Abgleich die Kopie als aktuell erkennt.
+                    @touch($target, filemtime($file) ?: time());
                 }
                 @chmod($target, 0644);
             }
