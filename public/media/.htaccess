@@ -1,5 +1,6 @@
 # Nur Bilddateien ausliefern, keinerlei Skriptausführung.
-Options -Indexes -ExecCGI
+# Bewusst ohne "Options": manche Hoster erlauben Options in .htaccess nicht (Fehler 500).
+# Verzeichnislisting ist bereits in public/.htaccess abgeschaltet und wird hierher vererbt.
 <IfModule mod_php.c>
   php_flag engine off
 </IfModule>
