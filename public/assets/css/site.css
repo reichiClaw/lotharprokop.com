@@ -51,6 +51,7 @@
   --ink-2: #3b3a38;
   --ink-3: #8b8985;
   --line: #e1dfda;
+  --line-2: #cbc8c1; /* Haarlinie an bedienbaren Elementen: sichtbar, ohne zu dominieren */
   --dark: #100f0e;
   --on-dark: #f5f3ef;
   --focus: #101010;
@@ -114,6 +115,9 @@ p a, .prose a, li a, address a {
   transition: text-decoration-color var(--dur) var(--ease);
 }
 p a:hover, .prose a:hover, li a:hover, address a:hover { text-decoration-color: var(--ink); }
+/* Elemente mit eigener Auszeichnung (Haarlinie, Unterstrich-Animation) ohne Standardunterstreichung. */
+.link-arrow, .link-back, .filter__link, .site-nav__list a, .brand,
+.card__link, .contact__big, .project__cats a, .project-nav__item, .site-footer__links a { text-decoration: none; }
 h1, h2, h3, h4 { font-family: var(--font-sans); font-weight: 400; line-height: 1.12; margin: 0; letter-spacing: -0.02em; }
 ul { margin: 0; padding: 0; list-style: none; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
@@ -593,7 +597,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .contact__big {
   display: inline-block;
   font-size: var(--t-mid); font-weight: 400; line-height: 1.15; letter-spacing: -0.015em;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-2);
   padding-bottom: 0.1em;
   transition: border-color var(--dur) var(--ease);
   word-break: break-word;
@@ -616,7 +620,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   width: 100%;
   padding: 0.6rem 0;
   border: 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--line-2);
   background: transparent;
   font: inherit;
   color: var(--ink);

@@ -4,7 +4,7 @@ Relaunch der Website des Fotografen Lothar Prokop als eigenständige, schlanke W
 
 ## Idee
 
-Das Design tritt hinter die Fotografie zurück: warmer, gebrochener Off-White-Grund, dunkle Typografie (Cormorant Garamond für Titel, IBM Plex Sans für Text – beide lokal, OFL-lizenziert), viel Weißraum, keine Kacheln, Rahmen, Schatten oder Verläufe. Die Bilder bestimmen die Anordnung: Reihen gleicher Höhe ohne Beschnitt, editoriale Wechsel aus breiten, paarweisen und eingerückten Bildern, Titelbilder mit redaktionell gesetztem Fokuspunkt.
+Das Design tritt hinter die Fotografie zurück: warmer Off-White-Grund, reduzierte Palette aus hellstem Grau, Anthrazit und Schwarz – Farbe kommt ausschließlich aus den Bildern. Typografie ist Inter als neutrale Grotesk (Navigation, Text, sehr große versale Headlines), Cormorant Garamond nur für einzelne große Aussagen; beide lokal, OFL-lizenziert. Haarlinien statt Rahmen, viel Weißraum, keine Kacheln, Schatten, Rundungen oder Verläufe in der Oberfläche. Die Bilder bestimmen die Anordnung: nahezu bildschirmfüllendes Hero, editoriale Wechsel aus breiten, paarweisen und eingerückten Bildern, Reihen gleicher Höhe ohne Beschnitt, Titelbilder mit redaktionell gesetztem Fokuspunkt.
 
 ## Aufbau
 
@@ -51,4 +51,4 @@ Danach: `http://localhost:8080` (Website) und `http://localhost:8080/admin` (Ver
 
 ## Lizenzen
 
-Anwendungscode: Alle Rechte beim Auftraggeber. Schriften: Cormorant Garamond und IBM Plex Sans unter SIL Open Font License 1.1 (`public/assets/fonts/`). sRGB-Profil: siehe `app/resources/README.md`. Fotografien: © Lothar Prokop, nicht Teil der Code-Lizenz und nicht im Repository enthalten.
+Anwendungscode: Alle Rechte beim Auftraggeber. Schriften: Inter, Cormorant Garamond und IBM Plex Sans (letztere nur im Adminbereich) unter SIL Open Font License 1.1 (`public/assets/fonts/`). sRGB-Profil: siehe `app/resources/README.md`. Fotografien: © Lothar Prokop, nicht Teil der Code-Lizenz und nicht im Repository enthalten.

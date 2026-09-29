@@ -125,6 +125,28 @@ Getestet mit Apache 2.4.58 + `mod_php` 8.3 (lokal, `AllowOverride All`, Document
 | `check.php`: per Shell im Repository (Hinweise zu 2M/8M-Limits und `debug`), im Browser unter Apache mit dem Split-Paket (`php_value`-Limits, `mod_rewrite aktiv`, `app-path.php` erkannt, alle Schreibrechte ok, Hinweis bei abweichender `base_url`), sowie in einem leeren Webroot ohne Anwendungsordner und ohne `config.php` (jeweils „Fehlt“ mit Handlungsanweisung) | ok |
 | Echter Hoster `lothar.drve.at` (Apache + PHP-FPM als `cgi-fcgi`, Kontobenutzer `drve`), Variante „ein Ordner“ per FTP: Nach dem FTP-Upload fehlten die Punktdateien in `public/` → Apache 404 für alle Routen; nach dem Nachladen Seiten 200. Bilder zunächst 404, Ursache: der Hoster lehnt die `Options`-Direktive in `public/media/.htaccess` ab; nach dem Entfernen von `Options` (Commit ecd9bd3) Bild-URLs 200 `image/jpeg` | ok (nach Korrektur) |
 
+## Visuelles Redesign des Frontends (29.09.2026)
+
+Alle Prüfungen wurden am 29.09.2026 in der Entwicklungsumgebung tatsächlich ausgeführt: PHP 8.3.6 (`php -S` mit `PHP_CLI_SERVER_WORKERS=8`, Document Root `public/`), Google Chrome 148 headless, gesteuert über das DevTools-Protokoll (Viewport-Emulation, Screenshots, Messungen im DOM).
+
+**Datenbasis:** Da die Fotografien nicht im Repository liegen, wurden für diese Prüfung lokal **neutrale graue Testbilder** mit den Seitenverhältnissen aus `data/legacy/projects.json` erzeugt (52 Galerien, 130 Bilder, Porträt, fünf Filmposter, Texte und Kontaktdaten wie im Import). Die Testbilder dienen ausschließlich der Layoutprüfung, wurden nicht committet und sagen nichts über die Bildwirkung der echten Fotografien aus.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Statuscodes `/`, `/fotografie`, drei Projektseiten (Layout `grid`, `column`, `editorial`), `/film`, `/vita`, `/kontakt`, `/impressum` | alle 200; unbekannte Seite 404 |
+| Kein horizontaler Überlauf (`scrollWidth > clientWidth`) bei 320, 360, 390, 768, 834, 1280, 1680 und 2560 px | kein Überlauf, kein Element rechts außerhalb |
+| Kopfbereich: `position: sticky`, Höhe 84 px, nach dem Scrollen `is-scrolled` und 64 px, bleibt bei `top: 0` | ok |
+| Kopfbereich mobil (≤ 620 px): Logo oben, vier Navigationspunkte darunter, Höhe 110 px; Hero = Viewporthöhe minus Kopfbereich (390×844 → 734 px, 320×700 → 590 px, 1680×1050 → 966 px) | ok |
+| Größe der Hauptüberschrift: 43 px bei 390 px, 96–112 px bei 1680–2560 px | ok |
+| Klickflächen bei ≤ 860 px bzw. `pointer: coarse`: Navigation 41 px, Textlinks mit Pfeil 38 px, Fußbereich und Kategorien 31 px, Kontaktzeilen 37 px | ok (vorher 14–27 px) |
+| Ohne JavaScript (390 px, `/fotografie`): kein Element mit `opacity: 0`, alle 41 Einblend-Elemente sichtbar, alle Filterlinks mit echtem `href`, 53 Bilder geladen | ok |
+| `prefers-reduced-motion: reduce`: kein Element mit `opacity: 0`, `scroll-behavior: auto` | ok |
+| Lightbox auf einer Projektseite (18 Bilder): Klick auf das zweite Bild öffnet mit „2 / 18“, Bild geladen (1280 px), `body.lightbox-open` gesetzt; „Weiter“ → „3 / 18“; Schließen → `hidden`, Body-Klasse entfernt | ok |
+| Kategoriefilter per fetch: 52 → 13 Projekte, URL `?kategorie=portraits`, „Portraits“ markiert, editoriale Blöcke neu aufgebaut (`wide`, `pair-landscape`, `inset`, `single-portrait`), Einblend-Elemente sofort sichtbar | ok |
+| Screenshots (1680 px und 390 px) von Start, Übersicht, drei Projektseiten, Film, Vita, Kontakt, Impressum durchgesehen | Rhythmus, Abstände und Typografie wie entworfen |
+| `php -l` für alle geänderten Templates und `app/View.php`, `node --check public/assets/js/site.js` | keine Fehler |
+| `php bin/build-release.php` in beiden Varianten (`split`, `single`): Paket wird gebaut, `inter.woff2` und `inter-italic.woff2` enthalten | ok |
+
 ## Nicht getestet
 
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
@@ -133,6 +155,8 @@ Getestet mit Apache 2.4.58 + `mod_php` 8.3 (lokal, `AllowOverride All`, Document
 - nginx-Konfiguration (nur als Beispiel dokumentiert)
 - HTTPS (Secure-Cookie-Flag nur im Code, nicht im Betrieb geprüft)
 - Safari/Firefox, iOS/Android auf echten Geräten (nur Chrome, davon mobile Größe per Viewport-Emulation)
+- Wirkung des Redesigns mit den echten Fotografien (lokal standen nur neutrale Testbilder zur Verfügung)
+- Ladezeiten, Core Web Vitals oder sonstige Performancewerte (nicht gemessen)
 - Vollständiger Import mit GD statt Imagick (GD wurde nur mit dem Orientierungs-Testbild geprüft)
 - AVIF (deaktiviert)
 - Screenreader
