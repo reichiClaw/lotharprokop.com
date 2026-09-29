@@ -10,6 +10,7 @@ use App\Csrf;
 use App\Database;
 use App\Films;
 use App\Galleries;
+use App\HeroSlides;
 use App\ImageProcessor;
 use App\Images;
 use App\Settings;
@@ -166,7 +167,7 @@ final class AdminController
         self::render('dashboard', [
             'counts' => $counts,
             'recent' => $recent,
-            'hero' => Settings::getInt('hero_image_id') > 0 ? Images::find(Settings::getInt('hero_image_id')) : null,
+            'slides' => HeroSlides::all(),
             'meta' => ['title' => 'Übersicht'],
         ]);
     }
@@ -231,12 +232,21 @@ final class AdminController
         $featured = array_values(array_filter($all, fn($g) => $g['featured'] === 1));
         usort($featured, fn($a, $b) => [$a['featured_order'], $a['sort_order']] <=> [$b['featured_order'], $b['sort_order']]);
         $others = array_values(array_filter($all, fn($g) => $g['featured'] !== 1));
-        $heroId = Settings::getInt('hero_image_id');
+        $slides = HeroSlides::all();
+        $inSlideshow = array_column(array_column($slides, 'image'), 'id');
+        // Titelbilder der hervorgehobenen Projekte, die noch nicht im Kopfbereich stehen.
+        $addable = 0;
+        foreach ($featured as $g) {
+            if ($g['cover'] !== null && !in_array($g['cover']['id'], $inSlideshow, true)) {
+                $addable++;
+            }
+        }
         self::render('homepage', [
             'featured' => $featured,
             'others' => $others,
-            'hero' => $heroId > 0 ? Images::find($heroId) : null,
-            'heroGalleryId' => Settings::getInt('hero_gallery_id'),
+            'slides' => $slides,
+            'slideInterval' => HeroSlides::interval(),
+            'featuredAddable' => $addable,
             'galleries' => $all,
             'meta' => ['title' => 'Startseite'],
         ]);
@@ -254,48 +264,77 @@ final class AdminController
                 json_response(['ok' => true]);
             }
             self::flash('ok', 'Auswahl und Reihenfolge der Startseite gespeichert.');
-        } elseif ($action === 'hero') {
-            $oldHero = Settings::getInt('hero_image_id');
-            $heroGallery = (int) ($_POST['hero_gallery_id'] ?? 0);
-            Settings::set('hero_gallery_id', $heroGallery > 0 ? (string) $heroGallery : null);
-            if (!empty($_FILES['hero']['name'])) {
+        } elseif ($action === 'slides') {
+            HeroSlides::setInterval((int) ($_POST['hero_interval'] ?? 0));
+            $removed = HeroSlides::apply(
+                (array) ($_POST['slide'] ?? []),
+                (array) ($_POST['slide_remove'] ?? []),
+                (array) ($_POST['slide_gallery'] ?? [])
+            );
+            foreach ($removed as $imageId) {
+                self::pruneImage($imageId);
+            }
+            self::flash('ok', $removed === []
+                ? 'Bildfolge im Kopfbereich gespeichert.'
+                : 'Bildfolge gespeichert, ' . count($removed) . ' Bild(er) entfernt.');
+        } elseif ($action === 'slide_add') {
+            $galleryId = (int) ($_POST['slide_gallery_id'] ?? 0);
+            if (!empty($_FILES['slide_file']['name'])) {
                 try {
-                    $image = Images::createFromUpload($_FILES['hero']);
-                    Settings::set('hero_image_id', (string) $image['id']);
-                    Images::syncPublic($image['id']);
-                    if ($oldHero > 0 && $oldHero !== $image['id']) {
-                        $usage = Images::usages($oldHero);
-                        if ($usage['galleries'] === [] && $usage['other'] === []) {
-                            Images::delete($oldHero);
-                        } else {
-                            Images::syncPublic($oldHero);
-                        }
-                    }
-                    self::flash('ok', 'Neues Startbild gespeichert.');
+                    $image = Images::createFromUpload($_FILES['slide_file']);
+                    HeroSlides::add($image['id'], $galleryId);
+                    self::flash('ok', 'Bild in die Bildfolge aufgenommen.');
                 } catch (\RuntimeException $e) {
                     self::flash('error', $e->getMessage());
                 }
-            } elseif (!empty($_POST['hero_image_id'])) {
-                $id = (int) $_POST['hero_image_id'];
-                if (Images::find($id)) {
-                    Settings::set('hero_image_id', (string) $id);
-                    Images::syncPublic($id);
-                    if ($oldHero > 0 && $oldHero !== $id) {
-                        Images::syncPublic($oldHero);
-                    }
-                    self::flash('ok', 'Startbild gespeichert.');
+            } elseif ($galleryId > 0) {
+                $cover = self::galleryCover($galleryId);
+                if ($cover === null) {
+                    self::flash('error', 'Dieses Projekt hat noch kein Titelbild. Erst ein Bild zuweisen oder hier eine eigene Datei hochladen.');
+                } else {
+                    HeroSlides::add($cover['id'], $galleryId);
+                    self::flash('ok', 'Projekt in die Bildfolge aufgenommen.');
                 }
             } else {
-                self::flash('ok', 'Einstellungen zum Startbild gespeichert.');
+                self::flash('error', 'Kein Projekt gewählt und keine Datei hochgeladen.');
             }
-            if (!empty($_POST['hero_focus_x']) && Settings::getInt('hero_image_id') > 0) {
-                $hero = Images::find(Settings::getInt('hero_image_id'));
-                if ($hero) {
-                    Images::updateMeta($hero['id'], (string) ($_POST['hero_alt'] ?? $hero['alt']), $hero['caption'], (float) $_POST['hero_focus_x'], (float) $_POST['hero_focus_y']);
+        } elseif ($action === 'slides_featured') {
+            $present = array_column(array_column(HeroSlides::all(), 'image'), 'id');
+            $added = 0;
+            foreach (Galleries::featured() as $gallery) {
+                if ($gallery['cover'] !== null && !in_array($gallery['cover']['id'], $present, true)) {
+                    HeroSlides::add($gallery['cover']['id'], $gallery['id']);
+                    $present[] = $gallery['cover']['id'];
+                    $added++;
                 }
             }
+            self::flash($added > 0 ? 'ok' : 'error', $added > 0
+                ? $added . ' Projekt(e) in die Bildfolge aufgenommen.'
+                : 'Es gab kein weiteres hervorgehobenes Projekt mit Titelbild.');
         }
         redirect('/admin/startseite');
+    }
+
+    /** Titelbild eines Projekts (mit Rückfall auf das erste Bild der Galerie). */
+    private static function galleryCover(int $galleryId): ?array
+    {
+        $gallery = Galleries::find($galleryId);
+        if ($gallery === null) {
+            return null;
+        }
+        $withRelations = Galleries::withRelations([$gallery]);
+        return $withRelations[0]['cover'] ?? null;
+    }
+
+    /** Löscht ein Bild, wenn es nach einer Änderung nirgends mehr verwendet wird. */
+    private static function pruneImage(int $imageId): void
+    {
+        $usage = Images::usages($imageId);
+        if ($usage['galleries'] === [] && $usage['other'] === []) {
+            Images::delete($imageId);
+        } else {
+            Images::syncPublic($imageId);
+        }
     }
 
     /* ---------- Filme ---------- */

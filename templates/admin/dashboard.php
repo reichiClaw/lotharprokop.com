@@ -1,7 +1,7 @@
 <?php
 /** @var array $counts */
 /** @var array $recent */
-/** @var array|null $hero */
+/** @var array $slides */
 use App\Galleries;
 use App\Images;
 ?>
@@ -37,11 +37,12 @@ use App\Images;
     <?php endif; ?>
   </section>
   <section>
-    <h2 class="a-subtitle">Startbild</h2>
-    <?php if ($hero): $v = Images::variantFor($hero, 960); ?>
-      <a href="/admin/startseite"><img class="a-preview" src="<?= e(Images::variantUrl($hero, $v, 'jpg', true)) ?>" alt="" style="aspect-ratio: 16/9; object-fit: cover; object-position:<?= $hero['focus_x'] * 100 ?>% <?= $hero['focus_y'] * 100 ?>%"></a>
+    <h2 class="a-subtitle">Kopfbereich der Startseite</h2>
+    <?php if ($slides !== []): $first = $slides[0]['image']; $v = Images::variantFor($first, 960); ?>
+      <a href="/admin/startseite"><img class="a-preview" src="<?= e(Images::variantUrl($first, $v, 'jpg', true)) ?>" alt="" style="aspect-ratio: 16/9; object-fit: cover; object-position:<?= $first['focus_x'] * 100 ?>% <?= $first['focus_y'] * 100 ?>%"></a>
+      <p class="a-help"><?= count($slides) === 1 ? 'Ein festes Startbild' : count($slides) . ' Bilder im Wechsel' ?> – <a href="/admin/startseite">Bildfolge bearbeiten</a>.</p>
     <?php else: ?>
-      <p class="a-help">Noch kein Startbild gewählt. <a href="/admin/startseite">Jetzt festlegen</a>.</p>
+      <p class="a-help">Noch kein Bild im Kopfbereich. <a href="/admin/startseite">Jetzt festlegen</a>.</p>
     <?php endif; ?>
   </section>
 </div>

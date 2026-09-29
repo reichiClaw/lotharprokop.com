@@ -1,10 +1,12 @@
 <?php
 /** @var array $featured */
 /** @var array $others */
-/** @var array|null $hero */
-/** @var int $heroGalleryId */
+/** @var array $slides */
+/** @var int $slideInterval */
+/** @var int $featuredAddable */
 /** @var array $galleries */
 use App\Csrf;
+use App\HeroSlides;
 use App\Images;
 ?>
 <div class="a-head">
@@ -12,42 +14,82 @@ use App\Images;
   <a class="a-btn a-btn--ghost" href="/" target="_blank" rel="noopener">Startseite ansehen</a>
 </div>
 
+<section>
+  <h2 class="a-subtitle">Kopfbereich: Bildfolge</h2>
+  <p class="a-help">Diese Bilder füllen den großen Kopfbereich der Startseite. Ab zwei Bildern wechseln sie sich ab (Überblendung, dazu eine Pause-Taste und Striche zum Umschalten); ein einzelnes Bild bleibt ein festes Startbild. Das verknüpfte Projekt macht das Bild anklickbar und erscheint als kleiner Bildnachweis. Ausschnitt 16:9 (Desktop) bzw. hochkant auf dem Telefon – der Fokuspunkt jedes Bildes entscheidet, was sichtbar bleibt. Ohne JavaScript zeigt der Kopfbereich das erste Bild.</p>
+  <?php if ($slides === []): ?>
+    <p class="a-help">Noch kein Bild im Kopfbereich – die Startseite beginnt dann direkt mit der Typografie.</p>
+  <?php else: ?>
+  <form method="post" action="/admin/startseite" class="a-form" data-dirty-guard>
+    <?= Csrf::field() ?>
+    <input type="hidden" name="action" value="slides">
+    <ol class="a-sortable" data-sortable="" data-sortable-name="slide">
+      <?php foreach ($slides as $n => $slide): $img = $slide['image']; $v = Images::variantFor($img, 480); ?>
+      <li class="a-sort-item" data-id="<?= $slide['id'] ?>" draggable="true">
+        <input type="hidden" name="slide[]" value="<?= $slide['id'] ?>">
+        <span class="a-image__num"><?= $n + 1 ?></span>
+        <span class="a-thumb"><?php if ($v): ?><img src="<?= e(Images::variantUrl($img, $v, 'jpg', true)) ?>" alt="" style="object-position:<?= $img['focus_x'] * 100 ?>% <?= $img['focus_y'] * 100 ?>%"><?php endif; ?></span>
+        <div class="a-sort-item__body">
+          <label class="a-label" for="slide-gallery-<?= $slide['id'] ?>">Projekt</label>
+          <select id="slide-gallery-<?= $slide['id'] ?>" name="slide_gallery[<?= $slide['id'] ?>]">
+            <option value="0">– kein Verweis –</option>
+            <?php foreach ($galleries as $g): ?>
+            <option value="<?= $g['id'] ?>" <?= $slide['gallery'] !== null && $slide['gallery']['id'] === $g['id'] ? 'selected' : '' ?>><?= e($g['title']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <p class="a-help"><?= $img['width'] ?> × <?= $img['height'] ?> px · <a href="/admin/bilder/<?= $img['id'] ?>">Fokuspunkt und Alternativtext</a></p>
+        </div>
+        <div class="a-sort-item__actions">
+          <button type="button" class="a-iconbtn" data-move="-1" aria-label="Nach oben">↑</button>
+          <button type="button" class="a-iconbtn" data-move="1" aria-label="Nach unten">↓</button>
+          <label class="a-check"><input type="checkbox" name="slide_remove[]" value="<?= $slide['id'] ?>"> Entfernen</label>
+        </div>
+      </li>
+      <?php endforeach; ?>
+    </ol>
+    <div class="a-row-3">
+      <div class="a-field">
+        <label for="hero_interval">Bildwechsel alle … Sekunden</label>
+        <input type="number" id="hero_interval" name="hero_interval" min="<?= HeroSlides::INTERVAL_MIN ?>" max="<?= HeroSlides::INTERVAL_MAX ?>" step="1" value="<?= $slideInterval ?>">
+      </div>
+    </div>
+    <div class="a-form__actions">
+      <button type="submit" class="a-btn">Bildfolge speichern</button>
+      <span class="a-savestate" data-dirty-label hidden>Ungespeicherte Änderungen</span>
+    </div>
+  </form>
+  <?php endif; ?>
+</section>
+
 <div class="a-grid-2">
 <section>
-  <h2 class="a-subtitle">Startbild</h2>
-  <?php if ($hero): $v = Images::variantFor($hero, 960); ?>
-    <img class="a-preview" src="<?= e(Images::variantUrl($hero, $v, 'jpg', true)) ?>" alt="" style="aspect-ratio:16/9; object-fit:cover; object-position:<?= $hero['focus_x'] * 100 ?>% <?= $hero['focus_y'] * 100 ?>%">
-    <p class="a-help">Ausschnitt 16:9 (Desktop) bzw. 4:5 (Mobil). Fokuspunkt und Alternativtext unter <a href="/admin/bilder/<?= $hero['id'] ?>">Bild bearbeiten</a>.</p>
-  <?php else: ?>
-    <p class="a-help">Noch kein Startbild gesetzt.</p>
-  <?php endif; ?>
+  <h2 class="a-subtitle">Bild für den Kopfbereich hinzufügen</h2>
   <form method="post" action="/admin/startseite" enctype="multipart/form-data" class="a-form">
     <?= Csrf::field() ?>
-    <input type="hidden" name="action" value="hero">
+    <input type="hidden" name="action" value="slide_add">
     <div class="a-field">
-      <label for="hero">Neues Startbild hochladen <span class="a-muted">(ersetzt das aktuelle)</span></label>
-      <input type="file" id="hero" name="hero" accept="image/jpeg,image/png,image/webp">
-    </div>
-    <div class="a-field">
-      <label for="hero_image_id">… oder ein vorhandenes Titelbild verwenden</label>
-      <select id="hero_image_id" name="hero_image_id">
-        <option value="">– unverändert –</option>
-        <?php foreach ($galleries as $g): if ($g['cover']): ?>
-        <option value="<?= $g['cover']['id'] ?>"><?= e($g['title']) ?> – Titelbild</option>
-        <?php endif; endforeach; ?>
-      </select>
-    </div>
-    <div class="a-field">
-      <label for="hero_gallery_id">Verlinktes Projekt <span class="a-muted">(optional, Bildnachweis unter dem Startbild)</span></label>
-      <select id="hero_gallery_id" name="hero_gallery_id">
+      <label for="slide_gallery_id">Projekt übernehmen <span class="a-muted">(dessen Titelbild, verlinkt auf das Projekt)</span></label>
+      <select id="slide_gallery_id" name="slide_gallery_id">
         <option value="0">– keines –</option>
         <?php foreach ($galleries as $g): ?>
-        <option value="<?= $g['id'] ?>" <?= $heroGalleryId === $g['id'] ? 'selected' : '' ?>><?= e($g['title']) ?></option>
+        <option value="<?= $g['id'] ?>"><?= e($g['title']) ?><?= $g['cover'] ? '' : ' (ohne Titelbild)' ?></option>
         <?php endforeach; ?>
       </select>
     </div>
-    <button type="submit" class="a-btn">Startbild speichern</button>
+    <div class="a-field">
+      <label for="slide_file">… oder eigenes Bild hochladen <span class="a-muted">(JPEG, PNG oder WebP; das Projekt oben wird dann verlinkt)</span></label>
+      <input type="file" id="slide_file" name="slide_file" accept="image/jpeg,image/png,image/webp">
+    </div>
+    <button type="submit" class="a-btn">Hinzufügen</button>
   </form>
+  <?php if ($featuredAddable > 0): ?>
+  <form method="post" action="/admin/startseite" class="a-form">
+    <?= Csrf::field() ?>
+    <input type="hidden" name="action" value="slides_featured">
+    <button type="submit" class="a-btn a-btn--ghost">Alle ausgewählten Projekte übernehmen (<?= $featuredAddable ?>)</button>
+  </form>
+  <p class="a-help">Übernimmt die Titelbilder der rechts ausgewählten Projekte in der dortigen Reihenfolge.</p>
+  <?php endif; ?>
 </section>
 
 <section>
