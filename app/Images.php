@@ -221,18 +221,33 @@ final class Images
             if (!is_dir($publicDir)) {
                 mkdir($publicDir, 0755, true);
             }
-            foreach (glob($privateDir . '/*') ?: [] as $file) {
+            if (!is_dir($publicDir)) {
+                self::syncError('Ordner ' . $publicDir . ' konnte nicht angelegt werden.');
+                return;
+            }
+            $files = self::listFiles($privateDir);
+            if ($files === []) {
+                self::syncError('Keine Varianten in ' . $privateDir . ' (Bild #' . $id . ').');
+            }
+            foreach ($files as $file) {
                 $target = $publicDir . '/' . basename($file);
                 if (is_file($target) && (fileinode($target) === fileinode($file)
                     || (filesize($target) === filesize($file) && filemtime($target) === filemtime($file)))) {
+                    self::$syncStats['present']++;
                     continue;
                 }
                 @unlink($target);
                 // Hardlink spart Speicherplatz; wenn das Dateisystem das nicht erlaubt, wird kopiert.
-                if (!@link($file, $target)) {
-                    copy($file, $target);
+                if (@link($file, $target)) {
+                    self::$syncStats['linked']++;
+                } elseif (@copy($file, $target)) {
                     // Änderungszeit übernehmen, damit der nächste Abgleich die Kopie als aktuell erkennt.
                     @touch($target, filemtime($file) ?: time());
+                    self::$syncStats['copied']++;
+                } else {
+                    $err = error_get_last();
+                    self::syncError('Kopieren nach ' . $target . ' fehlgeschlagen' . ($err ? ': ' . $err['message'] : '') . '.');
+                    continue;
                 }
                 @chmod($target, 0644);
             }
@@ -254,16 +269,52 @@ final class Images
         }
     }
 
+    /** @var array{present:int,linked:int,copied:int,errors:string[]} */
+    private static array $syncStats = ['present' => 0, 'linked' => 0, 'copied' => 0, 'errors' => []];
+
+    /** Ergebnis des letzten Abgleichs (für die Systemseite / Fehlersuche ohne Shell). */
+    public static function syncStats(): array
+    {
+        return self::$syncStats;
+    }
+
+    private static function syncError(string $message): void
+    {
+        if (count(self::$syncStats['errors']) < 5) {
+            self::$syncStats['errors'][] = $message;
+        }
+        error_log('Bildabgleich: ' . $message);
+    }
+
+    /** Dateien eines Ordners (ohne glob(), das bei manchen Hostern eingeschränkt ist). */
+    private static function listFiles(string $dir): array
+    {
+        if (!is_dir($dir)) {
+            return [];
+        }
+        $out = [];
+        foreach (scandir($dir) ?: [] as $entry) {
+            if ($entry !== '.' && $entry !== '..' && is_file($dir . '/' . $entry)) {
+                $out[] = $dir . '/' . $entry;
+            }
+        }
+        return $out;
+    }
+
     /** Vollständiger Abgleich aller Bilder; entfernt auch verwaiste öffentliche Ordner. */
     public static function syncAll(): int
     {
+        self::$syncStats = ['present' => 0, 'linked' => 0, 'copied' => 0, 'errors' => []];
+        @set_time_limit(0);
+        ignore_user_abort(true);
         $tokens = [];
         foreach (Database::pdo()->query('SELECT id, token FROM images') as $row) {
             self::syncPublic((int) $row['id']);
             $tokens[$row['token']] = true;
         }
-        foreach (glob(Config::publicMedia() . '/*', GLOB_ONLYDIR) ?: [] as $dir) {
-            if (!isset($tokens[basename($dir)])) {
+        foreach (scandir(Config::publicMedia()) ?: [] as $entry) {
+            $dir = Config::publicMedia() . '/' . $entry;
+            if ($entry !== '.' && $entry !== '..' && is_dir($dir) && !isset($tokens[$entry])) {
                 self::removeDir($dir);
             }
         }
@@ -350,7 +401,11 @@ final class Images
         if (!is_dir($dir)) {
             return;
         }
-        foreach (glob($dir . '/*') ?: [] as $file) {
+        foreach (scandir($dir) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            $file = $dir . '/' . $entry;
             is_dir($file) ? self::removeDir($file) : @unlink($file);
         }
         @rmdir($dir);

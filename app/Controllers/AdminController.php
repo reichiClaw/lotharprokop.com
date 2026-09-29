@@ -460,7 +460,14 @@ final class AdminController
         Auth::requireLogin();
         Csrf::verify();
         $n = Images::syncAll();
-        self::flash('ok', 'Sichtbarkeit von ' . $n . ' Bildern abgeglichen.');
+        $st = Images::syncStats();
+        $msg = 'Sichtbarkeit von ' . $n . ' Bildern abgeglichen: ' . $st['present'] . ' Dateien waren vorhanden, '
+            . $st['linked'] . ' verknüpft, ' . $st['copied'] . ' kopiert. Öffentlicher Ordner: ' . Config::publicMedia()
+            . ' (' . human_bytes(self::dirSize(Config::publicMedia())) . ').';
+        if ($st['errors'] !== []) {
+            $msg .= ' Fehler: ' . implode(' ', $st['errors']);
+        }
+        self::flash($st['errors'] === [] ? 'ok' : 'warn', $msg);
         redirect('/admin/system');
     }
 
@@ -532,7 +539,14 @@ final class AdminController
         $out = [];
         foreach (Database::pdo()->query('SELECT id, token, original_path FROM images ORDER BY id') as $row) {
             $dir = Config::storage('derivatives') . '/' . $row['token'];
-            if (!is_dir($dir) || !glob($dir . '/w*.jpg')) {
+            $hasJpg = false;
+            foreach (is_dir($dir) ? (scandir($dir) ?: []) : [] as $entry) {
+                if (preg_match('/^w\d+\.jpg$/', $entry)) {
+                    $hasJpg = true;
+                    break;
+                }
+            }
+            if (!$hasJpg) {
                 $out[] = $row;
             }
         }
