@@ -153,6 +153,30 @@ if ($storage) {
 $r = $writable($media);
 $add($r === 'beschreibbar' ? 'ok' : 'fail', 'media (öffentliche Bilder)', $media . ': ' . $r);
 
+/* Auslieferungstest: legt wie die Anwendung einen Ordner mit Bilddatei an; Rechte und URL zum Prüfen. */
+$perm = static fn(string $p): string => file_exists($p) ? substr(sprintf('%o', fileperms($p)), -4) : 'fehlt';
+if (is_dir($media)) {
+    $probeDir = $media . '/checkprobe';
+    $probeFile = $probeDir . '/w1.jpg';
+    if (!is_dir($probeDir)) {
+        @mkdir($probeDir, 0755);
+    }
+    if (!is_file($probeFile)) {
+        @file_put_contents($probeFile, "\xFF\xD8\xFF\xD9"); // minimaler JPEG-Rahmen
+        @chmod($probeFile, 0644);
+    }
+    $sample = '';
+    foreach (scandir($media) ?: [] as $entry) {
+        if (preg_match('/^[a-f0-9]{24}$/', $entry)) {
+            $files = array_values(array_diff(scandir($media . '/' . $entry) ?: [], ['.', '..']));
+            $sample = "; Beispiel $entry: Ordner " . $perm($media . '/' . $entry) . ($files ? ', Datei ' . $perm($media . '/' . $entry . '/' . $files[0]) : ', leer');
+            break;
+        }
+    }
+    $add(is_file($probeFile) ? 'info' : 'fail', 'Rechte in media', 'media ' . $perm($media) . ', checkprobe ' . $perm($probeDir) . ', w1.jpg ' . $perm($probeFile) . $sample);
+    $add('info', 'Auslieferungstest', 'Im Browser öffnen: /media/checkprobe/w1.jpg – muss ein (leeres) Bild bzw. Download liefern, nicht die 404-Seite. Ordner media/checkprobe danach löschen.');
+}
+
 /* Sicherheit: private Ordner nicht im Webroot? */
 foreach (['app', 'config', 'storage', 'templates'] as $d) {
     if (is_dir(__DIR__ . '/' . $d)) {

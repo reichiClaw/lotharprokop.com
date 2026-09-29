@@ -219,8 +219,11 @@ final class Images
         $privateDir = Config::storage('derivatives') . '/' . $image['token'];
         if ($public) {
             if (!is_dir($publicDir)) {
-                mkdir($publicDir, 0755, true);
+                @mkdir($publicDir, 0755, true);
             }
+            // Ausdrücklich setzen: die umask des Hosters kann mkdir()-Rechte auf 0700 kürzen, dann
+            // kann der Webserver-Benutzer die Dateien nicht ausliefern.
+            @chmod($publicDir, 0755);
             if (!is_dir($publicDir)) {
                 self::syncError('Ordner ' . $publicDir . ' konnte nicht angelegt werden.');
                 return;
@@ -233,6 +236,10 @@ final class Images
                 $target = $publicDir . '/' . basename($file);
                 if (is_file($target) && (fileinode($target) === fileinode($file)
                     || (filesize($target) === filesize($file) && filemtime($target) === filemtime($file)))) {
+                    if ((fileperms($target) & 0044) !== 0044) {
+                        @chmod($target, 0644);
+                        self::$syncStats['fixed']++;
+                    }
                     self::$syncStats['present']++;
                     continue;
                 }
@@ -269,13 +276,32 @@ final class Images
         }
     }
 
-    /** @var array{present:int,linked:int,copied:int,errors:string[]} */
-    private static array $syncStats = ['present' => 0, 'linked' => 0, 'copied' => 0, 'errors' => []];
+    /** @var array{present:int,linked:int,copied:int,fixed:int,errors:string[],sample:string} */
+    private static array $syncStats = ['present' => 0, 'linked' => 0, 'copied' => 0, 'fixed' => 0, 'errors' => [], 'sample' => ''];
 
     /** Ergebnis des letzten Abgleichs (für die Systemseite / Fehlersuche ohne Shell). */
     public static function syncStats(): array
     {
         return self::$syncStats;
+    }
+
+    /** Rechte des öffentlichen Ordners, eines Token-Ordners und einer Datei – zur Fehlersuche. */
+    public static function describePerms(string $mediaDir, ?string $token): string
+    {
+        $fmt = static fn(string $p): string => is_dir($p) || is_file($p) ? substr(sprintf('%o', fileperms($p)), -4) : 'fehlt';
+        $out = 'media ' . $fmt($mediaDir);
+        if ($token !== null) {
+            $dir = $mediaDir . '/' . $token;
+            $out .= ', Ordner ' . $fmt($dir);
+            foreach (self::listFiles($dir) as $f) {
+                $out .= ', Datei ' . $fmt($f);
+                break;
+            }
+        }
+        if (function_exists('posix_geteuid')) {
+            $out .= ', PHP-Benutzer ' . (posix_getpwuid(posix_geteuid())['name'] ?? posix_geteuid());
+        }
+        return $out;
     }
 
     private static function syncError(string $message): void
@@ -304,7 +330,7 @@ final class Images
     /** Vollständiger Abgleich aller Bilder; entfernt auch verwaiste öffentliche Ordner. */
     public static function syncAll(): int
     {
-        self::$syncStats = ['present' => 0, 'linked' => 0, 'copied' => 0, 'errors' => []];
+        self::$syncStats = ['present' => 0, 'linked' => 0, 'copied' => 0, 'fixed' => 0, 'errors' => [], 'sample' => ''];
         @set_time_limit(0);
         ignore_user_abort(true);
         $tokens = [];
@@ -318,6 +344,7 @@ final class Images
                 self::removeDir($dir);
             }
         }
+        self::$syncStats['sample'] = self::describePerms(Config::publicMedia(), array_key_first($tokens));
         return count($tokens);
     }
 

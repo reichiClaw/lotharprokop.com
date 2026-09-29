@@ -463,7 +463,8 @@ final class AdminController
         $st = Images::syncStats();
         $msg = 'Sichtbarkeit von ' . $n . ' Bildern abgeglichen: ' . $st['present'] . ' Dateien waren vorhanden, '
             . $st['linked'] . ' verknüpft, ' . $st['copied'] . ' kopiert. Öffentlicher Ordner: ' . Config::publicMedia()
-            . ' (' . human_bytes(self::dirSize(Config::publicMedia())) . ').';
+            . ' (' . human_bytes(self::dirSize(Config::publicMedia())) . '). Rechte: ' . $st['sample']
+            . ($st['fixed'] > 0 ? '; ' . $st['fixed'] . ' Dateien auf 0644 gesetzt' : '') . '.';
         if ($st['errors'] !== []) {
             $msg .= ' Fehler: ' . implode(' ', $st['errors']);
         }
