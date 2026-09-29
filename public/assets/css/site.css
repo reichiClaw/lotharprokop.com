@@ -86,6 +86,7 @@
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
   --dur: 400ms;
   --dur-slow: 800ms;
+  --dur-fade: 1100ms;
 }
 
 /* ---------- Grundlagen ---------- */
@@ -280,8 +281,16 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   color: var(--on-dark);
 }
 .hero__media { position: absolute; inset: 0; overflow: hidden; background: var(--paper-2); }
+.hero__slide { position: absolute; inset: 0; opacity: 0; pointer-events: none; }
+.hero__slide.is-active { opacity: 1; pointer-events: auto; }
 .hero__link, .hero__media picture, .hero__media img { display: block; width: 100%; height: 100%; }
 .hero__media img { object-fit: cover; }
+/* Überblenden statt Schieben; das Bild bewegt sich nur unmerklich. */
+.js .hero__slide { transition: opacity var(--dur-fade) var(--ease); }
+@media (prefers-reduced-motion: no-preference) {
+  .js .hero__media[data-hero] .hero__slide img { transition: transform 12s linear; }
+  .js .hero__media[data-hero] .hero__slide.is-active img { transform: scale(1.035); }
+}
 .hero--media::after {
   content: '';
   position: absolute; inset: 0;
@@ -301,7 +310,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   gap: var(--s-2);
 }
 .hero--media .hero__text { pointer-events: none; }
-.hero--media .hero__text a { pointer-events: auto; }
+.hero--media .hero__text a, .hero--media .hero__text button { pointer-events: auto; }
 .hero__title {
   font-size: var(--t-hero);
   font-weight: 250;
@@ -318,15 +327,73 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   max-width: 44ch;
   opacity: 0.88;
 }
-.hero__cta { margin: var(--s-3) 0 0; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); align-items: center; }
+/* Eine Zeile unten: Verweis und Bildnachweis links, Bedienung der Bildfolge rechts. */
+.hero__foot {
+  width: 100%;
+  margin-top: var(--s-3);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 var(--s-4);
+}
+.hero__cta { margin: 0; display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-4); align-items: center; }
 .hero__cta .link-arrow { color: inherit; }
-.hero__credit { font-size: var(--t-micro); letter-spacing: var(--track-mid); opacity: 0.6; }
+/* Alle Bildnachweise liegen übereinander, nur der aktuelle ist sichtbar. */
+.hero__credits { display: grid; }
+.hero__credits > * { grid-area: 1 / 1; }
+.hero__credit { font-size: var(--t-micro); letter-spacing: var(--track-mid); opacity: 0; transition: opacity var(--dur) var(--ease); }
+.hero__credit.is-active { opacity: 0.6; }
 .hero__credit a { text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: currentColor; }
+
+/* Bedienung der Bildfolge: dünne Striche, kein Kasten, keine Pfeilflächen. */
+.hero__controls { display: none; }
+.js .hero__controls { display: flex; align-items: center; gap: var(--s-2); color: var(--on-dark); }
+.hero__toggle {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0.6rem;
+  margin: 0 0 0 -0.6rem;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity var(--dur) var(--ease);
+}
+.hero__toggle:hover, .hero__toggle:focus-visible { opacity: 1; }
+.hero__icon { width: 0.9rem; height: 0.9rem; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; }
+.hero__icon--play, .hero__toggle.is-paused .hero__icon--pause { display: none; }
+.hero__toggle.is-paused .hero__icon--play { display: block; }
+/* Umbruch, damit auch viele Bilder auf schmalen Geräten nicht aus dem Bild laufen. */
+.hero__dots { display: flex; flex-wrap: wrap; gap: 0 0.5rem; list-style: none; margin: 0; padding: 0; max-width: 100%; }
+.hero__dot {
+  appearance: none;
+  background: none;
+  border: 0;
+  display: block;
+  width: 1.75rem;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  color: inherit;
+}
+.hero__dot::after {
+  content: '';
+  display: block;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.4;
+  transition: opacity var(--dur) var(--ease);
+}
+.hero__dot.is-active::after, .hero__dot:hover::after { opacity: 1; }
 /* Ohne Titelbild: dunkle Typografie auf Papierfläche. */
 .hero:not(.hero--media) .hero__text { padding-top: var(--s-4); padding-bottom: var(--s-6); }
 @media (max-width: 700px) {
   .hero--media { min-height: calc(100vh - var(--header-h)); min-height: calc(100svh - var(--header-h)); }
   .hero__intro { font-size: var(--t-body); max-width: 34ch; }
+}
+@media (max-width: 860px), (pointer: coarse) {
+  .hero__dot { padding: 1.35rem 0; }
+  .hero__toggle { padding: 0.95rem; margin-left: -0.95rem; }
 }
 
 /* ---------- Projektverweis (Titelbild, Titel, Kategorie) ---------- */

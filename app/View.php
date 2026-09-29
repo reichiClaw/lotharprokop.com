@@ -16,7 +16,7 @@ final class View
      * damit Besucher ohne Eingriff in config/config.php die neuen Dateien erhalten.
      * Ein Wert in der Konfiguration ('asset_version') hat Vorrang.
      */
-    public const ASSET_VERSION = '2';
+    public const ASSET_VERSION = '3';
 
     public static function jsBootHash(): string
     {

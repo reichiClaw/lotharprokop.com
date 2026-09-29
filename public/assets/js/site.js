@@ -23,6 +23,114 @@
     update();
   }
 
+  /* ---------- Bildfolge im Kopfbereich der Startseite ----------
+     Ohne JavaScript zeigt der Kopfbereich das erste Bild – wie ein festes Startbild.
+     Die weiteren Bilder stecken in <template> und werden erst geladen, wenn sie gebraucht werden. */
+  function initHero() {
+    var box = document.querySelector('[data-hero]');
+    if (!box) return;
+    var section = box.closest('.hero') || box;
+    var slots = Array.prototype.slice.call(box.querySelectorAll('[data-hero-slide], template[data-hero-slide-template]'));
+    if (slots.length < 2) return;
+    var credits = Array.prototype.slice.call(section.querySelectorAll('[data-hero-credit]'));
+    var dots = Array.prototype.slice.call(section.querySelectorAll('[data-hero-dot]'));
+    var toggle = section.querySelector('[data-hero-toggle]');
+    var interval = Math.max(2000, parseInt(box.getAttribute('data-hero-interval'), 10) || 6000);
+    var index = 0;
+    var timer = null;
+    var paused = false;
+
+    // Aus dem <template> ein echtes Bild machen; das Laden beginnt erst hier.
+    function materialize(i) {
+      var slot = slots[i];
+      if (slot.tagName !== 'TEMPLATE') return slot;
+      var fragment = slot.content.cloneNode(true);
+      var el = fragment.querySelector('[data-hero-slide]');
+      slot.parentNode.insertBefore(fragment, slot);
+      slot.parentNode.removeChild(slot);
+      slots[i] = el;
+      return el;
+    }
+
+    // Verborgene Folien enthalten Links: für Vorlesesoftware und Tastatur ausblenden.
+    function setHidden(el, hidden) {
+      if (!el) return;
+      if (hidden) el.setAttribute('aria-hidden', 'true');
+      else el.removeAttribute('aria-hidden');
+      el.querySelectorAll('a[href]').forEach(function (a) {
+        if (hidden) a.setAttribute('tabindex', '-1');
+        else a.removeAttribute('tabindex');
+      });
+    }
+
+    function show(target) {
+      var i = ((target % slots.length) + slots.length) % slots.length;
+      if (i === index) return;
+      var previous = slots[index];
+      var el = materialize(i);
+      index = i;
+      if (previous && previous.tagName !== 'TEMPLATE') {
+        previous.classList.remove('is-active');
+        setHidden(previous, true);
+      }
+      el.classList.add('is-active');
+      setHidden(el, false);
+      credits.forEach(function (credit, k) {
+        credit.classList.toggle('is-active', k === i);
+        setHidden(credit, k !== i);
+      });
+      dots.forEach(function (dot, k) {
+        dot.classList.toggle('is-active', k === i);
+        if (k === i) dot.setAttribute('aria-current', 'true');
+        else dot.removeAttribute('aria-current');
+      });
+      // Das nächste Bild im Hintergrund vorbereiten.
+      materialize((i + 1) % slots.length);
+    }
+
+    function stop() {
+      if (timer) { window.clearInterval(timer); timer = null; }
+    }
+
+    function start() {
+      stop();
+      if (paused || reduceMotion || document.hidden) return;
+      timer = window.setInterval(function () { show(index + 1); }, interval);
+    }
+
+    dots.forEach(function (dot, k) {
+      dot.addEventListener('click', function () { show(k); start(); });
+    });
+
+    if (toggle) {
+      if (reduceMotion) {
+        // Bei reduzierter Bewegung läuft nichts von allein; eine Pause-Taste wäre irreführend.
+        toggle.hidden = true;
+      } else {
+        toggle.addEventListener('click', function () {
+          paused = !paused;
+          toggle.classList.toggle('is-paused', paused);
+          toggle.setAttribute('aria-label', paused ? 'Bildwechsel fortsetzen' : 'Bildwechsel anhalten');
+          if (paused) stop(); else start();
+        });
+      }
+    }
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop(); else start();
+    });
+    section.addEventListener('focusin', stop);
+    section.addEventListener('focusout', function () {
+      window.setTimeout(function () {
+        if (!section.contains(document.activeElement)) start();
+      }, 0);
+    });
+
+    // Das zweite Bild erst nach dem ersten Seitenaufbau vorbereiten.
+    window.setTimeout(function () { materialize(1); }, 1200);
+    start();
+  }
+
   /* ---------- Einblenden beim Scrollen ---------- */
   function initReveal() {
     var items = document.querySelectorAll('.reveal');
@@ -286,6 +394,7 @@
 
   document.addEventListener('DOMContentLoaded', function () {
     initHeader();
+    initHero();
     initReveal();
     initFilter();
     initVideos();

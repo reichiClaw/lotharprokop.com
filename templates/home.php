@@ -1,29 +1,59 @@
 <?php
-/** @var array|null $hero */
-/** @var array|null $heroGallery */
+/** @var array $heroSlides */
+/** @var int $heroInterval */
 /** @var array $featured */
 /** @var array|null $portrait */
 use App\Picture;
 use App\Settings;
+use App\View;
 
 $tagline = (string) Settings::get('site_tagline', 'Fotograf – Ried im Innkreis, Österreich');
 $intro = (string) Settings::get('intro_text', '');
 $aboutShort = (string) Settings::get('about_short', '');
 $email = (string) Settings::get('contact_email', '');
+// Ab zwei Bildern wechselt der Kopfbereich; ein einzelnes Bild bleibt ein ruhiges Standbild.
+$slideCount = count($heroSlides);
+$slideshow = $slideCount > 1;
 ?>
-<section class="hero <?= $hero ? 'hero--media' : '' ?>" aria-labelledby="hero-title">
-  <?php if ($hero): ?>
-  <div class="hero__media">
-    <?php if ($heroGallery): ?><a href="/fotografie/<?= eurl($heroGallery['slug']) ?>" class="hero__link" aria-label="Zum Projekt <?= e($heroGallery['title']) ?>"><?php endif; ?>
-    <?= Picture::render($hero, ['sizes' => '100vw', 'cover' => true, 'loading' => 'eager', 'fetchpriority' => 'high', 'alt' => $hero['alt'] !== '' ? $hero['alt'] : 'Fotografie von Lothar Prokop']) ?>
-    <?php if ($heroGallery): ?></a><?php endif; ?>
+<section class="hero<?= $heroSlides !== [] ? ' hero--media' : '' ?>" aria-labelledby="hero-title">
+  <?php if ($heroSlides !== []): ?>
+  <div class="hero__media"<?php if ($slideshow): ?> data-hero data-hero-interval="<?= (int) $heroInterval * 1000 ?>" role="group" aria-roledescription="Bildfolge" aria-label="Ausgewählte Arbeiten"<?php endif; ?>>
+    <?= View::partial('partials/hero-slide', ['slide' => $heroSlides[0], 'index' => 0]) ?>
+    <?php for ($i = 1; $i < $slideCount; $i++): ?>
+    <?php // Die weiteren Bilder stehen in <template>: sie werden erst geladen, wenn sie an die Reihe kommen. ?>
+    <template data-hero-slide-template><?= View::partial('partials/hero-slide', ['slide' => $heroSlides[$i], 'index' => $i]) ?></template>
+    <?php endfor; ?>
   </div>
   <?php endif; ?>
   <div class="hero__text">
     <h1 id="hero-title" class="hero__title">Lothar Prokop</h1>
     <p class="hero__tagline"><?= e($tagline) ?></p>
     <?php if ($intro !== ''): ?><p class="hero__intro"><?= e($intro) ?></p><?php endif; ?>
-    <p class="hero__cta"><a class="link-arrow" href="/fotografie">Arbeiten ansehen</a><?php if ($heroGallery): ?><span class="hero__credit">Bild: <a href="/fotografie/<?= eurl($heroGallery['slug']) ?>"><?= e($heroGallery['title']) ?></a></span><?php endif; ?></p>
+    <div class="hero__foot">
+    <p class="hero__cta">
+      <a class="link-arrow" href="/fotografie">Arbeiten ansehen</a>
+      <?php if ($heroSlides !== []): ?>
+      <span class="hero__credits">
+        <?php foreach ($heroSlides as $i => $slide): ?>
+        <span class="hero__credit<?= $i === 0 ? ' is-active' : '' ?>" data-hero-credit<?= $i === 0 ? '' : ' aria-hidden="true"' ?>><?php if ($slide['gallery'] !== null): ?>Bild: <a href="/fotografie/<?= eurl($slide['gallery']['slug']) ?>"<?= $i === 0 ? '' : ' tabindex="-1"' ?>><?= e($slide['gallery']['title']) ?></a><?php endif; ?></span>
+        <?php endforeach; ?>
+      </span>
+      <?php endif; ?>
+    </p>
+    <?php if ($slideshow): ?>
+    <div class="hero__controls">
+      <button type="button" class="hero__toggle" data-hero-toggle aria-label="Bildwechsel anhalten">
+        <svg class="hero__icon hero__icon--pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5v14M14.5 5v14"/></svg>
+        <svg class="hero__icon hero__icon--play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5.1l10.4 6.9-10.4 6.9z"/></svg>
+      </button>
+      <ol class="hero__dots">
+        <?php foreach ($heroSlides as $i => $slide): ?>
+        <li><button type="button" class="hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>"<?= $i === 0 ? ' aria-current="true"' : '' ?> aria-label="Bild <?= $i + 1 ?> von <?= $slideCount ?><?= $slide['gallery'] !== null ? ': ' . e($slide['gallery']['title']) : '' ?>"></button></li>
+        <?php endforeach; ?>
+      </ol>
+    </div>
+    <?php endif; ?>
+    </div>
   </div>
 </section>
 

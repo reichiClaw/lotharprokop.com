@@ -9,6 +9,7 @@ use App\Config;
 use App\Database;
 use App\Films;
 use App\Galleries;
+use App\HeroSlides;
 use App\Images;
 use App\Picture;
 use App\Settings;
@@ -18,28 +19,20 @@ final class PublicController
 {
     public static function home(array $params): void
     {
-        $heroId = Settings::getInt('hero_image_id');
-        $hero = $heroId > 0 ? Images::find($heroId) : null;
-        $heroGallery = null;
-        if ($hero !== null && Settings::getInt('hero_gallery_id') > 0) {
-            $heroGallery = Galleries::find(Settings::getInt('hero_gallery_id'));
-            if ($heroGallery !== null && $heroGallery['status'] !== 'published') {
-                $heroGallery = null;
-            }
-        }
+        $heroSlides = HeroSlides::forDisplay();
         $featured = Galleries::featured();
         $portraitId = Settings::getInt('portrait_image_id');
         $portrait = $portraitId > 0 ? Images::find($portraitId) : null;
 
         View::render('home', [
-            'hero' => $hero,
-            'heroGallery' => $heroGallery,
+            'heroSlides' => $heroSlides,
+            'heroInterval' => HeroSlides::interval(),
             'featured' => $featured,
             'portrait' => $portrait,
             'meta' => [
                 'title' => '',
                 'description' => Settings::get('meta_description', ''),
-                'image' => $hero ? url(Picture::largestUrl($hero) ?? '') : null,
+                'image' => $heroSlides !== [] ? url(Picture::largestUrl($heroSlides[0]['image']) ?? '') : null,
             ],
         ]);
     }
