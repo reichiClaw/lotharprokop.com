@@ -125,6 +125,37 @@ Getestet mit Apache 2.4.58 + `mod_php` 8.3 (lokal, `AllowOverride All`, Document
 | `check.php`: per Shell im Repository (Hinweise zu 2M/8M-Limits und `debug`), im Browser unter Apache mit dem Split-Paket (`php_value`-Limits, `mod_rewrite aktiv`, `app-path.php` erkannt, alle Schreibrechte ok, Hinweis bei abweichender `base_url`), sowie in einem leeren Webroot ohne Anwendungsordner und ohne `config.php` (jeweils „Fehlt“ mit Handlungsanweisung) | ok |
 | Echter Hoster `lothar.drve.at` (Apache + PHP-FPM als `cgi-fcgi`, Kontobenutzer `drve`), Variante „ein Ordner“ per FTP: Nach dem FTP-Upload fehlten die Punktdateien in `public/` → Apache 404 für alle Routen; nach dem Nachladen Seiten 200. Bilder zunächst 404, Ursache: der Hoster lehnt die `Options`-Direktive in `public/media/.htaccess` ab; nach dem Entfernen von `Options` (Commit ecd9bd3) Bild-URLs 200 `image/jpeg` | ok (nach Korrektur) |
 
+### Komplettpaket mit Bildfolge, in Teilen (30.09.2026)
+
+Geprüft mit dem echten Bildbestand: Datenbank, 483 Originale und 3860 Bildvarianten aus der Inhaltsübernahme wurden in die Entwicklungsumgebung zurückgeholt, die Migration der Bildfolge lief dabei auf dem echten Datenstand. Geprüft mit PHP 8.3.6 (`php -S`, Document Root `public/` des entpackten Pakets) und Chrome 148 headless.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Migration auf dem echten Datenstand: Schema 1 → 2, das gesetzte `hero_image_id` wurde als erstes Bild der Bildfolge mit dem Projekt „Pelmondo“ übernommen, Startseite dadurch unverändert | ok |
+| `php bin/build-release.php --layout=single --with-content --base-url=https://lothar.drve.at` → 1.087,9 MB, 4447 Dateien, `config/config.php` mit zufälligem `setup_key`, `'debug' => false`, `base_url` gesetzt; Datenbank mit 52 Galerien, 483 Bildern, 5 Filmen, 5 Einträgen der Bildfolge, aber 0 Benutzern, 0 Loginversuchen, 0 Kontaktdaten | ok |
+| Aufteilung in 14 ZIP-Teile (Programm, 6 × Originale, 7 × Bildvarianten), größter Teil 95,1 MB; alle Teile in ein leeres Verzeichnis entpackt: 4447 Dateien, Dateiliste und Inhalte byteweise identisch zum Ausgangspaket (`diff -r`) | ok |
+| Erster Aufruf des entpackten Pakets: `storage/cache/needs-sync` wird abgearbeitet, 3862 Dateien in `public/media` angelegt (629 MB), Markerdatei danach entfernt; Bild-URLs 200 `image/jpeg` und 200 `image/webp` | ok |
+| Öffentliche Seiten des entpackten Pakets: `/`, `/fotografie`, `/film`, `/vita`, `/kontakt`, `/impressum`, `/datenschutz`, `/bildrechte`, `/sitemap.xml`, `/robots.txt`, `/check.php` → alle 200 | ok |
+| `/admin/setup` mit dem generierten Schlüssel: Konto angelegt, Weiterleitung zum Login, danach `/admin/setup` 404; Login → `/admin`; Übersicht zeigt „5 Bilder im Wechsel“ | ok |
+| `/admin/startseite` im entpackten Paket: 5 Einträge der Bildfolge mit je einer Projektauswahl, Intervallfeld mit dem Wert 6 | ok |
+| Startseite mit den echten Fotografien bei 1680 px und 390 px: erstes Bild (Pelmondo) bildschirmfüllend, Bildnachweis „Bild: Pelmondo“, 5 Punkte; Klick auf den dritten Punkt wechselt zum Claas-Porträt und der Nachweis auf „Bild: Claas“ | ok |
+
+### Update ohne Datenverlust: nur Programmdateien ersetzen (30.09.2026)
+
+Nachgestellt wurde der Stand des letzten FTP-Uploads: Paket vom 25.09.2026 entpackt (Schema 1, keine Tabelle `hero_slides`, `hero_image_id = 2`), Originale und Bildvarianten ergänzt, `public/media` über `needs-sync` aufgebaut (3862 Dateien), anschließend über `/admin/setup` ein Adminkonto angelegt. Darüber wurde das Paket „nur Programmdateien“ entpackt, das `config/` und `storage/` nicht enthält.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Vor dem Update: Adminübersicht ohne Abschnitt „Kopfbereich der Startseite“, `/admin/startseite` ohne Bildfolge, Startseite ohne `hero__slide` | erwarteter Ausgangszustand |
+| Paket „nur Programmdateien“ enthält 92 Dateien (`app/`, `templates/`, `public/`, `bin/`, `data/`, `docs/`, `.htaccess`, `README.md`) und weder `config/` noch `storage/` | ok |
+| Nach dem Überschreiben: `config/config.php` bytegleich (MD5 unverändert), `storage/database.sqlite` unverändert, `public/media` weiterhin 3862 Dateien, kein neues `needs-sync` | ok |
+| Erster Aufruf nach dem Update: Migration 2 angewendet (`MAX(version)` 1 → 2), `hero_slides` angelegt und das gesetzte `hero_image_id` als erster Eintrag mit dem Projekt Pelmondo übernommen; Startseite zeigt genau ein Bild, also unverändert | ok |
+| Bestand vollständig erhalten: 1 Benutzerkonto, 52 Galerien, 483 Bilder, 5 Filme | ok |
+| Anmeldung mit dem bestehenden Konto: 302 nach `/admin`; `/admin/setup` liefert 404, weil ein Konto existiert | ok |
+| Adminübersicht zeigt „Ein festes Startbild“, `/admin/startseite` einen Eintrag der Bildfolge; Bild-URL des Kopfbereichs 200 `image/webp` | ok |
+| Öffentliche Seiten nach dem Update: `/`, `/fotografie`, `/film`, `/vita`, `/kontakt`, `/impressum`, `/datenschutz`, `/bildrechte`, `/sitemap.xml` → alle 200 | ok |
+| Bildfolge im Adminbereich erweitern: zweites Bild aus einem Projekt übernommen, Wechseldauer auf 8 s gespeichert → Startseite liefert zwei Slides, zwei Punkte und `data-hero-interval="8000"` | ok |
+
 ## Visuelles Redesign des Frontends (29.09.2026)
 
 Alle Prüfungen wurden am 29.09.2026 in der Entwicklungsumgebung tatsächlich ausgeführt: PHP 8.3.6 (`php -S` mit `PHP_CLI_SERVER_WORKERS=8`, Document Root `public/`), Google Chrome 148 headless, gesteuert über das DevTools-Protokoll (Viewport-Emulation, Screenshots, Messungen im DOM).
