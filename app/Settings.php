@@ -74,6 +74,32 @@ final class Settings
     }
 
     /**
+     * Darstellung der „Ausgewählten Projekte“ auf der Startseite (Adminbereich).
+     * editorial = wechselnder Rhythmus aus großen Karten wie bisher; compact = gleichförmiges, kleines Raster,
+     * das sich deutlich von den großen Fotografien der Bildauswahl darüber absetzt.
+     */
+    public static function homeProjectsLayouts(): array
+    {
+        return [
+            'editorial' => [
+                'label' => 'Groß, im wechselnden Rhythmus',
+                'help' => 'Wie bisher: volle Breite, kleiner rechts, zwei nebeneinander – die Projekte wirken wie eine zweite Bildstrecke.',
+            ],
+            'compact' => [
+                'label' => 'Kompakte Übersicht',
+                'help' => 'Kleine, gleich große Kacheln in drei Spalten (zwei auf dem Tablet). Setzt die Projekte sichtbar von den großen Fotografien der Bildauswahl ab.',
+            ],
+        ];
+    }
+
+    /** Gewählte Darstellung der Projekte auf der Startseite; ungültige oder fehlende Werte → „editorial“. */
+    public static function homeProjectsLayout(): string
+    {
+        $value = (string) self::get('home_projects_layout', 'editorial');
+        return array_key_exists($value, self::homeProjectsLayouts()) ? $value : 'editorial';
+    }
+
+    /**
      * Kleine Spielereien im Frontend, einzeln abschaltbar (Adminbereich).
      * Schlüssel ohne Präfix „egg_“ landen als Leerzeichen-getrennte Liste im data-eggs-Attribut des <body>.
      */

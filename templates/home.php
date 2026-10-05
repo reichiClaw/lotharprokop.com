@@ -80,12 +80,22 @@ $slideshow = $slideCount > 1;
 </section>
 <?php endif; ?>
 
-<?php if ($featured !== []): ?>
-<section class="featured" aria-labelledby="featured-title">
+<?php if ($featured !== []): $compact = Settings::homeProjectsLayout() === 'compact'; ?>
+<section class="featured<?= $compact ? ' featured--compact' : '' ?>" aria-labelledby="featured-title">
   <header class="section-head">
     <h2 id="featured-title" class="section-head__title">Ausgewählte Projekte</h2>
     <a class="section-head__link link-arrow" href="/fotografie">Alle Projekte</a>
   </header>
+  <?php if ($compact): ?>
+  <?php // Kompakte Übersicht: gleich große Kacheln (3:2), die sich von den großen Fotografien der Bildauswahl absetzen. ?>
+  <div class="featured__grid featured__grid--compact">
+    <?php foreach ($featured as $i => $g): ?>
+      <div class="featured__item featured__item--compact reveal">
+        <?= App\View::partial('partials/gallery-card', ['gallery' => $g, 'sizes' => '(min-width: 1000px) 30vw, (min-width: 640px) 46vw, 100vw', 'loading' => $i < 3 ? 'eager' : 'lazy']) ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
+  <?php else: ?>
   <div class="featured__grid">
     <?php foreach ($featured as $i => $g): ?>
       <?php
@@ -102,6 +112,7 @@ $slideshow = $slideCount > 1;
       </div>
     <?php endforeach; ?>
   </div>
+  <?php endif; ?>
 </section>
 <?php endif; ?>
 

@@ -448,6 +448,22 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .featured__item--c { grid-column: 1 / span 9; }
   .featured__item--d { grid-column: 3 / span 10; }
 }
+/* Kompakte Übersicht (Einstellung): gleich große 3:2-Kacheln in drei Spalten – ein ruhiges Verzeichnis,
+   das sich bewusst von den großen Fotografien der Bildauswahl darüber absetzt. */
+.featured__grid--compact { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: var(--s-4); }
+.featured__item--compact { grid-column: auto; }
+.featured--compact .card__media { aspect-ratio: 3 / 2; }
+.featured--compact .card__text { padding-top: 0.75rem; }
+.featured--compact .card__title { font-size: var(--t-small); font-weight: 400; }
+.featured--compact .card__meta { font-size: 0.78rem; }
+.selection + .featured--compact { padding-top: var(--s-5); border-top: 1px solid var(--line); margin-top: var(--s-3); }
+@media (max-width: 999px) { .featured__grid--compact { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Auch auf dem Telefon zweispaltig, sonst wäre die Übersicht von der großen Variante nicht zu unterscheiden. */
+@media (max-width: 479px) {
+  .featured__grid--compact { row-gap: var(--s-3); }
+  .featured--compact .card__text { flex-direction: column; align-items: flex-start; gap: 0.1rem; padding-top: 0.5rem; }
+  .featured--compact .card__meta { font-size: 0.7rem; }
+}
 
 /* ---------- Bildauswahl: Startseite und Seite /auswahl ---------- */
 /* Direkt unter dem Kopfbereich: die ersten Bilder der Auswahl im editorialen Rhythmus der Galerien. */

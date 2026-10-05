@@ -238,6 +238,21 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 B
 | Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
 | JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
 
+## Darstellung der Projekte auf der Startseite (Schalter), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`, 4 hervorgehobene Galerien, Bildauswahl mit 4 Bildern auf der Startseite.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne gespeicherten Wert: Startseite wie bisher (`.featured` ohne Modifikator, Rhythmus 1165/474/573/573 px), im Admin ist „Groß, im wechselnden Rhythmus“ vorgewählt | ok |
+| Admin → Einstellungen: Abschnitt „Startseite: Ausgewählte Projekte“ mit zwei Optionen samt Skizze; „Kompakte Übersicht“ wählen + speichern → Option bleibt gewählt, Spielereien-Häkchen unverändert | ok |
+| Kompakt, 1280 px: `.featured--compact`, 3 Spalten à 375 px, alle Kacheln 3:2 (auch Hochformat-Titelbilder), Haarlinie zur Bildauswahl darüber, `sizes` 30vw | ok |
+| Kompakt, 800 px: 2 Spalten à 358 px | ok |
+| Kompakt, 390 px: 2 Spalten à 169 px, Beschriftung untereinander | ok |
+| Zurück auf „Groß“: Startseite wieder exakt wie vorher | ok |
+| Ungültiger Wert wird nicht gespeichert (`Settings::homeProjectsLayout()` fällt auf „editorial“ zurück) | ok (Code) |
+| JavaScript-Konsole | keine Fehler |
+
 ## HTTPS erzwingen (`.htaccess`), 05.10.2026
 
 Geprüft mit `curl -I` direkt gegen `lothar.drve.at` (Variante „ein Ordner“, Webroot-`.htaccess` = `deploy/webroot.htaccess`).
