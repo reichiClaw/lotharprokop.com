@@ -159,6 +159,9 @@ final class Images
         if (Settings::getInt('portrait_image_id') === $id) {
             $other[] = 'Porträt (Vita)';
         }
+        if (FeaturedImages::contains($id)) {
+            $other[] = 'Bildauswahl (Startseite, /auswahl)';
+        }
         $stmt = $pdo->prepare('SELECT title FROM films WHERE poster_image_id = ?');
         $stmt->execute([$id]);
         foreach ($stmt as $f) {
@@ -177,6 +180,7 @@ final class Images
         $pdo = Database::pdo();
         $pdo->prepare('UPDATE galleries SET cover_image_id = NULL WHERE cover_image_id = ?')->execute([$id]);
         $pdo->prepare('UPDATE films SET poster_image_id = NULL WHERE poster_image_id = ?')->execute([$id]);
+        $pdo->prepare('DELETE FROM featured_images WHERE image_id = ?')->execute([$id]);
         foreach (['hero_image_id', 'portrait_image_id'] as $key) {
             if (Settings::getInt($key) === $id) {
                 Settings::set($key, null);
@@ -186,7 +190,7 @@ final class Images
         self::removeFiles($image);
     }
 
-    /** Soll ein Bild öffentlich sein? Ja, wenn es in einem veröffentlichten Inhalt verwendet wird. */
+    /** Soll ein Bild öffentlich sein? Ja, wenn es in einem veröffentlichten Inhalt verwendet wird (auch in der Bildauswahl). */
     public static function shouldBePublic(int $id): bool
     {
         $pdo = Database::pdo();
@@ -205,7 +209,7 @@ final class Images
         if ($stmt->fetchColumn()) {
             return true;
         }
-        return HeroSlides::usesImage($id) > 0 || Settings::getInt('portrait_image_id') === $id;
+        return HeroSlides::usesImage($id) > 0 || FeaturedImages::contains($id) || Settings::getInt('portrait_image_id') === $id;
     }
 
     /** Gleicht den öffentlichen Ordner eines Bildes mit seinem Soll-Zustand ab. */

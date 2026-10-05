@@ -161,6 +161,7 @@ final class AdminController
             'archived' => (int) $pdo->query("SELECT COUNT(*) FROM galleries WHERE status = 'archived'")->fetchColumn(),
             'images' => (int) $pdo->query('SELECT COUNT(*) FROM images')->fetchColumn(),
             'films' => (int) $pdo->query("SELECT COUNT(*) FROM films WHERE status = 'published'")->fetchColumn(),
+            'selection' => (int) $pdo->query('SELECT COUNT(*) FROM featured_images')->fetchColumn(),
         ];
         $recent = array_slice(Galleries::all(), 0, 8);
         usort($recent, fn($a, $b) => strcmp($b['updated_at'], $a['updated_at']));

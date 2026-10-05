@@ -449,6 +449,13 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   .featured__item--d { grid-column: 3 / span 10; }
 }
 
+/* ---------- Bildauswahl: Startseite und Seite /auswahl ---------- */
+/* Direkt unter dem Kopfbereich: die ersten Bilder der Auswahl im editorialen Rhythmus der Galerien. */
+.selection { padding: var(--s-6) var(--gutter) var(--s-3); max-width: var(--max); margin: 0 auto; }
+.selection__grid .ed:last-child { margin-bottom: 0; }
+.selection + .featured { padding-top: var(--s-5); }
+.selection-page .page-head__back { margin: 0 0 var(--s-4); }
+
 /* ---------- Startseite: Kurzvorstellung ---------- */
 .about-teaser {
   display: grid;

@@ -7,6 +7,7 @@ use App\Auth;
 use App\Categories;
 use App\Config;
 use App\Database;
+use App\FeaturedImages;
 use App\Films;
 use App\Galleries;
 use App\HeroSlides;
@@ -21,6 +22,7 @@ final class PublicController
     {
         $heroSlides = HeroSlides::forDisplay();
         $featured = Galleries::featured();
+        $selection = FeaturedImages::forHome();
         $portraitId = Settings::getInt('portrait_image_id');
         $portrait = $portraitId > 0 ? Images::find($portraitId) : null;
 
@@ -28,11 +30,28 @@ final class PublicController
             'heroSlides' => $heroSlides,
             'heroInterval' => HeroSlides::interval(),
             'featured' => $featured,
+            'selection' => $selection,
+            'selectionTotal' => FeaturedImages::count(),
             'portrait' => $portrait,
             'meta' => [
                 'title' => '',
                 'description' => Settings::get('meta_description', ''),
                 'image' => $heroSlides !== [] ? url(Picture::largestUrl($heroSlides[0]['image']) ?? '') : null,
+            ],
+        ]);
+    }
+
+    /** Bildauswahl: alle ausgewählten Fotografien, unabhängig von Galerien. */
+    public static function selection(array $params): void
+    {
+        $images = FeaturedImages::forDisplay();
+        View::render('selection', [
+            'images' => $images,
+            'intro' => FeaturedImages::intro(),
+            'meta' => [
+                'title' => 'Ausgewählte Fotografien',
+                'description' => 'Eine Auswahl fotografischer Arbeiten von Lothar Prokop, Ried im Innkreis – quer durch Werbung, Industrie, Porträt, Reportage und Landschaft.',
+                'image' => $images !== [] ? url(Picture::largestUrl($images[0]) ?? '') : null,
             ],
         ]);
     }
@@ -256,6 +275,9 @@ final class PublicController
             ['loc' => url('/vita'), 'priority' => '0.6'],
             ['loc' => url('/kontakt'), 'priority' => '0.5'],
         ];
+        if (FeaturedImages::count() > 0) {
+            $urls[] = ['loc' => url('/auswahl'), 'priority' => '0.8'];
+        }
         foreach (Categories::withPublished() as $c) {
             $urls[] = ['loc' => url('/fotografie?kategorie=' . eurl($c['slug'])), 'priority' => '0.6'];
         }

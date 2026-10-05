@@ -45,6 +45,7 @@ unset($appRoot);
 use App\Controllers\AdminController;
 use App\Controllers\AdminGalleryController;
 use App\Controllers\AdminImageController;
+use App\Controllers\AdminSelectionController;
 use App\Controllers\PublicController;
 use App\Controllers\RedirectController;
 use App\Router;
@@ -60,6 +61,7 @@ $router = new Router();
 
 // Öffentliche Seiten
 $router->get('/', [PublicController::class, 'home']);
+$router->get('/auswahl', [PublicController::class, 'selection']);
 $router->get('/fotografie', [PublicController::class, 'portfolio']);
 $router->get('/fotografie/{slug:[a-z0-9-]+}', [PublicController::class, 'gallery']);
 $router->get('/film', [PublicController::class, 'films']);
@@ -126,6 +128,11 @@ $router->post('/admin/bilder/upload', [AdminImageController::class, 'uploadStand
 
 $router->get('/admin/kategorien', [AdminController::class, 'categories']);
 $router->post('/admin/kategorien', [AdminController::class, 'categoriesSave']);
+$router->get('/admin/auswahl', [AdminSelectionController::class, 'index']);
+$router->post('/admin/auswahl/hinzufuegen', [AdminSelectionController::class, 'add']);
+$router->post('/admin/auswahl/entfernen', [AdminSelectionController::class, 'remove']);
+$router->post('/admin/auswahl/sortieren', [AdminSelectionController::class, 'reorder']);
+$router->post('/admin/auswahl/einstellungen', [AdminSelectionController::class, 'settings']);
 $router->get('/admin/startseite', [AdminController::class, 'homepage']);
 $router->post('/admin/startseite', [AdminController::class, 'homepageSave']);
 $router->get('/admin/filme', [AdminController::class, 'films']);

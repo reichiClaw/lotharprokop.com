@@ -219,6 +219,25 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien; Admi
 - Echte Touchgeräte (Kontextmenü beim Gedrückthalten des Logos nur per `contextmenu`-Handler und `-webkit-touch-callout` unterbunden)
 - Klang des Auslösegeräuschs mit dem Ohr (nur Pegel und Zeitpunkte geprüft); Stummschaltung/Autoplay-Regeln auf iOS
 
+## Bildauswahl („Ausgewählte Fotografien“), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 Bilder); Migration 3 (`featured_images`) lief beim ersten Aufruf.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne Auswahl: Startseite ohne Abschnitt `.selection`; `/auswahl` 200 mit Hinweis „Derzeit sind keine Bilder ausgewählt.“ | ok |
+| Admin-Navigation „Bildauswahl“; Seite zeigt alle Bilder nach Galerie gruppiert (Pelmondo 17, Polar 1, Claas 3, YSL 14, „Weitere Bilder“ 1 = Porträt) | ok |
+| Picker: Schaltfläche anfangs deaktiviert; 3 Bilder anhaken + „Alle wählen“ in zweiter Gruppe → Zähler „4 Bilder angehakt.“, Gruppe bleibt geöffnet, Beschriftung wechselt zu „Keine wählen“; Absenden → Flash „4 Bilder in die Auswahl aufgenommen.“ | ok |
+| Bereits ausgewählte Bilder im Picker markiert und deaktiviert (kein Doppeleintrag) | ok |
+| Reihenfolge per Pfeil: Statusmeldung „Reihenfolge gespeichert.“, nach Neuladen vertauscht | ok |
+| „Aus Auswahl nehmen“ → Flash, Zahl sinkt | ok |
+| Darstellung: 4 Bilder für die Startseite, Einleitungstext → Markierung „Startseite“ an genau 4 Einträgen; Startseite zeigt 4 Bilder, Link „Alle 6 ansehen“; `/auswahl` zeigt alle 6 mit Einleitung | ok |
+| Bildformular: Kontrollkästchen spiegelt Auswahl, Abhaken + Speichern entfernt, Verwendung listet „Bildauswahl“ | ok |
+| Startseite: Abschnitt direkt nach dem Kopfbereich, Bildpfade unter `/media/…` (alle 200), Lightbox öffnet mit „1 / 4“ | ok |
+| `/auswahl`: Titel, Canonical, `og:image`; Sitemap enthält `/auswahl` nur bei nicht leerer Auswahl | ok |
+| Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
+| JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
+
 ## Nicht getestet
 
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)

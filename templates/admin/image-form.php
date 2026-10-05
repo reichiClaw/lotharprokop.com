@@ -2,6 +2,7 @@
 /** @var array $image */
 /** @var array $usage */
 /** @var int|null $backGallery */
+/** @var bool $inSelection  Bild ist in der Bildauswahl */
 use App\Config;
 use App\Csrf;
 use App\Images;
@@ -42,6 +43,9 @@ $usageCount = count($usage['galleries']) + count($usage['other']);
         <div class="a-field"><label for="focus_y">Vertikal (0–1)</label><input type="number" id="focus_y" name="focus_y" min="0" max="1" step="0.01" value="<?= $image['focus_y'] ?>" data-focus-y></div>
         <div class="a-field"><span class="a-label">Vorschau Ausschnitt 3:2 / 4:5</span><div class="a-focus-previews"><img src="<?= e($src) ?>" alt="" data-focus-preview style="aspect-ratio:3/2;object-position:<?= $image['focus_x'] * 100 ?>% <?= $image['focus_y'] * 100 ?>%"><img src="<?= e($src) ?>" alt="" data-focus-preview style="aspect-ratio:4/5;object-position:<?= $image['focus_x'] * 100 ?>% <?= $image['focus_y'] * 100 ?>%"></div></div>
       </div>
+    </div>
+    <div class="a-field">
+      <label class="a-check"><input type="hidden" name="featured" value="0"><input type="checkbox" name="featured" value="1" <?= $inSelection ? 'checked' : '' ?>> In der <a href="/admin/auswahl">Bildauswahl</a> zeigen <span class="a-muted">(Startseite und /auswahl – auch dann öffentlich, wenn das Bild nur in Entwürfen liegt)</span></label>
     </div>
     <div class="a-form__actions">
       <button type="submit" class="a-btn">Speichern</button>

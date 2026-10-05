@@ -11,6 +11,7 @@ $nav = [
     '/admin' => 'Übersicht',
     '/admin/galerien' => 'Galerien',
     '/admin/startseite' => 'Startseite',
+    '/admin/auswahl' => 'Bildauswahl',
     '/admin/kategorien' => 'Kategorien',
     '/admin/filme' => 'Filme',
     '/admin/einstellungen' => 'Einstellungen',
