@@ -31,6 +31,7 @@ public/       EINZIGES öffentliches Verzeichnis (Document Root)
   app-path.example.php  Vorlage für app-path.php (Pfad zum Anwendungsordner bei FTP-Hosting)
   .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
+  dokumente/  rechtliche PDFs (AGB, Rücktrittsrecht), verlinkt auf /agb
   media/      veröffentlichte Bildvarianten (werden automatisch verwaltet)
 storage/      privat: database.sqlite, originals/, derivatives/, sessions/, logs/, backups/, cache/
 templates/    HTML-Templates (öffentlich und Admin)

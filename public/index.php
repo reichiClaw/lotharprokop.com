@@ -69,6 +69,7 @@ $router->post('/kontakt', [PublicController::class, 'contactSubmit']);
 $router->get('/impressum', [PublicController::class, 'legal']);
 $router->get('/datenschutz', [PublicController::class, 'legal']);
 $router->get('/bildrechte', [PublicController::class, 'legal']);
+$router->get('/agb', [PublicController::class, 'legal']);
 $router->get('/sitemap.xml', [PublicController::class, 'sitemap']);
 $router->get('/robots.txt', [PublicController::class, 'robots']);
 
@@ -86,6 +87,8 @@ foreach (['shop', 'warenkorb', 'kasse', 'mein-konto', 'abstract-prints', 'blog',
     $router->get('/' . $gone, [RedirectController::class, 'gone']);
     $router->post('/' . $gone, [RedirectController::class, 'gone']);
 }
+// Rechtliche PDFs der alten Website liegen jetzt unter /dokumente/ (vor der pauschalen 410-Regel).
+$router->get('/wp-content/uploads/2019/04/{file:[^/]+\.pdf}', [RedirectController::class, 'document']);
 $router->get('/wp-content/{rest:.*}', [RedirectController::class, 'gone']);
 $router->get('/wp-includes/{rest:.*}', [RedirectController::class, 'gone']);
 $router->get('/wp-json/{rest:.*}', [RedirectController::class, 'gone']);

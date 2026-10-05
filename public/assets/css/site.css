@@ -718,6 +718,25 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 
 /* ---------- Rechtliches & Fehler ---------- */
 .legal__body { padding: 0 var(--gutter) var(--s-6); max-width: var(--max); margin: 0 auto; }
+/* Dokumente zum Herunterladen: Zeilen mit Haarlinien, kein Kasten. */
+.prose .doc-list { padding: 0; margin: var(--s-4) 0 0; border-top: 1px solid var(--line); max-width: var(--measure); }
+.prose .doc-list__item { margin: 0; border-bottom: 1px solid var(--line); }
+.prose .doc-list__item::before { display: none; }
+.prose .doc-list__link {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--s-3);
+  padding: var(--s-2) 0; color: var(--ink); text-decoration: none;
+}
+.doc-list__title { position: relative; }
+.doc-list__title::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -0.15em; height: 1px;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform var(--dur) var(--ease);
+}
+.doc-list__link:hover .doc-list__title::after, .doc-list__link:focus-visible .doc-list__title::after { transform: scaleX(1); }
+.doc-list__meta { flex: none; font-size: var(--t-micro); letter-spacing: var(--track-mid); color: var(--ink-3); white-space: nowrap; }
+@media (max-width: 480px) {
+  .prose .doc-list__link { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+}
 .error-page { padding: 0 var(--gutter) var(--s-6); max-width: var(--max); margin: 0 auto; }
 .error-page .page-head { padding-left: 0; padding-right: 0; }
 .error-page .page-head__note { font-family: var(--font-sans); font-size: var(--t-micro); letter-spacing: var(--track-wide); text-transform: uppercase; color: var(--ink-3); margin: 0 0 var(--s-2); }

@@ -210,19 +210,41 @@ final class PublicController
             'impressum' => ['key' => 'legal_impressum', 'title' => 'Impressum'],
             'datenschutz' => ['key' => 'legal_datenschutz', 'title' => 'Datenschutz'],
             'bildrechte' => ['key' => 'legal_bildrechte', 'title' => 'Bildrechte'],
+            'agb' => ['key' => 'legal_agb', 'title' => 'Allgemeine Geschäftsbedingungen', 'documents' => self::DOCUMENTS],
         ];
         $page = $map[$path] ?? null;
         if ($page === null) {
             View::notFound();
             return;
         }
+        $documents = [];
+        foreach ($page['documents'] ?? [] as $doc) {
+            $file = PUBLIC_ROOT . $doc['href'];
+            if (!is_file($file)) {
+                continue;
+            }
+            $doc['size'] = human_bytes((int) filesize($file));
+            $documents[] = $doc;
+        }
+        $text = (string) Settings::get($page['key'], '');
+        if ($text === '' && $documents !== []) {
+            $text = 'Die Allgemeinen Geschäftsbedingungen und die Rücktrittsbelehrung stehen hier als PDF zum Lesen und Herunterladen bereit.';
+        }
         View::render('legal', [
             'title' => $page['title'],
-            'text' => (string) Settings::get($page['key'], ''),
+            'text' => $text,
+            'documents' => $documents,
             'slug' => $path,
             'meta' => ['title' => $page['title'], 'robots' => 'noindex, follow', 'description' => $page['title'] . ' – Lothar Prokop Fotografie'],
         ]);
     }
+
+    /** Rechtliche Dokumente (PDF) unter public/dokumente/, übernommen von der alten Website. */
+    private const DOCUMENTS = [
+        ['title' => 'AGB für Unternehmer', 'href' => '/dokumente/agb-unternehmer.pdf', 'pages' => 9],
+        ['title' => 'AGB für Konsumenten', 'href' => '/dokumente/agb-konsumenten.pdf', 'pages' => 8],
+        ['title' => 'Rücktrittsrecht für Konsumenten', 'href' => '/dokumente/ruecktrittsrecht-konsumenten.pdf', 'pages' => 1],
+    ];
 
     public static function sitemap(array $params): void
     {

@@ -89,6 +89,7 @@ $linkedin = (string) App\Settings::get('social_linkedin', '');
         <li><a href="/impressum">Impressum</a></li>
         <li><a href="/datenschutz">Datenschutz</a></li>
         <li><a href="/bildrechte">Bildrechte</a></li>
+        <li><a href="/agb">AGB</a></li>
       </ul>
     </div>
   </div>

@@ -53,6 +53,7 @@ final class Settings
             'legal_impressum' => ['label' => 'Impressum', 'rows' => 14],
             'legal_datenschutz' => ['label' => 'Datenschutz', 'rows' => 20],
             'legal_bildrechte' => ['label' => 'Bildrechte', 'rows' => 8],
+            'legal_agb' => ['label' => 'AGB – Einleitungstext über den PDF-Dokumenten', 'rows' => 4],
         ];
     }
 
