@@ -207,7 +207,7 @@ Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript 
 
 **Filme** – Titel, Anbieter (YouTube / Vimeo), Video-ID oder -URL, Poster (eigenes Bild), Beschreibung, Status. Videos werden erst nach Klick geladen (youtube-nocookie bzw. Vimeo mit `dnt=1`).
 
-**Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte.
+**Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte sowie vier einzeln abschaltbare Spielereien im Frontend (Dunkelkammer, Verschluss am Logo, Autofokus auf der 404-Seite, Lichteinfall am Seitenende).
 
 **System** – Umgebungsinfos (PHP, Bildbibliothek, Upload-Limits, Schreibrechte, Speicherplatz, Anzahl Bilder ohne Varianten), „Fehlende Bildvarianten erzeugen“ (portionsweise, mit automatischer Fortsetzung), „Sichtbarkeit aller Bilder abgleichen“ (stellt `public/media/` aus den privaten Varianten wieder her) und „Datenbank herunterladen“ (Backup ohne Kommandozeile).
 

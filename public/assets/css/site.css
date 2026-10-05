@@ -816,3 +816,187 @@ body.lightbox-open { overflow: hidden; }
   .lightbox__bar { padding-bottom: 0.6rem; flex-direction: column; align-items: center; text-align: center; }
   .lightbox__caption { text-align: center; }
 }
+
+/* ==========================================================================
+   Spielereien (Easter Eggs) – einzeln im Adminbereich abschaltbar.
+   Alle sind rein dekorativ, blockieren nichts (pointer-events: none auf den
+   Überlagerungen) und respektieren „Bewegung reduzieren“ über die globale
+   Regel oben (Animationen auf 0,01 ms).
+   ========================================================================== */
+
+/* ---------- Dunkelkammer: rotes Schutzlicht, Abzüge entwickeln sich aus weißem Papier ---------- */
+html.is-darkroom {
+  --paper: #140606;
+  --paper-2: #1d0908;
+  --ink: #ff8471;
+  --ink-2: #dc6b59;
+  --ink-3: #9e4d40;
+  --line: #3b1612;
+  --line-2: #52201a;
+  --dark: #0a0202;
+  --on-dark: #ff9684;
+  --focus: #ff8471;
+  color-scheme: dark;
+  background: var(--paper);
+}
+html.is-darkroom body { background: var(--paper); color: var(--ink); }
+html.is-darkroom ::selection { background: #ff8471; color: #140606; }
+/* Jedes Foto ein Abzug unter Rotlicht: monochrom, rötlich, etwas abgedunkelt. */
+html.is-darkroom img:not(.brand__logo) {
+  filter: grayscale(1) sepia(1) hue-rotate(-28deg) saturate(2.4) contrast(1.08) brightness(0.72);
+}
+/* Entwicklung: aus Papierweiß über ein flaues Grau zum fertigen Abzug; je Bild zeitlich leicht versetzt (--develop-delay aus site.js). */
+html.is-darkroom.is-developing img:not(.brand__logo) {
+  animation: egg-develop 3400ms cubic-bezier(0.3, 0, 0.25, 1) both;
+  animation-delay: var(--develop-delay, 0ms);
+}
+@keyframes egg-develop {
+  0%   { filter: grayscale(1) sepia(1) hue-rotate(-28deg) saturate(0.4) contrast(0) brightness(3.4); }
+  30%  { filter: grayscale(1) sepia(1) hue-rotate(-28deg) saturate(1.1) contrast(0.3) brightness(1.9); }
+  100% { filter: grayscale(1) sepia(1) hue-rotate(-28deg) saturate(2.4) contrast(1.08) brightness(0.72); }
+}
+html.is-darkroom .brand__logo { filter: invert(0.3) sepia(1) saturate(3) hue-rotate(-40deg) brightness(1.5); }
+html.is-darkroom .hero--media::after { opacity: 0.35; }
+html.is-darkroom .lightbox { background: rgba(14, 3, 3, 0.98); }
+/* Schutzlicht von oben und Filmkorn über allem; beide ohne Zeigerinteraktion. */
+html.is-darkroom body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 210; pointer-events: none;
+  background: radial-gradient(ellipse 90% 55% at 50% -10%, rgba(255, 70, 40, 0.28), rgba(255, 70, 40, 0) 70%);
+}
+html.is-darkroom body::after {
+  content: '';
+  position: fixed; inset: -40%; z-index: 211; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1  0 0 0 0 0.45  0 0 0 0 0.35  0 0 0 0.7 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 320px 320px;
+  opacity: 0.14;
+  mix-blend-mode: screen;
+  animation: egg-grain 700ms steps(5) infinite;
+}
+@keyframes egg-grain {
+  0%   { transform: translate(0, 0); }
+  20%  { transform: translate(-3%, 2%); }
+  40%  { transform: translate(2%, -4%); }
+  60%  { transform: translate(-4%, -1%); }
+  80%  { transform: translate(3%, 3%); }
+  100% { transform: translate(0, 0); }
+}
+/* Gedrückthalten des Logos: das Logo färbt sich während der 1,5 s langsam rot – ein Hinweis, dass etwas passiert. */
+.brand { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.brand.is-pressing .brand__logo { filter: invert(0.3) sepia(1) saturate(3) hue-rotate(-40deg) brightness(1.5); transition: filter 1500ms linear, width var(--dur) var(--ease), opacity var(--dur) var(--ease); }
+html.is-darkroom .brand.is-pressing .brand__logo { filter: invert(0) sepia(0) hue-rotate(0deg) saturate(1) brightness(1); }
+
+/* Kleiner Hinweis unten in der Mitte (z. B. „Dunkelkammer – Esc beendet“). */
+.egg-toast {
+  position: fixed; left: 50%; bottom: 1.25rem; z-index: 220;
+  margin: 0; padding: 0.7rem 1rem; border: 0; border-radius: 0;
+  transform: translate(-50%, 0.5rem);
+  font: inherit; font-size: var(--t-micro); letter-spacing: var(--track-mid); text-transform: uppercase; line-height: 1.4;
+  color: var(--paper); background: var(--ink);
+  opacity: 0; pointer-events: none; cursor: pointer;
+  transition: opacity 320ms var(--ease), transform 320ms var(--ease);
+}
+.egg-toast.is-visible { opacity: 1; transform: translate(-50%, 0); pointer-events: auto; }
+.egg-toast:focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; }
+.egg-toast[hidden] { display: none; }
+
+/* ---------- Verschluss am Logo: eine sechsblättrige Blende schließt und öffnet sich über der Seite ---------- */
+.shutter { position: fixed; inset: 0; z-index: 300; pointer-events: none; overflow: hidden; display: none; }
+.shutter.is-playing { display: block; }
+.shutter__iris { position: absolute; inset: 0; }
+/* Sechs Lamellen: je eine große schwarze Fläche, deren Innenkante im Abstand d zur Bildmitte liegt. Die Vereinigung
+   aller sechs lässt ein Sechseck mit Inkreisradius d frei; d läuft auf 0 und wieder auf, dazu dreht die ganze Blende. */
+.shutter__iris i {
+  position: absolute; left: 50%; top: 50%;
+  width: 300vmax; height: 150vmax; margin-left: -150vmax;
+  background: #0b0908;
+  transform-origin: 50% 0;
+  transform: rotate(var(--a)) translateY(78vmax);
+  will-change: transform;
+}
+.shutter__iris i:nth-child(1) { --a: 0deg; }
+.shutter__iris i:nth-child(2) { --a: 60deg; }
+.shutter__iris i:nth-child(3) { --a: 120deg; }
+.shutter__iris i:nth-child(4) { --a: 180deg; }
+.shutter__iris i:nth-child(5) { --a: 240deg; }
+.shutter__iris i:nth-child(6) { --a: 300deg; }
+.shutter.is-playing .shutter__iris { animation: egg-shutter-twist 440ms cubic-bezier(0.55, 0, 0.45, 1) both; }
+.shutter.is-playing .shutter__iris i { animation: egg-shutter-blade 440ms cubic-bezier(0.55, 0, 0.45, 1) both; }
+@keyframes egg-shutter-blade {
+  0%        { transform: rotate(var(--a)) translateY(78vmax); }
+  44%, 56%  { transform: rotate(var(--a)) translateY(0); }
+  100%      { transform: rotate(var(--a)) translateY(78vmax); }
+}
+@keyframes egg-shutter-twist { from { transform: rotate(0deg); } to { transform: rotate(60deg); } }
+
+/* ---------- Autofokus auf der 404-Seite: unscharfes Foto, Fokusrahmen folgt dem Zeiger, rastet grün ein ---------- */
+.af {
+  position: relative; display: block;
+  margin: var(--s-5) 0 0;
+  overflow: hidden; background: var(--paper-2);
+  cursor: crosshair; touch-action: manipulation;
+}
+.af--landscape { aspect-ratio: 3 / 2; max-width: min(100%, 1100px); }
+.af--portrait { aspect-ratio: 4 / 5; max-width: min(100%, 560px); }
+.af__media, .af__media picture, .af__media img { display: block; width: 100%; height: 100%; }
+.af__media img { object-fit: cover; transition: filter 520ms var(--ease), transform 520ms var(--ease); will-change: filter, transform; }
+/* Nur mit JavaScript unscharf – ohne Skript gäbe es nichts, was scharf stellt. */
+.js .af:not(.is-focused) .af__media img { filter: blur(14px) saturate(0.8); transform: scale(1.05); }
+.js .af.is-hunting .af__media img { transition-duration: 240ms; }
+.af__frame {
+  position: absolute; left: 0; top: 0;
+  width: 4.75rem; height: 4.75rem;
+  transform: translate(-50%, -50%);
+  opacity: 0; pointer-events: none;
+  transition: opacity 260ms var(--ease), transform 140ms linear;
+}
+.js .af.is-tracking .af__frame { opacity: 1; }
+.af__frame i {
+  position: absolute; width: 0.95rem; height: 0.95rem;
+  border: 0 solid rgba(255, 255, 255, 0.95);
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.6));
+  transition: border-color 160ms var(--ease);
+}
+.af__frame i:nth-child(1) { left: 0; top: 0; border-left-width: 1.5px; border-top-width: 1.5px; }
+.af__frame i:nth-child(2) { right: 0; top: 0; border-right-width: 1.5px; border-top-width: 1.5px; }
+.af__frame i:nth-child(3) { right: 0; bottom: 0; border-right-width: 1.5px; border-bottom-width: 1.5px; }
+.af__frame i:nth-child(4) { left: 0; bottom: 0; border-left-width: 1.5px; border-bottom-width: 1.5px; }
+.af.is-focused .af__frame i { border-color: #3ddc84; }
+.af.is-focused .af__frame { animation: egg-af-lock 320ms var(--ease); }
+@keyframes egg-af-lock {
+  0%   { scale: 1.18; }
+  60%  { scale: 0.96; }
+  100% { scale: 1; }
+}
+.af__caption {
+  position: absolute; left: 0.9rem; right: 0.9rem; bottom: 0.8rem;
+  display: flex; justify-content: space-between; gap: var(--s-2);
+  font-size: var(--t-micro); letter-spacing: var(--track-mid); text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9); text-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.af__status::before { content: ''; display: inline-block; width: 0.45rem; height: 0.45rem; margin: 0 0.5rem 0.05rem 0; border-radius: 50%; background: currentColor; opacity: 0.7; }
+.js .af.is-hunting .af__status::before { animation: egg-af-blink 420ms steps(2) infinite; }
+.af.is-focused .af__status { color: #3ddc84; text-shadow: none; }
+@keyframes egg-af-blink { to { opacity: 0; } }
+.af__title { text-align: right; }
+.af:focus-visible { outline-offset: 6px; }
+
+/* ---------- Lichteinfall am Seitenende: warmer Schein wie bei undicht gewordenem Filmmagazin ---------- */
+.light-leak {
+  position: fixed; left: -10vw; right: -10vw; bottom: -18vh; height: 68vh;
+  z-index: 180; pointer-events: none; opacity: 0;
+  background:
+    radial-gradient(55% 75% at 18% 100%, rgba(255, 140, 40, 0.9), rgba(255, 100, 30, 0.45) 42%, rgba(255, 100, 30, 0) 72%),
+    radial-gradient(45% 65% at 84% 100%, rgba(255, 206, 96, 0.8), rgba(255, 150, 60, 0) 66%),
+    linear-gradient(to top, rgba(255, 96, 40, 0.5), rgba(255, 96, 40, 0));
+  filter: blur(14px);
+  will-change: opacity, transform;
+}
+.light-leak.is-on { animation: egg-leak 2600ms cubic-bezier(0.2, 0.6, 0.3, 1) both; }
+@keyframes egg-leak {
+  0%   { opacity: 0; transform: translateY(14%) scaleX(1.05); }
+  22%  { opacity: 1; }
+  58%  { opacity: 0.8; transform: translateY(0) scaleX(1); }
+  100% { opacity: 0; transform: translateY(-6%) scaleX(1.1); }
+}

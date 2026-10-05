@@ -47,7 +47,7 @@ $linkedin = (string) App\Settings::get('social_linkedin', '');
 <link rel="stylesheet" href="/assets/css/site.css?v=<?= e(App\Config::get('asset_version', App\View::ASSET_VERSION)) ?>">
 <script><?= App\View::JS_BOOT ?></script>
 </head>
-<body class="<?= $isHome ? 'is-home' : '' ?>">
+<body class="<?= $isHome ? 'is-home' : '' ?>" data-eggs="<?= e(App\Settings::enabledEggs()) ?>">
 <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
 <header class="site-header" id="oben">
   <div class="site-header__inner">

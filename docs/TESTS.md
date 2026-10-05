@@ -191,6 +191,31 @@ Umgebung: PHP 8.3.6 mit `php -S`, Chrome headless über das DevTools-Protokoll, 
 | Erreichbare Links im Kopfbereich in allen Zuständen | konstant 3 (Bild, Bildnachweis, „Arbeiten ansehen“) |
 | `node --check public/assets/js/site.js`, `php -l app/View.php` | keine Fehler |
 
+## Kleine Spielereien (Easter Eggs), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien; Admin-Schalter unter Einstellungen → „Kleine Spielereien“.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `<body data-eggs>` enthält ohne gespeicherte Einstellung alle vier (`darkroom shutter autofocus lightleak`) | ok |
+| Admin: Dunkelkammer und Lichteinfall abgehakt und gespeichert → Flash „Einstellungen gespeichert.“, Kästchen bleiben aus, `data-eggs="shutter autofocus"`, Tippen von „dunkelkammer“ bleibt wirkungslos | ok |
+| Admin: Autofokus abgeschaltet → 404-Seite ohne Foto (`[data-af]` fehlt); alle wieder eingeschaltet → vollständige Liste | ok |
+| Dunkelkammer per Tippen: `html.is-darkroom.is-developing`, Hintergrund `rgb(20, 6, 6)`, Bildfilter startet bei `contrast(0) brightness(3.4)` (Papierweiß) und steht nach 4,8 s auf dem Endzustand (`is-developing` entfernt); Esc beendet | ok |
+| Dunkelkammer per Gedrückthalten des Logos (Maus 1,7 s; Touch 1,65 s auf iPhone-13-Emulation): `.brand.is-pressing` nach 0,6 s, Modus an, keine Navigation durch den anschließenden Klick | ok |
+| Logo-Farbe im Rotlicht: Filterkette per Canvas gegen `--ink` (#ff8471) abgeglichen, Abweichung 3 von 441 | ok |
+| Verschluss: zwei Klicks innerhalb 60 ms → `.shutter.is-playing` sichtbar, Seite bleibt; Standbilder bei 60/120/190 ms zeigen ein sauberes Sechseck ohne Nahtlinien (Lamellen-Variante; die erste Variante mit `polygon(evenodd)` zeigte eine Antialiasing-Naht); einzelner Klick navigiert nach 280 ms zur Startseite | ok |
+| Lichteinfall: am Seitenende der Projektübersicht `.light-leak.is-on`, nach 2,7 s beendet; erneutes Erreichen des Endes ohne 320 px Zurückscrollen löst nicht aus, danach wieder | ok |
+| Autofokus (Maus): Bild `blur(14px)`, beim Bewegen `is-tracking is-hunting` mit Rahmenposition, nach 420 ms Ruhe `is-focused`, Status „Scharf“, Rahmen `rgb(61, 220, 132)`, Filter `none`; Verlassen setzt zurück; Tastaturfokus stellt mittig scharf | ok |
+| Autofokus (Touch): erstes Antippen stellt scharf ohne Navigation, zweites Antippen folgt dem Link zur Galerie | ok |
+| `prefers-reduced-motion: reduce`: 404-Foto sofort scharf, Logo-Klick navigiert ohne Verzögerung (39 ms) | ok |
+| JavaScript-Konsole auf Startseite, Projektübersicht, 404 in allen Zuständen | keine Fehler außer dem erwarteten 404-Status der Fehlerseite |
+| `php -l` (Settings, View, Galleries, AdminController, Templates), Syntaxprüfung `site.js` | keine Fehler |
+
+### Nicht getestet (Spielereien)
+
+- Safari/Firefox (Lamellen-Blende, `scale`-Eigenschaft am Fokusrahmen, `mix-blend-mode: screen` des Filmkorns)
+- Echte Touchgeräte (Kontextmenü beim Gedrückthalten des Logos nur per `contextmenu`-Handler und `-webkit-touch-callout` unterbunden)
+
 ## Nicht getestet
 
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)

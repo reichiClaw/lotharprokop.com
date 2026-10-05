@@ -40,6 +40,17 @@ use App\Images;
   </div>
   <?php endforeach; ?>
 
+  <h2 class="a-subtitle">Kleine Spielereien (Easter Eggs)</h2>
+  <p class="a-help">Versteckte Animationen für Besucher, die genauer hinsehen. Jede lässt sich einzeln abschalten; alle respektieren die Systemeinstellung „Bewegung reduzieren“.</p>
+  <div class="a-eggs">
+    <?php foreach ($eggs as $key => $def): $on = !array_key_exists($key, $values) || (string) $values[$key] === '1'; ?>
+    <label class="a-check a-egg">
+      <input type="checkbox" name="<?= e($key) ?>" value="1" <?= $on ? 'checked' : '' ?>>
+      <span class="a-egg__text"><strong><?= e($def['label']) ?></strong><span class="a-egg__help"><?= e($def['help']) ?></span></span>
+    </label>
+    <?php endforeach; ?>
+  </div>
+
   <div class="a-form__actions">
     <button type="submit" class="a-btn">Einstellungen speichern</button>
     <span class="a-savestate" data-dirty-label hidden>Ungespeicherte Änderungen</span>

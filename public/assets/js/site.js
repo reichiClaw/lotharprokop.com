@@ -465,6 +465,277 @@
     }, { passive: true });
   }
 
+  /* ==========================================================================
+     Spielereien (Easter Eggs) – einzeln im Adminbereich abschaltbar.
+     Das Layout schreibt die aktiven in <body data-eggs="darkroom shutter …">.
+     ========================================================================== */
+  function initEggs() {
+    var enabled = (document.body.getAttribute('data-eggs') || '').split(/\s+/).filter(Boolean);
+    function has(name) { return enabled.indexOf(name) !== -1; }
+    var brand = document.querySelector('.brand');
+    if (has('darkroom')) initDarkroom(brand);
+    if (has('shutter') && brand) initShutter(brand);
+    if (has('autofocus')) initAutofocus();
+    if (has('lightleak')) initLightLeak();
+  }
+
+  function isTypingTarget(el) {
+    return !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
+  }
+
+  /* ---------- Dunkelkammer ----------
+     „dunkelkammer“ tippen oder das Logo 1,5 s gedrückt halten: rotes Schutzlicht, die Bilder entwickeln sich
+     aus weißem Papier. Esc, erneutes Tippen oder Gedrückthalten schaltet das Licht wieder an. */
+  function initDarkroom(brand) {
+    var root = document.documentElement;
+    var WORD = 'dunkelkammer';
+    var typed = '';
+    var toast = null;
+    var toastTimer = null;
+    var developTimer = null;
+
+    function note(text) {
+      if (!toast) {
+        toast = document.createElement('button');
+        toast.type = 'button';
+        toast.className = 'egg-toast';
+        toast.addEventListener('click', leave);
+        document.body.appendChild(toast);
+      }
+      if (toastTimer) window.clearTimeout(toastTimer);
+      toast.textContent = text;
+      toast.hidden = false;
+      window.requestAnimationFrame(function () { toast.classList.add('is-visible'); });
+      toastTimer = window.setTimeout(function () { toast.classList.remove('is-visible'); }, 3600);
+    }
+
+    function isOn() { return root.classList.contains('is-darkroom'); }
+
+    function enter() {
+      // Jeder Abzug entwickelt sich etwas anders schnell – kein Gleichschritt.
+      document.querySelectorAll('img').forEach(function (img) {
+        img.style.setProperty('--develop-delay', Math.round(Math.random() * 1100) + 'ms');
+      });
+      root.classList.add('is-darkroom', 'is-developing');
+      if (developTimer) window.clearTimeout(developTimer);
+      developTimer = window.setTimeout(function () { root.classList.remove('is-developing'); }, 4800);
+      note('Dunkelkammer – Licht an: Esc oder hier antippen');
+    }
+
+    function leave() {
+      root.classList.remove('is-darkroom', 'is-developing');
+      if (developTimer) { window.clearTimeout(developTimer); developTimer = null; }
+      if (toast) { toast.classList.remove('is-visible'); if (toastTimer) window.clearTimeout(toastTimer); }
+    }
+
+    function toggle() { if (isOn()) leave(); else enter(); }
+
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && isOn()) { leave(); return; }
+      if (ev.metaKey || ev.ctrlKey || ev.altKey || isTypingTarget(ev.target)) return;
+      if (!ev.key || ev.key.length !== 1) return;
+      typed = (typed + ev.key.toLowerCase()).slice(-WORD.length);
+      if (typed === WORD) { typed = ''; toggle(); }
+    });
+
+    if (!brand) return;
+    var pressTimer = null;
+    var longPressed = false;
+    function cancelPress() {
+      if (pressTimer) { window.clearTimeout(pressTimer); pressTimer = null; }
+      brand.classList.remove('is-pressing');
+    }
+    brand.addEventListener('pointerdown', function (ev) {
+      if (ev.button !== 0) return;
+      longPressed = false;
+      brand.classList.add('is-pressing');
+      pressTimer = window.setTimeout(function () {
+        pressTimer = null;
+        longPressed = true;
+        brand.classList.remove('is-pressing');
+        toggle();
+      }, 1500);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (type) {
+      brand.addEventListener(type, cancelPress);
+    });
+    // Nach dem Gedrückthalten soll der Klick nicht zur Startseite führen (Capture-Phase: läuft vor dem Verschluss).
+    brand.addEventListener('click', function (ev) {
+      if (!longPressed) return;
+      longPressed = false;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    }, true);
+    // Auf Touchgeräten öffnet langes Drücken sonst das Kontextmenü des Links.
+    brand.addEventListener('contextmenu', function (ev) {
+      if (pressTimer || longPressed) ev.preventDefault();
+    });
+  }
+
+  /* ---------- Verschluss am Logo ----------
+     Doppelklick schließt und öffnet eine sechsblättrige Blende über der Seite. Damit der erste Klick nicht schon
+     zur Startseite springt, wartet die Navigation kurz auf einen möglichen zweiten Klick. */
+  function initShutter(brand) {
+    if (reduceMotion) return;
+    var clickTimer = null;
+    var overlay = null;
+    var busy = false;
+
+    function play() {
+      if (busy) return;
+      busy = true;
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'shutter';
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.innerHTML = '<div class="shutter__iris"><i></i><i></i><i></i><i></i><i></i><i></i></div>';
+        document.body.appendChild(overlay);
+      }
+      var iris = overlay.firstChild;
+      var done = function () {
+        overlay.classList.remove('is-playing');
+        busy = false;
+      };
+      iris.addEventListener('animationend', done, { once: true });
+      window.setTimeout(done, 1500);
+      overlay.classList.add('is-playing');
+    }
+
+    brand.addEventListener('click', function (ev) {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+      ev.preventDefault();
+      if (clickTimer) {
+        window.clearTimeout(clickTimer);
+        clickTimer = null;
+        play();
+        return;
+      }
+      clickTimer = window.setTimeout(function () {
+        clickTimer = null;
+        if (window.location.pathname === '/') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.location.href = brand.href;
+        }
+      }, 280);
+    });
+  }
+
+  /* ---------- Autofokus auf der 404-Seite ----------
+     Der Fokusrahmen folgt dem Zeiger; bleibt er kurz stehen, rastet er grün ein und das Bild wird scharf.
+     Touch: Antippen stellt scharf, erneutes Antippen folgt dem Link. Tastatur: Fokus stellt mittig scharf. */
+  function initAutofocus() {
+    var box = document.querySelector('[data-af]');
+    if (!box) return;
+    var frame = box.querySelector('.af__frame');
+    var status = box.querySelector('[data-af-status]');
+    var SETTLE_MS = 420;
+    var settle = null;
+
+    function say(text) { if (status) status.textContent = text; }
+
+    if (reduceMotion || !frame) {
+      box.classList.add('is-focused');
+      say('Scharf');
+      return;
+    }
+
+    function lock() {
+      settle = null;
+      box.classList.remove('is-hunting');
+      box.classList.add('is-focused');
+      say('Scharf');
+    }
+
+    function moveTo(clientX, clientY) {
+      var r = box.getBoundingClientRect();
+      var x = Math.min(Math.max(clientX - r.left, 0), r.width);
+      var y = Math.min(Math.max(clientY - r.top, 0), r.height);
+      frame.style.transform = 'translate(' + Math.round(x) + 'px, ' + Math.round(y) + 'px) translate(-50%, -50%)';
+      box.classList.add('is-tracking', 'is-hunting');
+      box.classList.remove('is-focused');
+      say('Fokus suchen …');
+      if (settle) window.clearTimeout(settle);
+      settle = window.setTimeout(lock, SETTLE_MS);
+    }
+
+    function release() {
+      if (settle) { window.clearTimeout(settle); settle = null; }
+      box.classList.remove('is-tracking', 'is-hunting', 'is-focused');
+      say('Fokus suchen …');
+    }
+
+    box.addEventListener('pointermove', function (ev) {
+      if (ev.pointerType === 'touch') return;
+      moveTo(ev.clientX, ev.clientY);
+    });
+    box.addEventListener('pointerleave', function (ev) {
+      if (ev.pointerType === 'touch') return;
+      release();
+    });
+    box.addEventListener('touchstart', function (ev) {
+      if (box.classList.contains('is-focused')) return; // zweites Antippen: Link folgt
+      var t = ev.touches[0];
+      moveTo(t.clientX, t.clientY);
+    }, { passive: true });
+    box.addEventListener('click', function (ev) {
+      if (box.classList.contains('is-focused')) return;
+      ev.preventDefault();
+      moveTo(ev.clientX, ev.clientY);
+    });
+    box.addEventListener('focus', function () {
+      var r = box.getBoundingClientRect();
+      moveTo(r.left + r.width / 2, r.top + r.height / 2);
+    });
+    box.addEventListener('blur', release);
+  }
+
+  /* ---------- Lichteinfall am Seitenende ----------
+     Wer die Projektübersicht oder eine Galerie bis ganz unten scrollt, sieht einmal einen warmen Lichteinfall.
+     Erst nach einem Stück Zurückscrollen kann er erneut ausgelöst werden. */
+  function initLightLeak() {
+    if (reduceMotion) return;
+    if (!document.querySelector('.portfolio, .project')) return;
+    var leak = null;
+    var armed = true;
+    var playing = false;
+    var ticking = false;
+
+    function play() {
+      if (!leak) {
+        leak = document.createElement('div');
+        leak.className = 'light-leak';
+        leak.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(leak);
+      }
+      playing = true;
+      leak.classList.add('is-on');
+      window.setTimeout(function () {
+        leak.classList.remove('is-on');
+        playing = false;
+      }, 2700);
+    }
+
+    function check() {
+      ticking = false;
+      var root = document.documentElement;
+      var max = root.scrollHeight - window.innerHeight;
+      if (max < 400) return; // zu kurze Seite: kein „Ende erreicht“
+      var y = window.pageYOffset || root.scrollTop || 0;
+      if (y >= max - 2) {
+        if (armed && !playing) { armed = false; play(); }
+      } else if (y < max - 320) {
+        armed = true;
+      }
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(check);
+    }, { passive: true });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initHeader();
     initHero();
@@ -472,5 +743,6 @@
     initFilter();
     initVideos();
     initLightbox();
+    initEggs();
   });
 })();

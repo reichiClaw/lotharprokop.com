@@ -410,6 +410,7 @@ final class AdminController
         self::render('settings', [
             'texts' => Settings::editableTexts(),
             'fields' => Settings::editableFields(),
+            'eggs' => Settings::easterEggs(),
             'values' => Settings::all(),
             'portrait' => $portraitId > 0 ? Images::find($portraitId) : null,
             'meta' => ['title' => 'Einstellungen'],
@@ -436,6 +437,10 @@ final class AdminController
                 }
                 Settings::set($key, $value);
             }
+        }
+        // Kontrollkästchen: nicht angehakt = nicht im POST, deshalb jeden Schlüssel explizit setzen.
+        foreach (array_keys(Settings::easterEggs()) as $key) {
+            Settings::set($key, isset($_POST[$key]) ? '1' : '0');
         }
         if (!empty($_FILES['portrait']['name'])) {
             try {

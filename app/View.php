@@ -16,7 +16,7 @@ final class View
      * damit Besucher ohne Eingriff in config/config.php die neuen Dateien erhalten.
      * Ein Wert in der Konfiguration ('asset_version') hat Vorrang.
      */
-    public const ASSET_VERSION = '6';
+    public const ASSET_VERSION = '7';
 
     public static function jsBootHash(): string
     {
@@ -74,10 +74,19 @@ final class View
     public static function notFound(string $message = 'Diese Seite gibt es nicht (mehr).'): void
     {
         http_response_code(404);
+        $focusGallery = null;
+        if (Settings::eggEnabled('autofocus')) {
+            try {
+                $focusGallery = Galleries::randomWithCover();
+            } catch (\Throwable) {
+                $focusGallery = null; // Die Fehlerseite darf an der Spielerei nicht scheitern.
+            }
+        }
         self::render('error', [
             'title' => 'Seite nicht gefunden',
             'code' => 404,
             'message' => $message,
+            'focusGallery' => $focusGallery,
             'meta' => ['title' => 'Seite nicht gefunden', 'robots' => 'noindex'],
         ]);
     }

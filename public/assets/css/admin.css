@@ -74,6 +74,11 @@ fieldset.a-field legend { font-size: 0.9rem; font-weight: 500; padding: 0 0.3rem
 .a-checks { display: flex; flex-wrap: wrap; gap: 0.3rem 1.25rem; }
 .a-check { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 32px; cursor: pointer; }
 .a-check input { width: 18px; height: 18px; margin: 0; }
+.a-eggs { display: grid; gap: 0.6rem; margin-bottom: 1.25rem; }
+.a-egg { align-items: flex-start; }
+.a-egg input { flex: none; margin-top: 0.15rem; }
+.a-egg__text { display: flex; flex-direction: column; gap: 0.15rem; }
+.a-egg__help { color: var(--a-ink-2); font-size: 0.85rem; line-height: 1.45; }
 .a-row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 1rem; }
 .a-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 1rem; }
 @media (max-width: 700px) { .a-row-2, .a-row-3 { grid-template-columns: 1fr; } .a-field--span2 { grid-column: auto; } }

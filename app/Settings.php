@@ -72,4 +72,49 @@ final class Settings
             'social_linkedin' => 'LinkedIn-URL',
         ];
     }
+
+    /**
+     * Kleine Spielereien im Frontend, einzeln abschaltbar (Adminbereich).
+     * Schlüssel ohne Präfix „egg_“ landen als Leerzeichen-getrennte Liste im data-eggs-Attribut des <body>.
+     */
+    public static function easterEggs(): array
+    {
+        return [
+            'egg_darkroom' => [
+                'label' => 'Dunkelkammer',
+                'help' => 'Wer irgendwo auf der Seite „dunkelkammer“ tippt oder das Logo etwa 1,5 Sekunden gedrückt hält, sieht die Seite im roten Schutzlicht; die Bilder entwickeln sich aus weißem Papier. Esc, erneutes Tippen oder Gedrückthalten beendet.',
+            ],
+            'egg_shutter' => [
+                'label' => 'Verschluss am Logo',
+                'help' => 'Doppelklick auf das Logo schließt und öffnet kurz eine Blende über der Seite.',
+            ],
+            'egg_autofocus' => [
+                'label' => 'Autofokus auf der 404-Seite',
+                'help' => 'Die „Seite nicht gefunden“ zeigt ein unscharfes Foto; der Fokusrahmen folgt dem Zeiger und stellt beim Verweilen scharf.',
+            ],
+            'egg_lightleak' => [
+                'label' => 'Lichteinfall am Seitenende',
+                'help' => 'Wer bis ans Ende der Projektübersicht oder einer Galerie scrollt, sieht kurz einen warmen Lichteinfall wie bei analogem Film.',
+            ],
+        ];
+    }
+
+    /** Ist eine Spielerei aktiv? Ohne gespeicherten Wert gilt: aktiv. */
+    public static function eggEnabled(string $egg): bool
+    {
+        return (string) self::get('egg_' . $egg, '1') === '1';
+    }
+
+    /** Aktive Spielereien als Leerzeichen-getrennte Liste, z. B. „darkroom shutter“. */
+    public static function enabledEggs(): string
+    {
+        $out = [];
+        foreach (array_keys(self::easterEggs()) as $key) {
+            $egg = substr($key, 4);
+            if (self::eggEnabled($egg)) {
+                $out[] = $egg;
+            }
+        }
+        return implode(' ', $out);
+    }
 }
