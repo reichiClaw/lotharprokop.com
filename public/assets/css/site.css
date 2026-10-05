@@ -87,6 +87,8 @@
   --dur: 400ms;
   --dur-slow: 800ms;
   --dur-fade: 1100ms;
+  --dur-hero-fade: 1500ms;   /* Überblendung der Bildfolge */
+  --dur-hero-settle: 2200ms; /* Einsinken des neuen Bildes, etwas länger als die Überblendung */
 }
 
 /* ---------- Grundlagen ---------- */
@@ -285,22 +287,23 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero__slide.is-active { opacity: 1; pointer-events: auto; }
 .hero__link, .hero__media picture, .hero__media img { display: block; width: 100%; height: 100%; }
 .hero__media img { object-fit: cover; }
-/* Überblenden statt Schieben; das Bild bewegt sich nur unmerklich.
-   Lineare Überblendung: die Deckkraft beider Folien ergänzt sich zu jedem Zeitpunkt zu 1, es gibt keinen
-   Helligkeitseinbruch in der Mitte. Die ein- und ausgehende Folie liegen auf eigenen Compositor-Ebenen. */
-.js .hero__slide { transition: opacity var(--dur-fade) linear; }
+/* Überblenden statt Schieben. Lineare Überblendung: die Deckkraft beider Folien ergänzt sich zu jedem
+   Zeitpunkt zu 1, es gibt keinen Helligkeitseinbruch in der Mitte. Ein- und ausgehende Folie liegen auf
+   eigenen Compositor-Ebenen. */
+.js .hero__slide { transition: opacity var(--dur-hero-fade) linear; }
 .js .hero__slide.is-active, .js .hero__slide.is-leaving { will-change: opacity; }
 @media (prefers-reduced-motion: no-preference) {
-  /* Die Dauer der Bewegung setzt das Skript aus Wechselzeit plus Überblendung (--hero-zoom), damit die
-     Bewegung über die gesamte Standzeit gleichmäßig läuft und sich beim Wechsel nicht umkehrt. */
-  .js .hero__media[data-hero] .hero__slide img { transform: scale(1); backface-visibility: hidden; }
+  /* Bewegung nur während der Überblendung: das neue Bild sinkt aus leichter Vergrößerung weich in seine
+     Ruhelage und steht danach vollkommen still. Eine über Sekunden kriechende Vergrößerung (Bruchteile
+     eines Pixels pro Frame) erzeugt beim Abtasten der Pixel sichtbare Stufen – deshalb keine Dauerbewegung. */
+  .js .hero__media[data-hero] .hero__slide img { transform: scale(1.03); backface-visibility: hidden; }
   .js .hero__media[data-hero] .hero__slide.is-active img,
   .js .hero__media[data-hero] .hero__slide.is-leaving img { will-change: transform; }
-  /* .is-running setzt das Skript nach dem ersten gezeichneten Bild – so startet auch das erste Bild aus der Ruhelage. */
-  .js .hero__media[data-hero] .hero__slide.is-active img { transition: transform var(--hero-zoom, 12s) linear; }
-  .js .hero__media[data-hero].is-running .hero__slide.is-active img { transform: scale(1.035); }
-  /* Ausgehende Folie: Bewegung läuft während des Ausblendens in dieselbe Richtung weiter. */
-  .js .hero__media[data-hero] .hero__slide.is-leaving img { transform: scale(1.04); transition: transform var(--dur-fade) linear; }
+  .js .hero__media[data-hero] .hero__slide.is-active img { transition: transform var(--dur-hero-settle) cubic-bezier(0.16, 0.6, 0.2, 1); }
+  /* .is-running setzt das Skript nach dem ersten gezeichneten Bild – so sinkt auch das erste Bild weich ein. */
+  .js .hero__media[data-hero].is-running .hero__slide.is-active img { transform: scale(1); }
+  /* Ausgehende Folie bleibt stehen (bzw. beendet ein noch laufendes Einsinken während des Ausblendens). */
+  .js .hero__media[data-hero] .hero__slide.is-leaving img { transform: scale(1); transition: transform var(--dur-hero-fade) ease-out; }
 }
 .hero--media::after {
   content: '';

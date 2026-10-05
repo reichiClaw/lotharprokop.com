@@ -178,14 +178,14 @@ Gleiche Umgebung wie beim Redesign (PHP 8.3.6 mit `php -S`, Chrome 148 headless 
 
 ## Flüssigere Bildfolge (05.10.2026)
 
-Umgebung: PHP 8.3.6 mit `php -S`, Chrome headless über das DevTools-Protokoll, die echten Fotografien aus dem Import (fünf Einträge, Wechselzeit 6 s). Anlass: Die Bewegung im Kopfbereich wirkte hakelig. Ursachen: Die langsame Vergrößerung lief fest über 12 s und kehrte beim Wechsel um (ausgehendes Bild schrumpfte, eingehendes wuchs), die Bilder lagen nicht auf eigenen Compositor-Ebenen, Folgebilder wurden erst beim Einblenden dekodiert, und die Überblendung mit Ease-Kurve ließ die Helligkeit in der Mitte einbrechen.
+Umgebung: PHP 8.3.6 mit `php -S`, Chrome headless über das DevTools-Protokoll, die echten Fotografien aus dem Import (fünf Einträge, Wechselzeit 6 s). Anlass: Die Bewegung im Kopfbereich wirkte hakelig, feine Strukturen zeigten sichtbare Stufen. Befund: Die Bewegung lief zwar auf dem Compositor (`LayerTree`: 0 Neuzeichnungen in 3 s Standzeit), aber eine über Sekunden kriechende Vergrößerung bewegt die Bildkanten nur um Bruchteile eines Pixels pro Frame – beim Abtasten der Pixel entstehen dabei zwangsläufig sichtbare Stufen bzw. ein Kriechen feiner Strukturen. Dazu kamen: Richtungsumkehr beim Wechsel (ausgehendes Bild schrumpfte, eingehendes wuchs), Folgebilder wurden erst beim Einblenden dekodiert, und die Überblendung mit Ease-Kurve ließ die Helligkeit in der Mitte einbrechen. Lösung: Bewegung nur noch während der Überblendung (das neue Bild sinkt in 2,2 s mit Ease-out aus 1,03 in die Ruhelage), danach steht das Bild still.
 
 | Prüfung | Ergebnis |
 |---|---|
-| `--hero-zoom` am Container = Wechselzeit + Überblendung (6000 + 1100 ms) | `7100ms` |
-| Erstes Bild beim Laden: Skalierung startet bei 1,0 (`matrix(1.0016 …)` nach 0,4 s) und wächst gleichmäßig | kein Sprung an den Endpunkt mehr |
-| Wechsel: ausgehende Folie erhält `is-leaving`, wächst weiter (1,029 → 1,038) und blendet linear aus; eingehende beginnt bei 1,0; Deckkraft beider Folien ergibt zu jedem Zeitpunkt ≈ 1 (0,757 + 0,242; 0,484 + 0,515) | keine Richtungsumkehr, kein Helligkeitseinbruch |
-| Nach der Überblendung: `is-leaving` entfernt, Folie unsichtbar auf 1,0 zurückgesetzt, `will-change` nur auf aktiver und ausgehender Folie | ok |
+| Erstes Bild beim Laden: sinkt aus 1,03 ein (`1.0137` nach 0,4 s, `1.0012` nach 1,4 s) und steht ab ~2 s bei exakt 1,0 | kein Sprung, danach keine Bewegung |
+| Wechsel: ausgehende Folie erhält `is-leaving`, bleibt bei 1,0 und blendet linear aus; eingehende sinkt ein (1,0155 → 1,0062 → 1,0024 → 1,0008); Deckkraft beider Folien ergibt zu jedem Zeitpunkt ≈ 1 (0,799 + 0,200; 0,533 + 0,466; 0,255 + 0,744) | keine Richtungsumkehr, kein Helligkeitseinbruch |
+| Standzeit (4,5 s bis zum nächsten Wechsel): Skalierung konstant 1,0 | keine kriechende Bewegung mehr |
+| Nach der Überblendung: `is-leaving` entfernt, Folie unsichtbar auf 1,03 zurückgesetzt, `will-change` nur auf aktiver und ausgehender Folie | ok |
 | Folgebild wird vor dem Wechsel ins DOM genommen, `loading="lazy"` entfernt, `img.decode()` angestoßen; automatischer Wechsel erst, wenn das Bild geladen ist (Notbremse: eine Wechselzeit) | ok |
 | Strich-Klick, Pause/Fortsetzen (7 s ohne Wechsel, danach Wechsel nach 6,8 s), Fokus im Kopfbereich, `prefers-reduced-motion: reduce` (kein automatischer Wechsel über 8 s, Pause-Taste ausgeblendet) | wie zuvor |
 | Erreichbare Links im Kopfbereich in allen Zuständen | konstant 3 (Bild, Bildnachweis, „Arbeiten ansehen“) |

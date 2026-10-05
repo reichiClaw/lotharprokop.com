@@ -36,13 +36,10 @@
     var dots = Array.prototype.slice.call(section.querySelectorAll('[data-hero-dot]'));
     var toggle = section.querySelector('[data-hero-toggle]');
     var interval = Math.max(2000, parseInt(box.getAttribute('data-hero-interval'), 10) || 6000);
-    var fadeMs = cssDuration('--dur-fade', 1100);
+    var fadeMs = cssDuration('--dur-hero-fade', 1500);
     var index = 0;
     var timer = null;
     var paused = false;
-
-    // Die sanfte Bewegung läuft über die gesamte Standzeit einer Folie (Wechselzeit plus Überblendung).
-    box.style.setProperty('--hero-zoom', (interval + fadeMs) + 'ms');
 
     function cssDuration(name, fallback) {
       var raw = window.getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -89,7 +86,7 @@
       window.setTimeout(finish, interval);
     }
 
-    // Ausgehende Folie: Bewegung läuft während des Ausblendens weiter, danach wird sie unsichtbar zurückgesetzt.
+    // Ausgehende Folie: blendet aus und wird danach unsichtbar in den Ausgangszustand zurückgesetzt.
     function leave(el) {
       el.classList.remove('is-active');
       el.classList.add('is-leaving');
@@ -196,8 +193,8 @@
       }, 0);
     });
 
-    // Das erste Bild ist beim Laden bereits aktiv; die Bewegung erst nach dem ersten gezeichneten Bild
-    // freigeben, damit sie wie bei den Folgebildern aus der Ruhelage läuft statt am Endpunkt zu stehen.
+    // Das erste Bild ist beim Laden bereits aktiv; das Einsinken erst nach dem ersten gezeichneten Bild
+    // freigeben, damit es wie bei den Folgebildern als Übergang läuft statt sofort am Endpunkt zu stehen.
     window.requestAnimationFrame(function () {
       window.requestAnimationFrame(function () { box.classList.add('is-running'); });
     });
