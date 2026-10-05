@@ -36,11 +36,23 @@
     var dots = Array.prototype.slice.call(section.querySelectorAll('[data-hero-dot]'));
     var toggle = section.querySelector('[data-hero-toggle]');
     var interval = Math.max(2000, parseInt(box.getAttribute('data-hero-interval'), 10) || 6000);
+    var fadeMs = cssDuration('--dur-fade', 1100);
     var index = 0;
     var timer = null;
     var paused = false;
 
+    // Die sanfte Bewegung läuft über die gesamte Standzeit einer Folie (Wechselzeit plus Überblendung).
+    box.style.setProperty('--hero-zoom', (interval + fadeMs) + 'ms');
+
+    function cssDuration(name, fallback) {
+      var raw = window.getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      var value = parseFloat(raw);
+      if (isNaN(value)) return fallback;
+      return raw.indexOf('ms') === -1 ? value * 1000 : value;
+    }
+
     // Aus dem <template> ein echtes Bild machen; das Laden beginnt erst hier.
+    // Das Bild wird sofort geladen und vorab dekodiert, damit beim Einblenden nichts mehr zu rechnen ist.
     function materialize(i) {
       var slot = slots[i];
       if (slot.tagName !== 'TEMPLATE') return slot;
@@ -49,7 +61,44 @@
       slot.parentNode.insertBefore(fragment, slot);
       slot.parentNode.removeChild(slot);
       slots[i] = el;
+      el.querySelectorAll('img').forEach(function (img) {
+        img.removeAttribute('loading');
+        if (img.decode) {
+          var decode = function () { img.decode().catch(function () {}); };
+          if (img.complete) decode(); else img.addEventListener('load', decode, { once: true });
+        }
+      });
       return el;
+    }
+
+    // Ruft cb auf, sobald die Bilder der Folie geladen sind (oder sofort, wenn das schon der Fall ist).
+    function whenLoaded(el, cb) {
+      var pending = Array.prototype.filter.call(el.querySelectorAll('img'), function (img) { return !img.complete; });
+      if (!pending.length) { cb(); return; }
+      var done = false;
+      function finish() {
+        if (done) return;
+        done = true;
+        cb();
+      }
+      pending.forEach(function (img) {
+        img.addEventListener('load', finish, { once: true });
+        img.addEventListener('error', finish, { once: true });
+      });
+      // Notbremse: nach einer Wechselzeit auf jeden Fall weiter.
+      window.setTimeout(finish, interval);
+    }
+
+    // Ausgehende Folie: Bewegung läuft während des Ausblendens weiter, danach wird sie unsichtbar zurückgesetzt.
+    function leave(el) {
+      el.classList.remove('is-active');
+      el.classList.add('is-leaving');
+      setHidden(el, true);
+      if (el._leaveTimer) window.clearTimeout(el._leaveTimer);
+      el._leaveTimer = window.setTimeout(function () {
+        el._leaveTimer = null;
+        el.classList.remove('is-leaving');
+      }, fadeMs + 50);
     }
 
     // Verborgene Folien enthalten Links: für Vorlesesoftware und Tastatur ausblenden.
@@ -70,9 +119,13 @@
       var el = materialize(i);
       index = i;
       if (previous && previous.tagName !== 'TEMPLATE') {
-        previous.classList.remove('is-active');
-        setHidden(previous, true);
+        leave(previous);
       }
+      if (el._leaveTimer) {
+        window.clearTimeout(el._leaveTimer);
+        el._leaveTimer = null;
+      }
+      el.classList.remove('is-leaving');
       el.classList.add('is-active');
       setHidden(el, false);
       credits.forEach(function (credit, k) {
@@ -88,14 +141,31 @@
       materialize((i + 1) % slots.length);
     }
 
+    var cycle = 0;
+
     function stop() {
-      if (timer) { window.clearInterval(timer); timer = null; }
+      cycle++;
+      if (timer) { window.clearTimeout(timer); timer = null; }
+    }
+
+    // Automatischer Wechsel: erst wenn das nächste Bild geladen ist, damit die Überblendung nicht ins Leere läuft.
+    function schedule() {
+      var current = cycle;
+      timer = window.setTimeout(function () {
+        timer = null;
+        var next = materialize((index + 1) % slots.length);
+        whenLoaded(next, function () {
+          if (current !== cycle) return; // inzwischen angehalten oder neu gestartet
+          show(index + 1);
+          schedule();
+        });
+      }, interval);
     }
 
     function start() {
       stop();
       if (paused || reduceMotion || document.hidden) return;
-      timer = window.setInterval(function () { show(index + 1); }, interval);
+      schedule();
     }
 
     dots.forEach(function (dot, k) {
@@ -124,6 +194,12 @@
       window.setTimeout(function () {
         if (!section.contains(document.activeElement)) start();
       }, 0);
+    });
+
+    // Das erste Bild ist beim Laden bereits aktiv; die Bewegung erst nach dem ersten gezeichneten Bild
+    // freigeben, damit sie wie bei den Folgebildern aus der Ruhelage läuft statt am Endpunkt zu stehen.
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () { box.classList.add('is-running'); });
     });
 
     // Das zweite Bild erst nach dem ersten Seitenaufbau vorbereiten.

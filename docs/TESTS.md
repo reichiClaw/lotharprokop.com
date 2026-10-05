@@ -176,6 +176,21 @@ Gleiche Umgebung wie beim Redesign (PHP 8.3.6 mit `php -S`, Chrome 148 headless 
 | „Alle ausgewählten Projekte übernehmen“: 8 fehlende Titelbilder ergänzt (13 Einträge), Schaltfläche danach nicht mehr vorhanden | keine Doppelungen |
 | `php -l` für alle geänderten PHP-Dateien, `node --check public/assets/js/site.js` | keine Fehler |
 
+## Flüssigere Bildfolge (05.10.2026)
+
+Umgebung: PHP 8.3.6 mit `php -S`, Chrome headless über das DevTools-Protokoll, die echten Fotografien aus dem Import (fünf Einträge, Wechselzeit 6 s). Anlass: Die Bewegung im Kopfbereich wirkte hakelig. Ursachen: Die langsame Vergrößerung lief fest über 12 s und kehrte beim Wechsel um (ausgehendes Bild schrumpfte, eingehendes wuchs), die Bilder lagen nicht auf eigenen Compositor-Ebenen, Folgebilder wurden erst beim Einblenden dekodiert, und die Überblendung mit Ease-Kurve ließ die Helligkeit in der Mitte einbrechen.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `--hero-zoom` am Container = Wechselzeit + Überblendung (6000 + 1100 ms) | `7100ms` |
+| Erstes Bild beim Laden: Skalierung startet bei 1,0 (`matrix(1.0016 …)` nach 0,4 s) und wächst gleichmäßig | kein Sprung an den Endpunkt mehr |
+| Wechsel: ausgehende Folie erhält `is-leaving`, wächst weiter (1,029 → 1,038) und blendet linear aus; eingehende beginnt bei 1,0; Deckkraft beider Folien ergibt zu jedem Zeitpunkt ≈ 1 (0,757 + 0,242; 0,484 + 0,515) | keine Richtungsumkehr, kein Helligkeitseinbruch |
+| Nach der Überblendung: `is-leaving` entfernt, Folie unsichtbar auf 1,0 zurückgesetzt, `will-change` nur auf aktiver und ausgehender Folie | ok |
+| Folgebild wird vor dem Wechsel ins DOM genommen, `loading="lazy"` entfernt, `img.decode()` angestoßen; automatischer Wechsel erst, wenn das Bild geladen ist (Notbremse: eine Wechselzeit) | ok |
+| Strich-Klick, Pause/Fortsetzen (7 s ohne Wechsel, danach Wechsel nach 6,8 s), Fokus im Kopfbereich, `prefers-reduced-motion: reduce` (kein automatischer Wechsel über 8 s, Pause-Taste ausgeblendet) | wie zuvor |
+| Erreichbare Links im Kopfbereich in allen Zuständen | konstant 3 (Bild, Bildnachweis, „Arbeiten ansehen“) |
+| `node --check public/assets/js/site.js`, `php -l app/View.php` | keine Fehler |
+
 ## Nicht getestet
 
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
