@@ -238,15 +238,32 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 B
 | Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
 | JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
 
+## HTTPS erzwingen (`.htaccess`), 05.10.2026
+
+Geprüft mit `curl -I` direkt gegen `lothar.drve.at` (Variante „ein Ordner“, Webroot-`.htaccess` = `deploy/webroot.htaccess`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `http://…/` → `301`, `Location: https://lothar.drve.at/` | ok |
+| Pfad und Query bleiben erhalten: `http://…/fotografie/pelmondo?x=1&y=2` → `https://…/fotografie/pelmondo?x=1&y=2`; kodierte Zeichen (`caf%C3%A9?q=a%20b`) unverändert | ok |
+| Assets: `http://…/assets/css/site.css?v=9` → `301` auf dieselbe https-Adresse | ok |
+| Unbekannter Pfad: `http://…/gibt-es-nicht` → `301` auf https, dort `404` | ok |
+| Gesperrte Pfade über http (`/config/config.php`, `/storage/database.sqlite`) → `404`, kein Inhalt | ok |
+| `/.well-known/acme-challenge/…` wird nicht umgeleitet (`404` über http) | ok |
+| Keine Schleife: `curl -IL http://…/fotografie?x=1` → genau 1 Umleitung, Ziel `200` | ok |
+| https unverändert: `/`, `/auswahl`, `/fotografie/pelmondo?x=1` → `200`; `/admin` → `302 /admin/login`; `/config/config.php`, `/storage/database.sqlite` → `404` | ok |
+| Variante mit Ziel aus `THE_REQUEST` verworfen: beim Hoster lieferte jede Anfrage mit Query `403` | — |
+
 ## Nicht getestet
 
+- HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
 - Bildfolge mit den echten Fotografien (nur neutrale Testbilder), Wischen auf echten Touchgeräten
 - Ladezeiten der Bildfolge (nur geprüft, dass Folgebilder erst bei Bedarf im DOM landen; keine Messwerte)
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)
-- HTTPS (Secure-Cookie-Flag nur im Code, nicht im Betrieb geprüft)
+- Secure-Cookie-Flag unter HTTPS (nur im Code, nicht im Betrieb geprüft)
 - Safari/Firefox, iOS/Android auf echten Geräten (nur Chrome, davon mobile Größe per Viewport-Emulation)
 - Wirkung des Redesigns mit den echten Fotografien (lokal standen nur neutrale Testbilder zur Verfügung)
 - Ladezeiten, Core Web Vitals oder sonstige Performancewerte (nicht gemessen)

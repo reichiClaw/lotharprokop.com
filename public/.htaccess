@@ -14,6 +14,15 @@ DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Immer HTTPS: unverschlüsselte Aufrufe dauerhaft auf https:// umleiten (gleicher Host, gleicher Pfad).
+  # X-Forwarded-Proto berücksichtigt Hoster, die TLS vor dem Webserver beenden (sonst Umleitungsschleife).
+  # Nur für die eigentliche Anfrage, nicht für interne Unteranfragen (z. B. Fehlerseiten des Hosters).
+  # Ausgenommen: ACME-Prüfpfade für Zertifikatsausstellung.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   # Direktzugriff über /public/… (wenn der Projektordner selbst das Webroot ist) nicht anbieten.
   # Interne Weiterleitungen aus der übergeordneten .htaccess (REDIRECT_STATUS gesetzt) sind davon ausgenommen.
   RewriteCond %{ENV:REDIRECT_STATUS} ^$

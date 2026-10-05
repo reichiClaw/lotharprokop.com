@@ -29,7 +29,7 @@ public/       EINZIGES öffentliches Verzeichnis (Document Root)
   index.php   Front-Controller
   check.php   Server-Check (Voraussetzungen prüfen; nach der Installation löschen)
   app-path.example.php  Vorlage für app-path.php (Pfad zum Anwendungsordner bei FTP-Hosting)
-  .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
+  .htaccess / .user.ini  HTTPS-Umleitung, Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
   dokumente/  rechtliche PDFs (AGB, Rücktrittsrecht), verlinkt auf /agb
   media/      veröffentlichte Bildvarianten (werden automatisch verwaltet)
@@ -93,7 +93,7 @@ Hat der Hoster kein Verzeichnis oberhalb des Webroots (nur FTP-Zugang direkt ins
 
 Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot liegen darf. Erfordert Apache mit `mod_rewrite` und aktivem `.htaccess` (`AllowOverride All` bzw. mindestens `FileInfo Options Limit`).
 
-1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
+1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die http-Aufrufe auf https umleitet, alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
 2. Gesamten Inhalt von `htdocs/` inklusive versteckter Dateien in das Webroot laden.
 3. **Pflichtprüfung** nach dem Upload: `https://DOMAIN/config/config.php` und `https://DOMAIN/storage/database.sqlite` müssen `403` oder `404` liefern. Erscheint stattdessen Inhalt oder ein Download, ist `.htaccess` nicht aktiv – dann sofort die Dateien entfernen und Variante A verwenden.
 4. Weiter wie Variante A ab Schritt 3 (`/check.php` aufrufen und danach `public/check.php` löschen, `/admin/setup`, System-Seite).
@@ -256,5 +256,6 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 - CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`)
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis
+- HTTPS erzwungen: beide `.htaccess`-Varianten leiten `http://` dauerhaft (`301`) auf dieselbe Adresse unter `https://` um (Pfad und Query bleiben erhalten; `X-Forwarded-Proto` wird berücksichtigt, `/.well-known/acme-challenge/` ist ausgenommen). Voraussetzung ist ein gültiges Zertifikat beim Hoster.
 - Security-Header inkl. Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
 - Kein Tracking, keine externen Ressourcen, Schriften lokal
