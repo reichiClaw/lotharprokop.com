@@ -88,6 +88,11 @@ final class Settings
                 'label' => 'Verschluss am Logo',
                 'help' => 'Doppelklick auf das Logo schließt und öffnet kurz eine Blende über der Seite.',
             ],
+            'egg_shutter_sound' => [
+                'label' => 'Verschluss mit Auslösegeräusch',
+                'help' => 'Zur Blende klickt ein kurzes Spiegel-/Verschlussgeräusch (im Browser erzeugt, keine Audiodatei; nur nach der Nutzeraktion Doppelklick). Wirkt nur, wenn der Verschluss aktiv ist.',
+                'sub' => true,
+            ],
             'egg_autofocus' => [
                 'label' => 'Autofokus auf der 404-Seite',
                 'help' => 'Die „Seite nicht gefunden“ zeigt ein unscharfes Foto; der Fokusrahmen folgt dem Zeiger und stellt beim Verweilen scharf.',

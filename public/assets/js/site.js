@@ -474,7 +474,7 @@
     function has(name) { return enabled.indexOf(name) !== -1; }
     var brand = document.querySelector('.brand');
     if (has('darkroom')) initDarkroom(brand);
-    if (has('shutter') && brand) initShutter(brand);
+    if (has('shutter') && brand) initShutter(brand, has('shutter_sound'));
     if (has('autofocus')) initAutofocus();
     if (has('lightleak')) initLightLeak();
   }
@@ -575,15 +575,17 @@
   /* ---------- Verschluss am Logo ----------
      Doppelklick schließt und öffnet eine sechsblättrige Blende über der Seite. Damit der erste Klick nicht schon
      zur Startseite springt, wartet die Navigation kurz auf einen möglichen zweiten Klick. */
-  function initShutter(brand) {
+  function initShutter(brand, withSound) {
     if (reduceMotion) return;
     var clickTimer = null;
     var overlay = null;
     var busy = false;
+    var sound = withSound ? createShutterSound() : null;
 
     function play() {
       if (busy) return;
       busy = true;
+      if (sound) sound();
       if (!overlay) {
         overlay = document.createElement('div');
         overlay.className = 'shutter';
@@ -619,6 +621,87 @@
         }
       }, 280);
     });
+  }
+
+  /* Auslösegeräusch einer Spiegelreflexkamera, mit Web Audio aus Rauschen und Sinus erzeugt – keine Audiodatei,
+     nichts zu laden. Zwei Anschläge: Spiegel hoch/Verschluss (wenn sich die Blende schließt) und Spiegel zurück
+     (wenn sie sich öffnet), zeitlich auf die CSS-Animation (440 ms, geschlossen bei 44–56 %) abgestimmt.
+     Der AudioContext entsteht erst im Doppelklick selbst, damit die Autoplay-Regeln der Browser erfüllt sind. */
+  function createShutterSound() {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    var ctx = null;
+    var noise = null;
+
+    function noiseBuffer(seconds) {
+      var len = Math.ceil(ctx.sampleRate * seconds);
+      var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      return buf;
+    }
+
+    // Kurzer, bandbegrenzter Rauschimpuls: das „Klacken“ von Metall und Mechanik.
+    function burst(out, at, freq, q, dur, gain) {
+      var src = ctx.createBufferSource();
+      src.buffer = noise;
+      var filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = freq;
+      filter.Q.value = q;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, at);
+      g.gain.linearRampToValueAtTime(gain, at + 0.0015);
+      g.gain.exponentialRampToValueAtTime(0.0004, at + dur);
+      src.connect(filter);
+      filter.connect(g);
+      g.connect(out);
+      src.start(at);
+      src.stop(at + dur + 0.02);
+    }
+
+    // Tieffrequenter Schlag: der Spiegel trifft auf den Anschlag.
+    function thump(out, at, f0, f1, dur, gain) {
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f0, at);
+      osc.frequency.exponentialRampToValueAtTime(f1, at + dur);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(gain, at);
+      g.gain.exponentialRampToValueAtTime(0.0004, at + dur);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(at);
+      osc.stop(at + dur + 0.02);
+    }
+
+    return function play() {
+      try {
+        if (!ctx) {
+          ctx = new Ctx();
+          noise = noiseBuffer(0.3);
+        }
+        if (ctx.state === 'suspended' && ctx.resume) {
+          var resumed = ctx.resume();
+          if (resumed && resumed.catch) resumed.catch(function () {});
+        }
+        var master = ctx.createGain();
+        master.gain.value = 0.32;
+        master.connect(ctx.destination);
+        var t = ctx.currentTime + 0.005;
+        // 1. Anschlag (~150 ms): Spiegel hoch, Verschluss läuft – die Blende ist fast zu.
+        thump(master, t + 0.15, 190, 70, 0.045, 0.55);
+        burst(master, t + 0.15, 1800, 0.8, 0.03, 0.7);
+        burst(master, t + 0.15, 6200, 1.0, 0.008, 0.5);
+        // 2. Anschlag (~250 ms): Spiegel zurück – die Blende öffnet sich. Etwas kräftiger, mit kurzem Nachklingen.
+        thump(master, t + 0.25, 230, 80, 0.05, 0.65);
+        burst(master, t + 0.25, 2600, 0.7, 0.045, 0.9);
+        burst(master, t + 0.25, 5200, 1.2, 0.012, 0.6);
+        burst(master, t + 0.27, 3400, 3.0, 0.09, 0.22);
+      } catch (e) {
+        // Ohne Ton geht die Blende trotzdem zu und auf.
+      }
+    };
   }
 
   /* ---------- Autofokus auf der 404-Seite ----------

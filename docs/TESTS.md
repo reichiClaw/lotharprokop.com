@@ -208,6 +208,8 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien; Admi
 | Autofokus (Maus): Bild `blur(14px)`, beim Bewegen `is-tracking is-hunting` mit Rahmenposition, nach 420 ms Ruhe `is-focused`, Status „Scharf“, Rahmen `rgb(61, 220, 132)`, Filter `none`; Verlassen setzt zurück; Tastaturfokus stellt mittig scharf | ok |
 | Autofokus (Touch): erstes Antippen stellt scharf ohne Navigation, zweites Antippen folgt dem Link zur Galerie | ok |
 | `prefers-reduced-motion: reduce`: 404-Foto sofort scharf, Logo-Klick navigiert ohne Verzögerung (39 ms) | ok |
+| Auslösegeräusch (Web Audio, synthetisch): `AudioContext` im Test durch `OfflineAudioContext` ersetzt, Doppelklick gerendert – zwei Anschläge bei 150 ms und 250 ms (passend zu Schließen/Öffnen der Blende), Spitzenpegel 0,27 (kein Clipping), danach Stille; keine Fehler | ok |
+| Admin: „Verschluss mit Auslösegeräusch“ abgehakt → `data-eggs` ohne `shutter_sound`; wieder angehakt → enthalten | ok |
 | JavaScript-Konsole auf Startseite, Projektübersicht, 404 in allen Zuständen | keine Fehler außer dem erwarteten 404-Status der Fehlerseite |
 | `php -l` (Settings, View, Galleries, AdminController, Templates), Syntaxprüfung `site.js` | keine Fehler |
 
@@ -215,6 +217,7 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien; Admi
 
 - Safari/Firefox (Lamellen-Blende, `scale`-Eigenschaft am Fokusrahmen, `mix-blend-mode: screen` des Filmkorns)
 - Echte Touchgeräte (Kontextmenü beim Gedrückthalten des Logos nur per `contextmenu`-Handler und `-webkit-touch-callout` unterbunden)
+- Klang des Auslösegeräuschs mit dem Ohr (nur Pegel und Zeitpunkte geprüft); Stummschaltung/Autoplay-Regeln auf iOS
 
 ## Nicht getestet
 

@@ -44,7 +44,7 @@ use App\Images;
   <p class="a-help">Versteckte Animationen für Besucher, die genauer hinsehen. Jede lässt sich einzeln abschalten; alle respektieren die Systemeinstellung „Bewegung reduzieren“.</p>
   <div class="a-eggs">
     <?php foreach ($eggs as $key => $def): $on = !array_key_exists($key, $values) || (string) $values[$key] === '1'; ?>
-    <label class="a-check a-egg">
+    <label class="a-check a-egg <?= !empty($def['sub']) ? 'a-egg--sub' : '' ?>">
       <input type="checkbox" name="<?= e($key) ?>" value="1" <?= $on ? 'checked' : '' ?>>
       <span class="a-egg__text"><strong><?= e($def['label']) ?></strong><span class="a-egg__help"><?= e($def['help']) ?></span></span>
     </label>
