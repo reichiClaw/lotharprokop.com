@@ -10,7 +10,7 @@
  */
 use App\Csrf;
 use App\FeaturedImages;
-use App\Galleries;
+use App\View;
 use App\Images;
 
 $selectedCount = count($selected);
@@ -79,30 +79,13 @@ $onHome = $homeCount > 0 ? min($homeCount, $selectedCount) : $selectedCount;
 <section id="hinzufuegen">
   <h2 class="a-subtitle">Bilder hinzufügen <span class="a-muted">(aus allen <?= $imageTotal ?> Bildern)</span></h2>
   <p class="a-help">Galerie aufklappen, Bilder anhaken, unten „In die Auswahl aufnehmen“. Bereits ausgewählte Bilder sind markiert. Neue Bilder werden hinten angehängt; die Reihenfolge lässt sich oben ändern.</p>
-  <form method="post" action="/admin/auswahl/hinzufuegen" class="a-form a-pick-form" data-pick>
-    <?= Csrf::field() ?>
-    <?php foreach ($groups as $gi => $group): $inSel = 0; foreach ($group['images'] as $img) { if (isset($selectedIds[$img['id']])) $inSel++; } ?>
-    <details class="a-pick-group" <?= $gi === 0 && $selected === [] ? 'open' : '' ?>>
-      <summary>
-        <span class="a-pick-group__title"><?= e($group['title']) ?></span>
-        <?php if ($group['status'] !== null): ?><span class="a-badge <?= $group['status'] === 'published' ? 'a-badge--published' : '' ?>"><?= e(Galleries::STATUSES[$group['status']] ?? $group['status']) ?></span><?php endif; ?>
-        <span class="a-muted"><?= count($group['images']) ?> <?= count($group['images']) === 1 ? 'Bild' : 'Bilder' ?><?= $inSel > 0 ? ', ' . $inSel . ' in der Auswahl' : '' ?></span>
-        <button type="button" class="a-btn a-btn--sm a-btn--ghost a-pick-group__all" data-pick-all>Alle wählen</button>
-      </summary>
-      <div class="a-pick">
-        <?php foreach ($group['images'] as $img): $v = Images::variantFor($img, 480); $is = isset($selectedIds[$img['id']]); ?>
-        <label class="a-pick__item <?= $is ? 'is-selected' : '' ?>" title="<?= e($img['original_name']) ?><?= $is ? ' – bereits in der Auswahl' : '' ?>">
-          <input type="checkbox" name="add[]" value="<?= $img['id'] ?>" <?= $is ? 'disabled checked' : '' ?>>
-          <span class="a-pick__media"><?php if ($v): ?><img src="<?= e(Images::variantUrl($img, $v, 'jpg', true)) ?>" alt="<?= e($img['alt']) ?>" loading="lazy"><?php else: ?><span class="a-image__missing">Datei fehlt</span><?php endif; ?></span>
-          <span class="a-pick__mark" aria-hidden="true"><?= $is ? '✓' : '' ?></span>
-        </label>
-        <?php endforeach; ?>
-      </div>
-    </details>
-    <?php endforeach; ?>
-    <div class="a-form__actions a-pick-form__actions">
-      <button type="submit" class="a-btn" data-pick-submit disabled>In die Auswahl aufnehmen</button>
-      <span class="a-savestate" data-pick-count>Noch kein Bild angehakt.</span>
-    </div>
-  </form>
+  <?= View::partial('admin/partials/image-picker', [
+      'action' => '/admin/auswahl/hinzufuegen',
+      'groups' => $groups,
+      'selectedIds' => $selectedIds,
+      'submitLabel' => 'In die Auswahl aufnehmen',
+      'usedLabel' => 'bereits in der Auswahl',
+      'usedCount' => 'in der Auswahl',
+      'openFirst' => $selected === [],
+  ]) ?>
 </section>

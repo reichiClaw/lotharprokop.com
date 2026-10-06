@@ -238,6 +238,20 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 B
 | Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
 | JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
 
+## Kopfbereich: beliebige Bilder aus der Bibliothek, 06.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`, 36 Bilder in 4 Galerien, 1 Bild im Kopfbereich.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Admin → Startseite: Abschnitt „Bilder aus der Bibliothek …“ mit 5 Gruppen / 36 Bildern, 1 bereits im Kopfbereich (gesperrt, Häkchen), Schaltfläche anfangs deaktiviert, Verweis „automatisch“ vorgewählt | ok |
+| 2 Bilder aus Pelmondo und Polar anhaken → Zähler „2 Bilder angehakt.“, Absenden → Flash „2 Bilder in die Bildfolge aufgenommen.“, Liste hat 3 Einträge, Projektverweis automatisch „Pelmondo“ bzw. „Polar“ | ok |
+| Picker danach: 3 Bilder gesperrt; dasselbe Bild kann nicht erneut gewählt werden | ok |
+| Startseite: Bildfolge mit 3 Bildern, 3 Striche, Bildnachweise „Bild: Pelmondo / Pelmondo / Polar“ | ok |
+| Entfernen der beiden Einträge über die Bildfolge → „2 Bild(er) entfernt“, Bilder weiterhin vorhanden (`/admin/bilder/{id}` 200, da in Galerien) | ok |
+| Bildauswahl-Seite nach Umbau auf das gemeinsame Partial: 5 Gruppen, 6 gesperrte Bilder wie zuvor | ok |
+| JavaScript-Konsole | keine Fehler |
+
 ## Darstellung der Projekte auf der Startseite (Schalter), 05.10.2026
 
 Headless Chrome 148 (Puppeteer) gegen `php -S`, 4 hervorgehobene Galerien, Bildauswahl mit 4 Bildern auf der Startseite.

@@ -5,9 +5,7 @@ namespace App\Controllers;
 
 use App\Auth;
 use App\Csrf;
-use App\Database;
 use App\FeaturedImages;
-use App\Galleries;
 use App\Images;
 
 /** Bildauswahl: Zusammenstellung, Reihenfolge und Darstellung der „Ausgewählten Fotografien“. */
@@ -19,43 +17,13 @@ final class AdminSelectionController
         $selected = FeaturedImages::all();
         $selectedIds = array_flip(array_column($selected, 'id'));
 
-        // Alle Bilder, nach Galerie gruppiert (ein Bild kann in mehreren Galerien liegen und erscheint dann mehrfach).
-        $galleries = Galleries::all();
-        $byGallery = [];
-        $assigned = [];
-        $stmt = Database::pdo()->query('SELECT gallery_id, image_id FROM gallery_images ORDER BY gallery_id, sort_order, image_id');
-        foreach ($stmt as $row) {
-            $byGallery[(int) $row['gallery_id']][] = (int) $row['image_id'];
-            $assigned[(int) $row['image_id']] = true;
-        }
-        $all = Images::all();
-        $images = [];
-        foreach ($all as $img) {
-            $images[$img['id']] = $img;
-        }
-        $groups = [];
-        foreach ($galleries as $g) {
-            $ids = $byGallery[$g['id']] ?? [];
-            if ($ids === []) {
-                continue;
-            }
-            $groups[] = [
-                'title' => $g['title'],
-                'status' => $g['status'],
-                'gallery' => $g,
-                'images' => array_values(array_filter(array_map(fn($id) => $images[$id] ?? null, $ids))),
-            ];
-        }
-        $loose = array_values(array_filter($all, fn($img) => !isset($assigned[$img['id']])));
-        if ($loose !== []) {
-            $groups[] = ['title' => 'Weitere Bilder (Kopfbereich, Porträt, Filmposter, Einzelbilder)', 'status' => null, 'gallery' => null, 'images' => $loose];
-        }
+        $library = Images::groupedByGallery();
 
         AdminController::render('selection', [
             'selected' => $selected,
             'selectedIds' => $selectedIds,
-            'groups' => $groups,
-            'imageTotal' => count($all),
+            'groups' => $library['groups'],
+            'imageTotal' => $library['total'],
             'homeCount' => FeaturedImages::homeCount(),
             'intro' => FeaturedImages::intro(),
             'meta' => ['title' => 'Bildauswahl'],

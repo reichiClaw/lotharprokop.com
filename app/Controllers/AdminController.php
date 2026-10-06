@@ -242,6 +242,7 @@ final class AdminController
                 $addable++;
             }
         }
+        $library = Images::groupedByGallery();
         self::render('homepage', [
             'featured' => $featured,
             'others' => $others,
@@ -249,6 +250,9 @@ final class AdminController
             'slideInterval' => HeroSlides::interval(),
             'featuredAddable' => $addable,
             'galleries' => $all,
+            'groups' => $library['groups'],
+            'slideImageIds' => array_flip($inSlideshow),
+            'imageTotal' => $library['total'],
             'meta' => ['title' => 'Startseite'],
         ]);
     }
@@ -299,6 +303,25 @@ final class AdminController
             } else {
                 self::flash('error', 'Kein Projekt gewählt und keine Datei hochgeladen.');
             }
+        } elseif ($action === 'slide_pick') {
+            // Beliebige Bilder aus der Bibliothek; Verweis wahlweise automatisch aus der Galerie des Bildes.
+            $link = (string) ($_POST['slide_pick_gallery'] ?? 'auto');
+            $present = array_column(array_column(HeroSlides::all(), 'image'), 'id');
+            $ids = array_values(array_unique(array_map('intval', (array) ($_POST['add'] ?? []))));
+            $images = Images::findMany($ids);
+            $added = 0;
+            foreach ($ids as $imageId) {
+                if (!isset($images[$imageId]) || in_array($imageId, $present, true)) {
+                    continue;
+                }
+                $galleryId = $link === 'auto' ? Images::primaryGalleryId($imageId) : (int) $link;
+                HeroSlides::add($imageId, $galleryId);
+                $present[] = $imageId;
+                $added++;
+            }
+            self::flash($added > 0 ? 'ok' : 'error', $added > 0
+                ? $added . ' Bild' . ($added === 1 ? '' : 'er') . ' in die Bildfolge aufgenommen.'
+                : 'Kein Bild gewählt (oder alle gewählten stehen schon im Kopfbereich).');
         } elseif ($action === 'slides_featured') {
             $present = array_column(array_column(HeroSlides::all(), 'image'), 'id');
             $added = 0;

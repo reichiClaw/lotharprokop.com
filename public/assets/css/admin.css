@@ -211,4 +211,5 @@ fieldset.a-field legend { font-size: 0.9rem; font-weight: 500; padding: 0 0.3rem
 .a-pick__item.is-selected .a-pick__mark { background: #e9e4f7; color: #4b3d8f; border-color: #c9bfe8; }
 .a-pick__item.is-selected .a-pick__mark::before { content: none; }
 .a-pick__item:has(input:focus-visible) { outline-color: var(--a-accent); }
+.a-pick-form__options { margin-top: 1.25rem; }
 .a-pick-form__actions { position: sticky; bottom: 0; background: var(--a-bg, #fff); padding: 0.75rem 0; border-top: 1px solid var(--a-line); }
