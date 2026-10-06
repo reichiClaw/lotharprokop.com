@@ -6,6 +6,7 @@
 /** @var array $eggs */
 /** @var array $projectLayouts */
 /** @var string $projectLayout */
+/** @var bool $scrollHint */
 use App\Csrf;
 use App\Images;
 ?>
@@ -42,6 +43,14 @@ use App\Images;
     <?php if (str_starts_with($key, 'legal_')): ?><p class="a-help a-warn">Rechtlich zu prüfender Inhalt – bitte von einer fachkundigen Stelle prüfen lassen (Impressumspflicht ECG/MedienG, DSGVO).</p><?php endif; ?>
   </div>
   <?php endforeach; ?>
+
+  <h2 class="a-subtitle">Startseite: Kopfbereich</h2>
+  <div class="a-eggs">
+    <label class="a-check a-egg">
+      <input type="checkbox" name="hero_scroll_hint" value="1" <?= $scrollHint ? 'checked' : '' ?>>
+      <span class="a-egg__text"><strong>Scroll-Hinweis anzeigen</strong><span class="a-egg__help">Am unteren Rand des bildschirmhohen Kopfbereichs erscheint mittig eine dünne Linie mit wanderndem Punkt und dem Wort „Scrollen“. Sie ist anklickbar (führt zum ersten Abschnitt darunter) und verschwindet, sobald gescrollt wird. Nur bei Kopfbereich mit Bild; respektiert „Bewegung reduzieren“.</span></span>
+    </label>
+  </div>
 
   <h2 class="a-subtitle">Startseite: Ausgewählte Projekte</h2>
   <p class="a-help">Wie die ausgewählten Projekte unter der Bildauswahl erscheinen. Die Auswahl der Projekte selbst erfolgt unter „Galerien“ (Häkchen „Auf der Startseite hervorheben“).</p>

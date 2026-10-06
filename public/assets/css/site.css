@@ -401,6 +401,32 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero__dot.is-active::after, .hero__dot:hover::after { opacity: 1; }
 /* Ohne Titelbild: dunkle Typografie auf Papierfläche. */
 .hero:not(.hero--media) .hero__text { padding-top: var(--s-4); padding-bottom: var(--s-6); }
+
+/* Scroll-Hinweis (Einstellung): mittig an der Unterkante, dünne Linie mit wanderndem Punkt.
+   Erscheint verzögert, verschwindet sobald gescrollt wurde (html.is-scrolled aus site.js). */
+.hero--hint .hero__text { padding-bottom: calc(var(--s-4) + 4.25rem); }
+.hero__scroll {
+  position: absolute; left: 50%; bottom: 0.9rem; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  transform: translateX(-50%);
+  color: var(--on-dark); text-decoration: none;
+  opacity: 0;
+  animation: hero-hint-in 900ms var(--ease) 1200ms forwards;
+  transition: opacity var(--dur) var(--ease), visibility 0s linear var(--dur);
+}
+.hero__scroll-label { font-size: var(--t-micro); text-transform: uppercase; letter-spacing: var(--track-mid); opacity: 0.7; transition: opacity var(--dur) var(--ease); }
+.hero__scroll:hover .hero__scroll-label, .hero__scroll:focus-visible .hero__scroll-label { opacity: 1; }
+.hero__scroll-line { position: relative; display: block; width: 1px; height: 2.75rem; background: rgba(245, 243, 239, 0.3); overflow: hidden; }
+.hero__scroll-line i { position: absolute; left: 0; top: 0; width: 1px; height: 1rem; background: currentColor; animation: hero-hint-run 2.4s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
+@keyframes hero-hint-in { to { opacity: 1; } }
+@keyframes hero-hint-run { 0% { transform: translateY(-1rem); } 55%, 100% { transform: translateY(2.75rem); } }
+html.is-scrolled .hero__scroll { opacity: 0; visibility: hidden; animation: none; }
+.hero__anchor { scroll-margin-top: var(--header-h); }
+@media (prefers-reduced-motion: reduce) {
+  .hero__scroll { opacity: 1; animation: none; }
+  .hero__scroll-line i { animation: none; transform: translateY(1.75rem); }
+}
 @media (max-width: 700px) {
   .hero--media { min-height: calc(100vh - var(--header-h)); min-height: calc(100svh - var(--header-h)); }
   .hero__intro { font-size: var(--t-body); max-width: 34ch; }

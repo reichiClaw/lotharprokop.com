@@ -238,6 +238,22 @@ Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 B
 | Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
 | JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
 
+## Scroll-Hinweis im Kopfbereich (Schalter), 06.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`; Kopfbereich mit einem Bild (bildschirmhoch).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne gespeicherten Wert: Hinweis vorhanden (`.hero--hint`, Link „Scrollen“ → `#weiter`), mittig (x = 640 von 1280), 14 px über der Unterkante, keine Überlappung mit der Fußzeile des Kopfbereichs | ok |
+| Erscheint verzögert: Deckkraft 0 beim Laden, 1 nach 2,3 s; Punkt wandert (4 verschiedene Positionen in 2 s) | ok |
+| Scrollen um 200 px → Deckkraft 0, `visibility: hidden`; zurück nach oben → wieder sichtbar | ok |
+| Klick → scrollt weich auf 816 px = Unterkante des Kopfbereichs minus Kopfzeile (`scroll-margin-top`); erster Abschnitt liegt direkt unter der Kopfzeile | ok |
+| Erste Fassung mit `href="#inhalt"` kollidierte mit dem Sprunglink-Ziel `<main id="inhalt">` (Klick scrollte nach oben) → Anker heißt `#weiter` | behoben |
+| Telefon 390 px: mittig, keine Überlappung mit der Fußzeile (Reserve unten 4,25 rem; mit 3,25 rem überlappte es um 11 px) | ok |
+| „Bewegung reduzieren“: sofort sichtbar, Punkt steht still | ok |
+| Admin → Einstellungen „Startseite: Kopfbereich“: Häkchen standardmäßig gesetzt; abhaken + speichern → Hinweis fehlt, `.hero__text` hat wieder normales Padding (51 px), übrige Einstellungen (Projekt-Darstellung, Spielereien) unverändert; wieder anhaken → Hinweis da | ok |
+| JavaScript-Konsole | keine Fehler |
+
 ## Kopfbereich: beliebige Bilder aus der Bibliothek, 06.10.2026
 
 Headless Chrome 148 (Puppeteer) gegen `php -S`, 36 Bilder in 4 Galerien, 1 Bild im Kopfbereich.

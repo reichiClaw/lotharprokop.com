@@ -17,8 +17,10 @@ $email = (string) Settings::get('contact_email', '');
 // Ab zwei Bildern wechselt der Kopfbereich; ein einzelnes Bild bleibt ein ruhiges Standbild.
 $slideCount = count($heroSlides);
 $slideshow = $slideCount > 1;
+// Scroll-Hinweis nur beim bildschirmhohen Kopfbereich mit Bild (Einstellung).
+$scrollHint = $heroSlides !== [] && Settings::heroScrollHint();
 ?>
-<section class="hero<?= $heroSlides !== [] ? ' hero--media' : '' ?>" aria-labelledby="hero-title">
+<section class="hero<?= $heroSlides !== [] ? ' hero--media' : '' ?><?= $scrollHint ? ' hero--hint' : '' ?>" aria-labelledby="hero-title">
   <?php if ($heroSlides !== []): ?>
   <div class="hero__media"<?php if ($slideshow): ?> data-hero data-hero-interval="<?= (int) $heroInterval * 1000 ?>" role="group" aria-roledescription="Bildfolge" aria-label="Ausgewählte Arbeiten"<?php endif; ?>>
     <?= View::partial('partials/hero-slide', ['slide' => $heroSlides[0], 'index' => 0]) ?>
@@ -58,7 +60,15 @@ $slideshow = $slideCount > 1;
     <?php endif; ?>
     </div>
   </div>
+  <?php if ($scrollHint): ?>
+  <?php // Dünne Linie mit wanderndem Punkt; verschwindet per CSS, sobald die Seite gescrollt ist (html.is-scrolled). ?>
+  <a class="hero__scroll" href="#weiter" data-scroll-hint>
+    <span class="hero__scroll-label">Scrollen</span>
+    <span class="hero__scroll-line" aria-hidden="true"><i></i></span>
+  </a>
+  <?php endif; ?>
 </section>
+<div id="weiter" class="hero__anchor" aria-hidden="true"></div>
 
 <?php if ($selection !== []): ?>
 <?php // Bildauswahl: frei zusammengestellte Fotografien, direkt unter dem Kopfbereich – mit Lightbox. ?>

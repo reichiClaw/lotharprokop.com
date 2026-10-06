@@ -437,6 +437,7 @@ final class AdminController
             'eggs' => Settings::easterEggs(),
             'projectLayouts' => Settings::homeProjectsLayouts(),
             'projectLayout' => Settings::homeProjectsLayout(),
+            'scrollHint' => Settings::heroScrollHint(),
             'values' => Settings::all(),
             'portrait' => $portraitId > 0 ? Images::find($portraitId) : null,
             'meta' => ['title' => 'Einstellungen'],
@@ -468,6 +469,7 @@ final class AdminController
         foreach (array_keys(Settings::easterEggs()) as $key) {
             Settings::set($key, isset($_POST[$key]) ? '1' : '0');
         }
+        Settings::set('hero_scroll_hint', isset($_POST['hero_scroll_hint']) ? '1' : '0');
         $layout = (string) ($_POST['home_projects_layout'] ?? '');
         if (array_key_exists($layout, Settings::homeProjectsLayouts())) {
             Settings::set('home_projects_layout', $layout);

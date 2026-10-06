@@ -73,6 +73,12 @@ final class Settings
         ];
     }
 
+    /** Scroll-Hinweis am unteren Rand des bildschirmhohen Kopfbereichs; ohne gespeicherten Wert: an. */
+    public static function heroScrollHint(): bool
+    {
+        return (string) self::get('hero_scroll_hint', '1') === '1';
+    }
+
     /**
      * Darstellung der „Ausgewählten Projekte“ auf der Startseite (Adminbereich).
      * editorial = wechselnder Rhythmus aus großen Karten wie bisher; compact = gleichförmiges, kleines Raster,
