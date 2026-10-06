@@ -2,7 +2,10 @@
 /** @var array $heroSlides */
 /** @var int $heroInterval */
 /** @var array $featured */
+/** @var array $selection       Bildauswahl für die Startseite (erste N) */
+/** @var int $selectionTotal    Gesamtzahl der Bildauswahl */
 /** @var array|null $portrait */
+use App\Layout;
 use App\Picture;
 use App\Settings;
 use App\View;
@@ -14,8 +17,10 @@ $email = (string) Settings::get('contact_email', '');
 // Ab zwei Bildern wechselt der Kopfbereich; ein einzelnes Bild bleibt ein ruhiges Standbild.
 $slideCount = count($heroSlides);
 $slideshow = $slideCount > 1;
+// Scroll-Hinweis nur beim bildschirmhohen Kopfbereich mit Bild (Einstellung).
+$scrollHint = $heroSlides !== [] && Settings::heroScrollHint();
 ?>
-<section class="hero<?= $heroSlides !== [] ? ' hero--media' : '' ?>" aria-labelledby="hero-title">
+<section class="hero<?= $heroSlides !== [] ? ' hero--media' : '' ?><?= $scrollHint ? ' hero--hint' : '' ?>" aria-labelledby="hero-title">
   <?php if ($heroSlides !== []): ?>
   <div class="hero__media"<?php if ($slideshow): ?> data-hero data-hero-interval="<?= (int) $heroInterval * 1000 ?>" role="group" aria-roledescription="Bildfolge" aria-label="Ausgewählte Arbeiten"<?php endif; ?>>
     <?= View::partial('partials/hero-slide', ['slide' => $heroSlides[0], 'index' => 0]) ?>
@@ -55,14 +60,52 @@ $slideshow = $slideCount > 1;
     <?php endif; ?>
     </div>
   </div>
+  <?php if ($scrollHint): ?>
+  <?php // Dünne Linie mit wanderndem Punkt; verschwindet per CSS, sobald die Seite gescrollt ist (html.is-scrolled). ?>
+  <a class="hero__scroll" href="#weiter" data-scroll-hint>
+    <span class="hero__scroll-label">Scrollen</span>
+    <span class="hero__scroll-line" aria-hidden="true"><i></i></span>
+  </a>
+  <?php endif; ?>
 </section>
+<div id="weiter" class="hero__anchor" aria-hidden="true"></div>
 
-<?php if ($featured !== []): ?>
-<section class="featured" aria-labelledby="featured-title">
+<?php if ($selection !== []): ?>
+<?php // Bildauswahl: frei zusammengestellte Fotografien, direkt unter dem Kopfbereich – mit Lightbox. ?>
+<section class="selection" aria-labelledby="selection-title">
+  <header class="section-head">
+    <h2 id="selection-title" class="section-head__title">Ausgewählte Fotografien</h2>
+    <a class="section-head__link link-arrow" href="/auswahl"><?= $selectionTotal > count($selection) ? 'Alle ' . (int) $selectionTotal . ' ansehen' : 'Zur Auswahl' ?></a>
+  </header>
+  <div class="selection__grid">
+    <?php $i = 0; foreach (Layout::editorial($selection) as $block): ?>
+      <div class="ed ed--<?= e($block['type']) ?> reveal">
+        <?php foreach ($block['items'] as $img): ?>
+          <?= View::partial('partials/figure', ['image' => $img, 'index' => $i, 'sizes' => match ($block['type']) { 'wide' => '(min-width: 1740px) 1560px, 92vw', 'pair', 'pair-landscape' => '(min-width: 700px) 46vw, 100vw', 'inset' => '(min-width: 700px) 66vw, 100vw', default => '(min-width: 700px) 52vw, 100vw' }, 'loading' => 'lazy']) ?>
+          <?php $i++; ?>
+        <?php endforeach; ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
+</section>
+<?php endif; ?>
+
+<?php if ($featured !== []): $compact = Settings::homeProjectsLayout() === 'compact'; ?>
+<section class="featured<?= $compact ? ' featured--compact' : '' ?>" aria-labelledby="featured-title">
   <header class="section-head">
     <h2 id="featured-title" class="section-head__title">Ausgewählte Projekte</h2>
     <a class="section-head__link link-arrow" href="/fotografie">Alle Projekte</a>
   </header>
+  <?php if ($compact): ?>
+  <?php // Kompakte Übersicht: gleich große Kacheln (3:2), die sich von den großen Fotografien der Bildauswahl absetzen. ?>
+  <div class="featured__grid featured__grid--compact">
+    <?php foreach ($featured as $i => $g): ?>
+      <div class="featured__item featured__item--compact reveal">
+        <?= App\View::partial('partials/gallery-card', ['gallery' => $g, 'sizes' => '(min-width: 1000px) 30vw, (min-width: 640px) 46vw, 100vw', 'loading' => $i < 3 ? 'eager' : 'lazy']) ?>
+      </div>
+    <?php endforeach; ?>
+  </div>
+  <?php else: ?>
   <div class="featured__grid">
     <?php foreach ($featured as $i => $g): ?>
       <?php
@@ -79,6 +122,7 @@ $slideshow = $slideCount > 1;
       </div>
     <?php endforeach; ?>
   </div>
+  <?php endif; ?>
 </section>
 <?php endif; ?>
 

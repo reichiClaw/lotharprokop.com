@@ -30,6 +30,26 @@ final class RedirectController
         'landscape' => 'landschaft',
     ];
 
+    /** Alte PDF-Dateinamen unter /wp-content/uploads/2019/04/ → neue Ablage unter /dokumente/. */
+    private const DOCUMENTS = [
+        'AGB_Unternehmer.pdf' => '/dokumente/agb-unternehmer.pdf',
+        'AGB_Konsumenten.pdf' => '/dokumente/agb-konsumenten.pdf',
+        'Rücktrittsrecht-Konsumenten.pdf' => '/dokumente/ruecktrittsrecht-konsumenten.pdf',
+        'Datenschutz.pdf' => '/datenschutz',
+    ];
+
+    public static function document(array $params): void
+    {
+        // Der Router liefert den Dateinamen bereits URL-dekodiert; „ü“ kann als ein Zeichen oder als u + Trema kommen.
+        $file = str_replace("u\u{0308}", 'ü', (string) ($params['file'] ?? ''));
+        $target = self::DOCUMENTS[$file] ?? null;
+        if ($target === null) {
+            self::gone($params);
+            return;
+        }
+        redirect($target, 301);
+    }
+
     public static function to(array $params): void
     {
         $path = rtrim(parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/', '/');
