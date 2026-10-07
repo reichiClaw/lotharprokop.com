@@ -33,7 +33,14 @@ if (!is_file($configFile)) {
     exit("Konfiguration fehlt: config/config.php anlegen (Vorlage: config/config.example.php).\n");
 }
 
-$config = array_replace_recursive(require APP_ROOT . '/config/config.example.php', require $configFile);
+$userConfig = require $configFile;
+$config = array_replace_recursive(require APP_ROOT . '/config/config.example.php', $userConfig);
+// Die Kategorienliste der Architekturseite gilt so, wie sie in config.php steht – nicht positionsweise
+// mit der Vorlage zusammengeführt (sonst ließe sich kein Eintrag entfernen).
+if (isset($userConfig['architektur']['categories']) && is_array($userConfig['architektur']['categories'])) {
+    $config['architektur']['categories'] = $userConfig['architektur']['categories'];
+}
+unset($userConfig);
 App\Config::init($config);
 
 if (App\Config::get('debug')) {

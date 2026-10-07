@@ -13,11 +13,21 @@ function eurl(string $value): string
     return rawurlencode($value);
 }
 
-/** Absolute URL aus einem Pfad. */
+/**
+ * Pfad innerhalb des aktuellen Auftritts, z. B. path('/projekte') → '/architektur/projekte',
+ * wenn die Architekturseite als Unterordner läuft, sonst '/projekte'. Für Links und Assets.
+ */
+function path(string $path = ''): string
+{
+    return App\Site::basePath() . '/' . ltrim($path, '/');
+}
+
+/** Absolute URL aus einem Pfad (Canonical, Sitemap, Social-Vorschau). */
 function url(string $path = ''): string
 {
     $path = '/' . ltrim($path, '/');
-    return App\Config::baseUrl() !== '' ? App\Config::baseUrl() . $path : $path;
+    $base = App\Site::baseUrl();
+    return $base !== '' ? $base . $path : path($path);
 }
 
 /** Slug aus einem Titel: Kleinbuchstaben, ASCII, Bindestriche. */

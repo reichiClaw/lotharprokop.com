@@ -208,16 +208,41 @@ final class Images
         return HeroSlides::usesImage($id) > 0 || Settings::getInt('portrait_image_id') === $id;
     }
 
-    /** Gleicht den öffentlichen Ordner eines Bildes mit seinem Soll-Zustand ab. */
+    /**
+     * Öffentliche Bildordner aller Auftritte: Hauptseite (public/media) und Architekturseite
+     * (public/architektur/media). Jeder Auftritt erhält nur die Bilder seiner veröffentlichten Inhalte.
+     * @return array<string,string> Kennung → Ordner
+     */
+    public static function publicMediaDirs(): array
+    {
+        $dirs = [Site::MAIN => Config::publicMedia()];
+        if (Architektur::enabled()) {
+            $dirs[Architektur::KEY] = Architektur::publicMedia();
+        }
+        return $dirs;
+    }
+
+    /** Gleicht die öffentlichen Ordner eines Bildes (je Auftritt) mit ihrem Soll-Zustand ab. */
     public static function syncPublic(int $id): void
     {
         $image = self::find($id);
         if ($image === null) {
             return;
         }
-        $public = self::shouldBePublic($id);
-        $publicDir = Config::publicMedia() . '/' . $image['token'];
         $privateDir = Config::storage('derivatives') . '/' . $image['token'];
+        $public = self::shouldBePublic($id);
+        foreach (self::publicMediaDirs() as $site => $dir) {
+            $wanted = $site === Site::MAIN ? $public : Architektur::shouldBePublic($id);
+            self::syncDir($id, $privateDir, $dir . '/' . $image['token'], $wanted);
+        }
+        if ($image['is_public'] !== ($public ? 1 : 0)) {
+            Database::pdo()->prepare('UPDATE images SET is_public = ? WHERE id = ?')->execute([$public ? 1 : 0, $id]);
+        }
+    }
+
+    /** Ein öffentlicher Ordner eines Bildes: anlegen und füllen (Hardlink oder Kopie) bzw. entfernen. */
+    private static function syncDir(int $id, string $privateDir, string $publicDir, bool $public): void
+    {
         if ($public) {
             if (!is_dir($publicDir)) {
                 @mkdir($publicDir, 0755, true);
@@ -261,9 +286,6 @@ final class Images
             }
         } else {
             self::removeDir($publicDir);
-        }
-        if ($image['is_public'] !== ($public ? 1 : 0)) {
-            Database::pdo()->prepare('UPDATE images SET is_public = ? WHERE id = ?')->execute([$public ? 1 : 0, $id]);
         }
     }
 
@@ -339,10 +361,12 @@ final class Images
             self::syncPublic((int) $row['id']);
             $tokens[$row['token']] = true;
         }
-        foreach (scandir(Config::publicMedia()) ?: [] as $entry) {
-            $dir = Config::publicMedia() . '/' . $entry;
-            if ($entry !== '.' && $entry !== '..' && is_dir($dir) && !isset($tokens[$entry])) {
-                self::removeDir($dir);
+        foreach (self::publicMediaDirs() as $mediaDir) {
+            foreach (scandir($mediaDir) ?: [] as $entry) {
+                $dir = $mediaDir . '/' . $entry;
+                if ($entry !== '.' && $entry !== '..' && is_dir($dir) && !isset($tokens[$entry])) {
+                    self::removeDir($dir);
+                }
             }
         }
         self::$syncStats['sample'] = self::describePerms(Config::publicMedia(), array_key_first($tokens));
@@ -390,7 +414,8 @@ final class Images
     public static function variantUrl(array $image, array $variant, string $format, bool $admin = false): string
     {
         $file = 'w' . max((int) $variant['w'], (int) $variant['h']) . '.' . $format;
-        return $admin ? '/admin/media/' . $image['id'] . '/' . $file : '/media/' . $image['token'] . '/' . $file;
+        // Jeder Auftritt hat seinen eigenen media/-Ordner im Webroot; die Admin-Vorschau gibt es nur auf der Hauptseite.
+        return $admin ? '/admin/media/' . $image['id'] . '/' . $file : path('/media/' . $image['token'] . '/' . $file);
     }
 
     private static function assertUploadOk(array $file): void
@@ -421,7 +446,9 @@ final class Images
             @unlink($original);
         }
         self::removeDir(Config::storage('derivatives') . '/' . $image['token']);
-        self::removeDir(Config::publicMedia() . '/' . $image['token']);
+        foreach (self::publicMediaDirs() as $dir) {
+            self::removeDir($dir . '/' . $image['token']);
+        }
     }
 
     public static function removeDir(string $dir): void
