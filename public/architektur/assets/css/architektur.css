@@ -315,9 +315,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero--media::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(11, 11, 12, 0.88) 0%, rgba(11, 11, 12, 0.55) 26%, rgba(11, 11, 12, 0.12) 55%, rgba(11, 11, 12, 0) 75%);
+  /* Zwei Abdunkelungen: von unten (Textblock) und von links (Ausrichtungskante) – die echten
+     Fotografien sind oft hell; der Text muss auch vor weißem Grund lesbar bleiben. */
+  background:
+    linear-gradient(to right, rgba(11, 11, 12, 0.55) 0%, rgba(11, 11, 12, 0.25) 40%, rgba(11, 11, 12, 0) 70%),
+    linear-gradient(to top, rgba(11, 11, 12, 0.94) 0%, rgba(11, 11, 12, 0.72) 28%, rgba(11, 11, 12, 0.3) 58%, rgba(11, 11, 12, 0.04) 85%);
   pointer-events: none;
 }
+.hero--media .hero__title, .hero--media .hero__intro, .hero--media .hero__kicker { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 0 24px rgba(0, 0, 0, 0.35); }
 /* Senkrechte Linie am linken Rand des Textblocks – die Kante, an der alles ausgerichtet ist. */
 .hero__text {
   position: relative;
