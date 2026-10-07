@@ -6,13 +6,18 @@ Relaunch der Website des Fotografen Lothar Prokop als eigenständige, schlanke W
 
 Das Design tritt hinter die Fotografie zurück: warmer Off-White-Grund, reduzierte Palette aus hellstem Grau, Anthrazit und Schwarz – Farbe kommt ausschließlich aus den Bildern. Typografie ist Inter als neutrale Grotesk (Navigation, Text, sehr große versale Headlines), Cormorant Garamond nur für einzelne große Aussagen; beide lokal, OFL-lizenziert. Haarlinien statt Rahmen, viel Weißraum, keine Kacheln, Schatten, Rundungen oder Verläufe in der Oberfläche. Die Bilder bestimmen die Anordnung: nahezu bildschirmfüllender Kopfbereich – auf Wunsch als ruhige Bildfolge mehrerer Projekte, editoriale Wechsel aus breiten, paarweisen und eingerückten Bildern, Reihen gleicher Höhe ohne Beschnitt, Titelbilder mit redaktionell gesetztem Fokuspunkt.
 
+## Architekturseite
+
+Zweiter Auftritt derselben Installation, spezialisiert auf Architekturfotografie: dunkler Grund, Haarlinien-Raster, fünf fest definierte Leistungen (Gebäudefotografie, Immobilienfotografie, Baudokumentation / Baufortschrittsfotografie, Fertigstellungsaufnahme, Architectural Photography). Liegt im Unterordner `public/architektur/`, ist sofort unter `/architektur/` erreichbar und wird nach Zuweisung einer eigenen Domain deren Document Root – ohne zweite Datenbank, ohne zweiten Admin. Welche Galerien dort erscheinen, bestimmen Kategorien. Details: [docs/ARCHITEKTUR.md](docs/ARCHITEKTUR.md).
+
 ## Aufbau
 
 | Verzeichnis | Inhalt |
 |---|---|
 | `public/` | Document Root: Front-Controller, Assets, veröffentlichte Bildvarianten |
+| `public/architektur/` | zweites Webroot der Architekturseite: Front-Controller, Stylesheet, eigene Bildvarianten |
 | `app/` | Router, Controller, Datenzugriff, Bildpipeline, Auth, CSRF |
-| `templates/` | HTML-Templates (öffentlich und Admin) |
+| `templates/` | HTML-Templates (öffentlich, Architekturseite und Admin) |
 | `config/` | Konfiguration (Vorlage im Repository, echte Datei privat) |
 | `storage/` | privat: SQLite-Datenbank, Originale, Ableitungen, Sitzungen, Logs, Backups |
 | `bin/` | CLI: Benutzer anlegen, Backup, Import, Bilder neu verarbeiten, Release-Paket für FTP-Upload bauen |
@@ -23,6 +28,7 @@ Das Design tritt hinter die Fotografie zurück: warmer Off-White-Grund, reduzier
 ## Dokumentation
 
 - [Installation, Betrieb, Backup & Wiederherstellung](docs/INSTALL.md)
+- [Architekturseite: Konzept, Konfiguration, Domain zuweisen](docs/ARCHITEKTUR.md)
 - [Übernommene Inhalte, fehlende Originale, benötigte Freigaben](docs/CONTENT.md)
 - [Weiterleitungen alter URLs](docs/REDIRECTS.md)
 - [Durchgeführte Tests](docs/TESTS.md)
@@ -47,7 +53,7 @@ php bin/import-legacy.php                           # optional: Bestandsinhalte 
 php -S 127.0.0.1:8080 -t public public/index.php
 ```
 
-Danach: `http://localhost:8080` (Website) und `http://localhost:8080/admin` (Verwaltung).
+Danach: `http://localhost:8080` (Website), `http://localhost:8080/architektur/` (Architekturseite) und `http://localhost:8080/admin` (Verwaltung).
 
 ## Lizenzen
 

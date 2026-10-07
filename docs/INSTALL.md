@@ -11,7 +11,7 @@
   - `exif` – empfohlen (Ausrichtung mit GD; Imagick liest sie selbst)
   - `zip` – nur für `bin/backup.php`
 - Webserver mit Document Root auf `public/` bzw. dem Inhalt von `public/` (Apache mit `mod_rewrite` und `AllowOverride All`, alternativ nginx, siehe unten); Shell-Zugang ist **nicht** erforderlich
-- Schreibrechte des PHP-Prozesses auf `storage/` und `public/media/`
+- Schreibrechte des PHP-Prozesses auf `storage/`, `public/media/` und `public/architektur/media/`
 - Empfohlene PHP-Einstellungen: `upload_max_filesize` ≥ 40M, `post_max_size` ≥ 48M, `memory_limit` ≥ 256M (mit GD bei sehr großen Bildern 512M), `max_execution_time` ≥ 120
 
 Kein Node, kein Composer, kein Build-Schritt. Das Repository wird so ausgeliefert, wie es ist.
@@ -32,6 +32,9 @@ public/       EINZIGES öffentliches Verzeichnis (Document Root)
   .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
   media/      veröffentlichte Bildvarianten (werden automatisch verwaltet)
+  architektur/  zweites Webroot der Architekturseite (docs/ARCHITEKTUR.md):
+    index.php   Front-Controller, .htaccess, assets/css/architektur.css,
+    media/      eigene Bildvarianten (nur Projekte im Umfang der Architekturseite)
 storage/      privat: database.sqlite, originals/, derivatives/, sessions/, logs/, backups/, cache/
 templates/    HTML-Templates (öffentlich und Admin)
 dist/         Ausgabe von bin/build-release.php (nicht im Repository)
@@ -189,6 +192,8 @@ server {
 cp config/config.example.php config/config.php   # base_url auf http://localhost:8080 setzen, debug => true
 php -S 127.0.0.1:8080 -t public public/index.php
 ```
+
+Die Architekturseite ist damit unter `http://127.0.0.1:8080/architektur/` erreichbar; die Variante mit eigener Domain lässt sich mit `php -S 127.0.0.1:8081 -t public/architektur public/architektur/index.php` nachstellen (siehe [ARCHITEKTUR.md](ARCHITEKTUR.md)).
 
 ## Inhalte pflegen
 

@@ -176,6 +176,28 @@ Gleiche Umgebung wie beim Redesign (PHP 8.3.6 mit `php -S`, Chrome 148 headless 
 | „Alle ausgewählten Projekte übernehmen“: 8 fehlende Titelbilder ergänzt (13 Einträge), Schaltfläche danach nicht mehr vorhanden | keine Doppelungen |
 | `php -l` für alle geänderten PHP-Dateien, `node --check public/assets/js/site.js` | keine Fehler |
 
+## Architekturseite (07.10.2026)
+
+Geprüft in der Entwicklungsumgebung mit PHP 8.3.6 (`php -S`), Google Chrome (1440 px und 390 px per Viewport-Emulation) sowie `curl`. Datenbasis: lokal erzeugte Testgalerien mit synthetischen Fassadenbildern – zwei Galerien `architektur` (eine davon zusätzlich `fertigstellung`), je eine `immobilien` und `baudokumentation`, eine Galerie `people` (nicht im Umfang) und ein Entwurf. Nicht committet.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Unterordner-Modus (`-t public`, Aufruf `/architektur/…`): `/`, `/leistungen`, fünf Leistungsseiten, `/projekte`, Projektseiten, `/profil`, `/kontakt`, `/impressum`, `/sitemap.xml`, `/robots.txt`, durchgereichte Assets (`site.js`, `inter.woff2`) | alle 200; `/architektur` → 301 `/architektur/`; Links, Bilder und Sitemap mit Präfix `/architektur` |
+| Eigene-Domain-Modus (`-t public/architektur`): dieselben Pfade ohne Präfix | alle 200; Sitemap und Canonical mit Host der Anfrage (`http://127.0.0.1:8081/…`), ohne konfigurierte `base_url` |
+| Galerie außerhalb des Umfangs (`people`) per direkter URL; Entwurf ohne Anmeldung | 404 / 404; Entwurf mit Anmeldung als Vorschau (`noindex`) |
+| Öffentliche Bildordner nach `bin/reprocess-images.php`: `public/media` 29 Bildordner, `public/architektur/media` 26 | ok – Bilder der Galerie `people` und des Entwurfs fehlen im Ordner der Architekturseite |
+| Browser-Konsole auf Start-, Projekt- und Kontaktseite | keine Fehler, keine CSP-Verstöße |
+| Kategoriefilter `/projekte` → „Immobilien“ | Grid per fetch ersetzt, URL `?kategorie=immobilien`, nur Projekte der Kategorie |
+| Lightbox auf `/projekte/wohnbau-am-hang`: öffnen per Klick, schließen mit Escape | ok |
+| Kontaktformular: gültige Eingabe mit Fake-`sendmail` | 200, Erfolgsmeldung, Betreff „[Architekturfotografie] Anfrage von …“, Herkunft „Kontaktformular der Architekturseite“; ohne `sendmail` 500 mit Hinweis auf die E-Mail-Adresse (wie Hauptseite) |
+| 404-Seite im dunklen Layout | ok |
+| 390 px: Start und `/projekte` – Wortmarke oben, Navigation darunter umbrechend (wie Hauptseite, kein Burger-Menü), kein horizontaler Überlauf | ok |
+| Admin: Dashboard-Abschnitt „Architekturseite“ (Anzahl Projekte im Umfang, Kategorien mit Zählern), Einstellungen → Gruppe „Architekturfotografie“ mit Platzhaltern | ok |
+| `php -l` für alle geänderten und neuen PHP-Dateien | keine Fehler |
+| `php bin/build-release.php` in beiden Varianten: `htdocs/architektur/` mit `index.php`, `.htaccess`, `assets/`, leerem `media/` (nur `.htaccess`, `index.html`); `config.php` mit Abschnitt `'architektur'` und passendem `public_media`; LIES-MICH mit Abschnitt „ARCHITEKTURSEITE“ | ok |
+
+Nicht geprüft: Apache mit echter Domain-Zuweisung auf den Unterordner (Basis-Pfad-Erkennung über `SCRIPT_NAME`), Canonical-Redirect mit gesetzter `base_url` im Betrieb, Wirkung des dunklen Layouts mit den echten Fotografien.
+
 ## Nicht getestet
 
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
