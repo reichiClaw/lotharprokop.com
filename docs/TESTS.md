@@ -369,7 +369,15 @@ Rot (`#c8553d`), Barlow Condensed, ausdrucksstarke Bewegung, automatische Projek
 | Mobil (390): Plankopf unter dem Text, Index ohne Vorschau mit Thumbnails (ab 480 px), lange Komposita getrennt (`hyphens`), Fußzeile einspaltig | ok |
 | Fußzeile als Legende: Blatt, Stand, Maßstab, Urheber; Name in Barlow (Spezifität gegen `.site-footer p` korrigiert) | ok |
 
-Nicht geprüft: Wirkung mit den echten Fotografien (nur neutrale Testbilder), Safari (`-webkit-text-stroke`, `:has()` für die Fortschrittslinie – in aktuellen Versionen unterstützt), echte Touchgeräte.
+Nicht geprüft: Safari (`-webkit-text-stroke`, `:has()` für die Fortschrittslinie – in aktuellen Versionen unterstützt), echte Touchgeräte.
+
+### Live-Prüfung nach dem Deploy (07.10.2026, lothar.drve.at)
+
+`tools/deploy-ftp.py deploy`: 24 Dateien hochgeladen (Schriften, `architektur.js`, CSS, Templates, Controller, Doku), 103 unverändert, nichts gelöscht, alle Größen verifiziert. Danach per curl: alle Routen der Architekturseite 200 (`/architektur/`, Leistungen, 5 Leistungsseiten, Projekte, Projektseiten, Profil, Kontakt, Impressum, Datenschutz), unbekannte Pfade 404 mit eigener Fehlerseite, keine PHP-Fehlertexte; `architektur.css?v=14` 62 162 B `text/css`, `architektur.js` `application/javascript`, beide woff2 `font/woff2`; Hauptseite, Impressum, Datenschutz unverändert 200; `/app/`, `/storage/`, `/.htaccess`, `/app/View.php`, `/storage/database.sqlite` 404. Screenshots mit den echten Fotografien (Chrome headless, 1440×900 und 390×844): Kopfbild, Leistungsindex, Blattraster, Projektseite, Leistungsseite, Kontakt.
+
+| Befund live | Ergebnis |
+|---|---|
+| Blattraster, Reihe mit drei kleinen Blättern: Bei „Angerhofer“ (Kategorien „People, Architektur, Industrie“) brach der Titel buchstabenweise um. Ursache: `.card__text` als Grid `auto 1fr auto` – die `auto`-Spalte der Kategorien nahm ihre volle Breite, der Titel (`overflow-wrap: anywhere`) schrumpfte auf Zeichenbreite. Lösung: `.card__text` als Flex mit Umbruch; passt die Kategoriezeile nicht neben den Titel, rutscht sie rechtsbündig in die nächste Zeile (mobil weiterhin linksbündig darunter). Geprüft gegen die Live-Seite mit eingespieltem lokalem CSS (1440 und 390). Asset-Version 15. | behoben |
 
 ## Nicht getestet
 

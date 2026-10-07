@@ -677,8 +677,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .card__hover { position: absolute; left: 0; bottom: 0; padding: 0.55rem 0.9rem; background: var(--accent); color: #fff; transform: translateY(100%); transition: transform 500ms var(--ease-out); }
 .card__link:hover .card__hover, .card__link:focus-visible .card__hover { transform: none; }
+/* Flex mit Umbruch: Passt die Kategoriezeile nicht mehr neben den Titel, rutscht sie rechtsbündig in die nächste Zeile,
+   statt den Titel (overflow-wrap: anywhere) auf Buchstabenbreite zu quetschen. */
 .card__text {
-  display: grid; grid-template-columns: auto 1fr auto; align-items: baseline;
+  display: flex; flex-wrap: wrap; align-items: baseline;
   gap: 0.25rem var(--s-2);
   margin-top: 0.9rem;
   padding-top: 0.75rem;
@@ -686,13 +688,12 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 .card__index { font-size: 1rem; color: var(--fg-3); transition: color var(--dur) var(--ease); }
 .card__link:hover .card__index { color: var(--accent); }
-.card__title { font-size: 1.5rem; line-height: 0.95; text-transform: uppercase; color: var(--fg); }
+.card__title { flex: 1 1 auto; min-width: 0; font-size: 1.5rem; line-height: 0.95; text-transform: uppercase; color: var(--fg); }
 .card--xl .card__title { font-size: clamp(1.75rem, 1rem + 2.2vw, 3rem); }
-.card__meta { margin: 0; color: var(--fg-3); display: flex; gap: 0.9em; justify-self: end; text-align: right; }
+.card__meta { margin: 0 0 0 auto; color: var(--fg-3); display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.25em 0.9em; text-align: right; }
 .card__link:focus-visible { outline-offset: 4px; }
 @media (max-width: 759px) {
-  .card__text { grid-template-columns: auto 1fr; }
-  .card__meta { grid-column: 1 / -1; justify-self: start; text-align: left; }
+  .card__meta { flex-basis: 100%; justify-content: flex-start; text-align: left; }
 }
 
 /* ---------- Startseite: Arbeitsweise, Aufruf ---------- */
