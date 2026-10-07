@@ -155,7 +155,7 @@ Wird per FTP ein neuer `storage/`-Stand eingespielt (z. B. Backup), lässt sich 
 
 ### Updates per FTP
 
-Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inhalt des Webroots (ohne `media/`, ohne `app-path.php`) überschreiben. `config/config.php`, `storage/` und `media/` bleiben unverändert. Datenbankänderungen werden beim ersten Aufruf automatisch angewendet (idempotente Migrationen).
+Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inhalt des Webroots (ohne `media/`, ohne `app-path.php`) überschreiben – bei Variante „ein Ordner“ auch die `.htaccess` im Webroot aus `deploy/webroot.htaccess`. `config/config.php`, `storage/` und `media/` bleiben unverändert. Datenbankänderungen werden beim ersten Aufruf automatisch angewendet (idempotente Migrationen). Für die Architekturseite (`public/architektur/`, inklusive ihrer versteckten Dateien) siehe [ARCHITEKTUR.md](ARCHITEKTUR.md).
 
 ### Apache
 

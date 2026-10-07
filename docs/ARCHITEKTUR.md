@@ -75,6 +75,25 @@ Bildvarianten werden pro Auftritt in einen eigenen öffentlichen Ordner synchron
 
 Unter eigener Domain ist `/assets/` der Hauptseite nicht erreichbar. Deshalb reicht der Front-Controller der Architekturseite `site.js`, die Schriften und die Favicons aus `public/assets/` per PHP durch (Whitelist, lange Cache-Dauer, `immutable`). Das eigene Stylesheet `public/architektur/assets/css/architektur.css` liegt als Datei im eigenen Webroot. Eine Datei, die sowohl in `public/architektur/assets/` als auch in `public/assets/` liegt, gewinnt lokal.
 
+## In eine bestehende Installation einspielen (FTP)
+
+Die Architekturseite ist Teil der Anwendung – sie wird wie ein normales Update hochgeladen (siehe „Updates per FTP“ in [INSTALL.md](INSTALL.md)). Es gibt keinen automatischen Deploy; solange die Dateien nicht auf dem Server liegen, beantwortet die Hauptseite `/architektur/…` mit 404.
+
+Hochzuladen (versteckte Dateien im FTP-Programm einblenden!):
+
+| Quelle im Repository | Ziel bei Variante „ein Ordner“ (Projektordner = Webroot) | Ziel bei Variante „getrennt“ |
+|---|---|---|
+| `app/` (komplett) | `app/` | `lotharprokop/app/` |
+| `templates/` (komplett) | `templates/` | `lotharprokop/templates/` |
+| `public/architektur/` komplett, **inklusive** `.htaccess` und `media/.htaccess` | `public/architektur/` | `architektur/` im Webroot |
+| `public/.htaccess`, `public/index.php` | `public/` | Webroot |
+| `deploy/webroot.htaccess` | `.htaccess` im Webroot (ersetzen) | – |
+| `bin/`, `docs/`, `config/config.example.php` | `bin/`, `docs/`, `config/` | `lotharprokop/…` |
+
+Nicht anfassen: `config/config.php`, `storage/`, `public/media/`. Die bestehende `config.php` braucht **keinen** `'architektur'`-Abschnitt – ohne ihn gelten die Standardwerte (aktiv, Unterordner `/architektur`, Standard-Kategorien). Beim ersten Aufruf nach dem Upload befüllt die Anwendung `public/architektur/media/` automatisch aus den privaten Ableitungen (Marker `storage/cache/architektur-synced`); dafür muss PHP den Ordner `public/architektur/media/` beschreiben dürfen (wie `public/media/`).
+
+Prüfung nach dem Upload: `https://DOMAIN/architektur/` zeigt die dunkle Startseite, `https://DOMAIN/architektur/assets/css/architektur.css` liefert CSS (kommt dort eine HTML-404-Seite, fehlt der Ordner), `https://DOMAIN/architektur/.htaccess` liefert 403 oder 404.
+
 ## Eigene Domain zuweisen
 
 1. Im Hosting-Panel die neue Domain anlegen und auf den Ordner `architektur` **innerhalb des Webroots** der Hauptseite zeigen lassen (bei der FTP-Installation: `htdocs/architektur`; bei Variante „ein Ordner“: `htdocs/public/architektur`). SSL für die Domain aktivieren.
@@ -122,4 +141,4 @@ php -S 127.0.0.1:8080 -t public public/index.php
 php -S 127.0.0.1:8081 -t public/architektur public/architektur/index.php
 ```
 
-Der eingebaute PHP-Server liefert vorhandene Dateien selbst aus; alles andere geht an den Front-Controller. Der Basis-Pfad wird im Entwicklungsserver aus Document Root und Ordner des Front-Controllers bestimmt, unter Apache aus `SCRIPT_NAME`.
+Der eingebaute PHP-Server liefert vorhandene Dateien selbst aus; alles andere geht an den Front-Controller. Der Basis-Pfad wird im Entwicklungsserver aus Document Root und Ordner des Front-Controllers bestimmt, unter Apache aus `SCRIPT_NAME`, abgeglichen mit dem angefragten Pfad: In der Variante „ein Ordner“ schreibt Apache intern auf `/public/architektur/index.php` um, der Basis-Pfad der Anfrage ist aber `/architektur` – führende Segmente werden so lange entfernt, bis der Rest zum angefragten Pfad passt.

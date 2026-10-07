@@ -196,7 +196,22 @@ Geprüft in der Entwicklungsumgebung mit PHP 8.3.6 (`php -S`), Google Chrome (14
 | `php -l` für alle geänderten und neuen PHP-Dateien | keine Fehler |
 | `php bin/build-release.php` in beiden Varianten: `htdocs/architektur/` mit `index.php`, `.htaccess`, `assets/`, leerem `media/` (nur `.htaccess`, `index.html`); `config.php` mit Abschnitt `'architektur'` und passendem `public_media`; LIES-MICH mit Abschnitt „ARCHITEKTURSEITE“ | ok |
 
-Nicht geprüft: Apache mit echter Domain-Zuweisung auf den Unterordner (Basis-Pfad-Erkennung über `SCRIPT_NAME`), Canonical-Redirect mit gesetzter `base_url` im Betrieb, Wirkung des dunklen Layouts mit den echten Fotografien.
+### Apache (07.10.2026)
+
+Anlass: Auf `lothar.drve.at` (Variante „ein Ordner“) war `/architektur` nicht erreichbar – die Dateien lagen dort noch nicht (die reine Datei `architektur/assets/css/architektur.css` kam als HTML-404 der Hauptseite zurück). Beim Nachstellen unter echtem Apache 2.4 (`AllowOverride All`, `mod_rewrite`, `mod_headers`, mod_php) mit den Paketen aus `bin/build-release.php --with-content` zeigte sich zusätzlich ein Fehler, der nach dem Upload aufgetreten wäre: In der Variante „ein Ordner“ schreibt Apache intern auf `/public/architektur/index.php` um, `SCRIPT_NAME` lautet entsprechend (nachgemessen: `/public/architektur/sn.php` bei Anfrage `/architektur/sn.php`); die Basis-Pfad-Erkennung ergab `/public/architektur` → alle Routen 404. Behoben durch Abgleich mit dem angefragten Pfad (`Site::detectBasePath()`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Variante „ein Ordner“ (Document Root = Projektordner, `deploy/webroot.htaccess`): `/architektur/`, Leistungen, Projekte, Kontakt, Impressum, Sitemap, robots, eigenes CSS, durchgereichte `site.js`/`inter.woff2`, Bildvarianten aus `architektur/media` | alle 200, Links und Sitemap mit Präfix `/architektur`; Hauptseite weiterhin 200 |
+| `/architektur` ohne Schrägstrich (ein Ordner) | 301 → `/architektur/` (vorher hätte Apache nach `/public/architektur/` umgeleitet; eigene Regel in `webroot.htaccess`) |
+| `/public/architektur/`, `/public/architektur/index.php`, `/architektur/.htaccess`, `/config/config.php` | 404 / 404 / 404 / 403 |
+| Galerie außerhalb des Umfangs, unbekannte Seite | 404 (dunkle Fehlerseite) |
+| Variante „getrennt“ (Document Root = `htdocs`): dieselben Pfade | alle 200; `/architektur` → 301 `/architektur/`; `.htaccess`-Dateien 403 |
+| Eigene Domain (Document Root = `public/architektur`, `base_url` gesetzt): `/`, Leistungen, Projekt, Assets, Bilder, Sitemap mit Host der eigenen Domain; `/index.php` 404 | ok |
+| Canonical-Redirect: `/architektur/leistungen?x=1` über die Hauptdomain | 301 → `https://EIGENE-DOMAIN/leistungen?x=1`; eigenes CSS unter der Hauptdomain weiterhin 200 (Vergleich über Host und Port) |
+| Update einer bestehenden Installation: `config.php` **ohne** Abschnitt `'architektur'`, leerer Ordner `architektur/media`, kein Marker | erster Aufruf 200, `architektur/media` automatisch mit 26 Bildordnern befüllt, Marker `storage/cache/architektur-synced` geschrieben, Bild-URL 200 `image/jpeg` |
+
+Nicht geprüft: PHP-FPM statt mod_php (SCRIPT_NAME-Verhalten identisch erwartet, da von Apache gesetzt), Wirkung des dunklen Layouts mit den echten Fotografien.
 
 ## Nicht getestet
 
