@@ -12,6 +12,11 @@ DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Direktzugriff über /public/… (wenn der Projektordner selbst das Webroot ist) nicht anbieten;
+  # interne Weiterleitungen aus der übergeordneten .htaccess (REDIRECT_STATUS gesetzt) sind ausgenommen.
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} ^/public(/|$)
+  RewriteRule ^ - [R=404,L]
   # Vorhandene Dateien (eigenes CSS, Bildvarianten in media/) direkt ausliefern, alles andere –
   # auch gemeinsame Assets wie assets/js/site.js und Schriften – an den Front-Controller.
   RewriteCond %{REQUEST_FILENAME} !-f

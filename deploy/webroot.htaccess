@@ -10,6 +10,9 @@ Options -Indexes -MultiViews
   # Private Ordner und versteckte Dateien: nicht vorhanden melden.
   RewriteRule ^(app|config|storage|templates|bin|data|docs|deploy|dist)(/|$) - [R=404,L]
   RewriteRule (^|/)\.(?!well-known/) - [R=404,L]
+  # Architekturseite (zweites Webroot public/architektur, docs/ARCHITEKTUR.md) ohne Schrägstrich:
+  # sichtbar umleiten, sonst würde Apache intern auf /public/architektur/ verweisen.
+  RewriteRule ^architektur$ /architektur/ [R=301,L]
   # Alles andere aus public/ bedienen; nicht existierende Pfade an den Front-Controller.
   RewriteCond %{REQUEST_URI} !^/public/
   RewriteRule ^(.*)$ public/$1 [L]

@@ -80,8 +80,13 @@ $query = (string) ($_SERVER['QUERY_STRING'] ?? '');
 // (kein doppelter Inhalt). Ohne konfigurierte base_url passiert nichts.
 if (in_array($method, ['GET', 'HEAD'], true) && Architektur::config('canonical_redirect', true)) {
     $target = Architektur::baseUrl();
-    $targetHost = $target !== '' ? strtolower((string) parse_url($target, PHP_URL_HOST)) : '';
-    $requestHost = strtolower((string) strtok((string) ($_SERVER['HTTP_HOST'] ?? ''), ':'));
+    $parts = $target !== '' ? parse_url($target) : false;
+    $targetHost = is_array($parts) && isset($parts['host'])
+        ? strtolower($parts['host'] . (isset($parts['port']) ? ':' . $parts['port'] : ''))
+        : '';
+    $requestHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+    // Standardports weglassen, damit „example.org“ und „example.org:443“ gleich behandelt werden.
+    $requestHost = (string) preg_replace('/:(80|443)$/', '', $requestHost);
     if ($targetHost !== '' && $requestHost !== '' && $requestHost !== $targetHost) {
         redirect($target . $path . ($query !== '' ? '?' . $query : ''), 301);
     }

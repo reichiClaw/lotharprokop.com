@@ -112,6 +112,11 @@ final class Site
      * Basis-Pfad aus dem Ort des Front-Controllers ableiten: /architektur/index.php → '/architektur',
      * /index.php → ''. Funktioniert damit sowohl im Unterordner als auch unter eigener Domain.
      *
+     * Der Ordner des Front-Controllers (aus SCRIPT_NAME) wird mit dem angefragten Pfad abgeglichen:
+     * Liegt der Projektordner selbst im Webroot (Variante „ein Ordner“), schreibt Apache intern auf
+     * /public/architektur/index.php um – der Basis-Pfad der Anfrage ist aber nur '/architektur'. Deshalb
+     * werden führende Segmente so lange entfernt, bis der Rest am Anfang des angefragten Pfads steht.
+     *
      * Der eingebaute Entwicklungsserver (php -S) setzt SCRIPT_NAME bei nicht vorhandenen Dateien auf den
      * Anfragepfad; dort wird stattdessen der Ordner des Front-Controllers relativ zum Document Root genommen.
      *
@@ -127,8 +132,20 @@ final class Site
             }
         }
         $script = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
-        $dir = str_replace('\\', '/', dirname($script));
-        return self::normalizePath($dir);
+        $dir = self::normalizePath(str_replace('\\', '/', dirname($script)));
+        if ($dir === '') {
+            return '';
+        }
+        $request = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
+        $segments = explode('/', ltrim($dir, '/'));
+        while ($segments !== []) {
+            $candidate = '/' . implode('/', $segments);
+            if ($request === $candidate || str_starts_with($request, $candidate . '/')) {
+                return $candidate;
+            }
+            array_shift($segments);
+        }
+        return '';
     }
 
     private static function normalizePath(string $path): string
