@@ -75,3 +75,17 @@ if (is_file($syncMarker) && @unlink($syncMarker)) {
     }
 }
 unset($syncMarker);
+
+// Architekturseite nachträglich per FTP in eine bestehende Installation gespielt: ihr öffentlicher
+// Bildordner wird beim ersten Aufruf einmalig befüllt (Marker verhindert Wiederholungen).
+if (App\Architektur::enabled()) {
+    $archMarker = App\Config::storage('cache') . '/architektur-synced';
+    if (!is_file($archMarker) && @file_put_contents($archMarker, date('c')) !== false) {
+        try {
+            App\Images::syncAll();
+        } catch (\Throwable $e) {
+            error_log('Erstabgleich der Bilder für die Architekturseite fehlgeschlagen: ' . $e->getMessage());
+        }
+    }
+    unset($archMarker);
+}
