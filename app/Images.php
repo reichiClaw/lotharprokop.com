@@ -205,6 +205,10 @@ final class Images
         if ($slides > 0) {
             $other[] = $slides > 1 ? 'Bildfolge Startseite (' . $slides . '×)' : 'Bildfolge Startseite';
         }
+        $archSlides = HeroSlides::usesImage($id, Architektur::KEY);
+        if ($archSlides > 0) {
+            $other[] = $archSlides > 1 ? 'Bildfolge Architekturseite (' . $archSlides . '×)' : 'Bildfolge Architekturseite';
+        }
         if (Settings::getInt('portrait_image_id') === $id) {
             $other[] = 'Porträt (Vita)';
         }

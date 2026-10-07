@@ -340,7 +340,7 @@ final class AdminController
     }
 
     /** Titelbild eines Projekts (mit Rückfall auf das erste Bild der Galerie). */
-    private static function galleryCover(int $galleryId): ?array
+    public static function galleryCover(int $galleryId): ?array
     {
         $gallery = Galleries::find($galleryId);
         if ($gallery === null) {
@@ -351,7 +351,7 @@ final class AdminController
     }
 
     /** Löscht ein Bild, wenn es nach einer Änderung nirgends mehr verwendet wird. */
-    private static function pruneImage(int $imageId): void
+    public static function pruneImage(int $imageId): void
     {
         $usage = Images::usages($imageId);
         if ($usage['galleries'] === [] && $usage['other'] === []) {

@@ -12,11 +12,15 @@ $nav = [
     '/admin/galerien' => 'Galerien',
     '/admin/startseite' => 'Startseite',
     '/admin/auswahl' => 'Bildauswahl',
+    '/admin/architektur' => 'Architekturseite',
     '/admin/kategorien' => 'Kategorien',
     '/admin/filme' => 'Filme',
     '/admin/einstellungen' => 'Einstellungen',
     '/admin/system' => 'System',
 ];
+if (!App\Architektur::enabled()) {
+    unset($nav['/admin/architektur']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="de">

@@ -24,7 +24,7 @@ Die Zuordnung verbindet Leistungsseiten und Projekte: Auf einer Leistungsseite e
 
 Bewegung: Titelwörter schieben sich beim Laden hoch, Maßlinien ziehen sich, Projektbilder steigen beim Scrollen gestaffelt aus der Unterkante auf (`clip-path`), das Kopfbild läuft leicht parallax und der Text blendet aus, die Fortschrittslinie im Plankopf füllt sich im Takt des Bildwechsels (rein CSS, pausiert mit dem Schalter). Alles respektiert `prefers-reduced-motion`.
 
-Der Kopfbereich zeigt die Titelbilder der hervorgehobenen Projekte als Bildfolge (Mechanik der Hauptseite); der Plankopf rechts unten wechselt mit: Projekt, Kategorie · Jahr, Blatt 01 / 05. Der Leistungsindex auf der Startseite zeigt beim Überfahren oder Fokussieren einer Zeile **automatisch** das Titelbild eines Projekts der zugehörigen Kategorie (hervorgehobene zuerst, je Leistung ein anderes Projekt; hat eine Kategorie noch keines, springt ein Projekt aus dem Umfang ein) – es gibt dafür nichts zu pflegen (`Architektur::servicePreviews()`). Projekte stehen im Blattraster: 1 groß (21:9) → 2 mittel → 3 klein, mit wechselnden Versätzen; die Projektübersicht hat links einen haftenden Index mit Zählern je Kategorie, die Projektseite einen haftenden Plankopf neben der Bildstrecke und am Ende zwei Flächen mit abgedunkelten Titelbildern der Nachbarprojekte.
+Der Kopfbereich zeigt eine Bildfolge (Mechanik der Hauptseite); der Plankopf rechts unten wechselt mit: Projekt, Kategorie · Jahr, Blatt 01 / 05. Welche Bilder: entweder eine im Admin gezielt zusammengestellte Auswahl (**Admin → Architekturseite**, eigene Tabelle `hero_slides` mit `site = 'architektur'`) oder – solange dort nichts steht – automatisch die Titelbilder der hervorgehobenen Projekte im Umfang. Ein Bild ohne Projektverweis (oder mit Verweis auf ein unveröffentlichtes Projekt) ist nicht anklickbar; der Plankopf zeigt dann Bildunterschrift oder Alternativtext unter „Motiv“. Der Leistungsindex auf der Startseite zeigt beim Überfahren oder Fokussieren einer Zeile **automatisch** das Titelbild eines Projekts der zugehörigen Kategorie (hervorgehobene zuerst, je Leistung ein anderes Projekt; hat eine Kategorie noch keines, springt ein Projekt aus dem Umfang ein) – es gibt dafür nichts zu pflegen (`Architektur::servicePreviews()`). Projekte stehen im Blattraster: 1 groß (21:9) → 2 mittel → 3 klein, mit wechselnden Versätzen; die Projektübersicht hat links einen haftenden Index mit Zählern je Kategorie, die Projektseite einen haftenden Plankopf neben der Bildstrecke und am Ende zwei Flächen mit abgedunkelten Titelbildern der Nachbarprojekte.
 
 ## Seiten und URLs
 
@@ -57,7 +57,7 @@ Abschnitt `'architektur'` in `config/config.php` (Vorlage: `config/config.exampl
 | `canonical_redirect` | Mit gesetzter `base_url`: Aufrufe über die Hauptdomain (`…/architektur/…`) werden per 301 auf die eigene Domain geleitet |
 | `base_path` | Nur setzen, wenn die automatische Erkennung beim Hoster nicht greift (`''` oder `'/architektur'`) |
 | `categories` | Slugs der Kategorien, die den Umfang bilden (Admin → Kategorien). Die Liste ersetzt den Standard vollständig |
-| `hero_interval` | Wechselzeit der Bildfolge in Sekunden |
+| `hero_interval` | Wechselzeit der Bildfolge in Sekunden (Standard, solange im Admin unter Architekturseite nichts anderes gesetzt ist) |
 | `mail_subject_prefix` | Betreff-Präfix für Anfragen über das Kontaktformular der Architekturseite (Empfänger bleibt `mail.to`) |
 | `public_media` | Pfad des öffentlichen Bildordners der Architekturseite; leer = `public/architektur/media` neben dem Hauptordner |
 
@@ -67,7 +67,8 @@ Alle Texte des Auftritts (Untertitel, Einführung, Leitsatz, Profil, Kontakt-Ein
 
 1. **Kategorien anlegen** (Admin → Kategorien): `architektur`, `immobilien`, `baudokumentation`, `fertigstellung` – oder andere Slugs, dann die Liste in `config/config.php` anpassen. Das Dashboard zeigt, welche konfigurierten Kategorien noch fehlen.
 2. **Galerien zuordnen**: Eine Galerie erscheint auf der Architekturseite, sobald sie veröffentlicht ist und eine dieser Kategorien trägt. Eine Galerie kann gleichzeitig auf der Hauptseite stehen – dort gelten die bekannten Regeln.
-3. **Hervorheben** steuert die Bildfolge im Kopfbereich und die Auswahl auf der Startseite (nur Galerien im Umfang).
+3. **Hervorheben** steuert die Auswahl auf der Startseite (nur Galerien im Umfang) und – solange keine eigene Auswahl gesetzt ist – die Bildfolge im Kopfbereich.
+3a. **Kopfbereich gezielt** (Admin → Architekturseite): Bilder aus der gesamten Bibliothek wählen (Galerien im Umfang zuerst), einzeln hochladen oder das Titelbild eines Projekts übernehmen; Reihenfolge per Ziehen, je Bild ein Projektverweis (nur Projekte im Umfang; „automatisch“ nimmt die Galerie im Umfang, in der das Bild liegt), Wechselzeit in Sekunden (überschreibt `hero_interval` aus der Konfiguration). „Diese Auswahl übernehmen und bearbeiten“ kopiert die automatische Folge als Ausgangspunkt; „Eigene Auswahl löschen“ kehrt zur Automatik zurück. Ein Bild in der Bildfolge liegt immer im eigenen Bildordner der Architekturseite, auch wenn seine Galerie nicht im Umfang ist.
 4. **Projektfakten**: Auftraggeber und Jahr der Galerie werden als Fakten gezeigt; die Beschreibung steht neben den Fakten. Das Layout der Bildserie (Spalte, editorial, Raster) wird aus der Galerie übernommen.
 5. **Texte** unter Einstellungen → Architekturfotografie.
 

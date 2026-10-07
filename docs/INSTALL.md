@@ -211,7 +211,7 @@ Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript 
 
 **Galerien** – anlegen, bearbeiten, sortieren (Drag-and-drop oder Pfeile), Status `Entwurf` / `Veröffentlicht` / `Archiviert`, Löschen nur nach Eingabe des Slugs. Pro Galerie: Titel, URL-Slug (wird aus dem Titel vorgeschlagen; reservierte Wörter und Doppelungen werden abgefangen), Beschreibung, Kunde/Jahr/Credits (optional), Kategorien, Titelbild, Layout (`Ruhiges Raster` / `Einzelspalte` / `Editorial`), Startseite (hervorheben).
 
-**Bilder** – Mehrfachupload per Drag-and-drop oder Dateidialog (JPEG, PNG, WebP; bis 40 MB und 100 Megapixel; Prüfung des echten Dateityps; SVG und ausführbare Dateien werden abgelehnt). Pro Bild: Alt-Text, Bildunterschrift, Fokuspunkt (Klick ins Bild) für Zuschnitte auf Startseite/Übersicht, Ersetzen (neue Datei, Metadaten bleiben), Löschen mit Bestätigung. Wird ein Bild an mehreren Stellen genutzt (mehrere Galerien, Bildfolge der Startseite, Porträt, Filmposter), zeigt die Bildseite alle Verwendungen an und verlangt eine ausdrückliche Zusatzbestätigung.
+**Bilder** – Mehrfachupload per Drag-and-drop oder Dateidialog (JPEG, PNG, WebP; bis 40 MB und 100 Megapixel; Prüfung des echten Dateityps; SVG und ausführbare Dateien werden abgelehnt). Pro Bild: Alt-Text, Bildunterschrift, Fokuspunkt (Klick ins Bild) für Zuschnitte auf Startseite/Übersicht, Ersetzen (neue Datei, Metadaten bleiben), Löschen mit Bestätigung. Wird ein Bild an mehreren Stellen genutzt (mehrere Galerien, Bildfolge der Startseite oder der Architekturseite, Porträt, Filmposter), zeigt die Bildseite alle Verwendungen an und verlangt eine ausdrückliche Zusatzbestätigung.
 
 **Entwürfe** sind öffentlich nicht erreichbar (404, nicht in Sitemap/Übersicht), ihre Bildvarianten liegen nicht in `public/media/`. Eingeloggt lässt sich ein Entwurf unter seiner späteren URL als Vorschau ansehen (Banner „Vorschau“, `noindex`).
 
@@ -220,6 +220,8 @@ Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript 
 **Kategorien** – anlegen, umbenennen, sortieren, löschen (Galerien bleiben erhalten). Doppelte Namen werden abgewiesen.
 
 **Filme** – Titel, Anbieter (YouTube / Vimeo), Video-ID oder -URL, Poster (eigenes Bild), Beschreibung, Status. Videos werden erst nach Klick geladen (youtube-nocookie bzw. Vimeo mit `dnt=1`).
+
+**Architekturseite** – Bildfolge im Kopfbereich der Architektur-Startseite gezielt zusammenstellen: Bilder aus der gesamten Bibliothek (Bildwähler, Galerien im Umfang der Architekturseite zuerst), Titelbild eines Projekts übernehmen oder eigene Datei hochladen; Reihenfolge per Ziehen, je Bild ein Projektverweis auf ein Projekt im Umfang (macht Bild und Plankopf anklickbar), Wechselzeit in Sekunden. Ohne eigene Auswahl zeigt die Seite automatisch die Titelbilder der hervorgehobenen Projekte im Umfang; diese Automatik lässt sich als Ausgangspunkt übernehmen und jederzeit wiederherstellen. Details: `docs/ARCHITEKTUR.md`.
 
 **Bildauswahl** – frei aus allen Bildern (alle Galerien, auch Entwürfe, sowie Einzelbilder) zusammengestellte Reihe „Ausgewählte Fotografien“. Erscheint auf der Startseite direkt unter dem Kopfbereich (die ersten N Bilder, Zahl einstellbar) und vollständig unter `/auswahl` (mit Lightbox, in der Sitemap). Reihenfolge per Ziehen; ein Bild ist über die Auswahl auch dann öffentlich, wenn es sonst nur in Entwürfen liegt. Das Kontrollkästchen „In der Bildauswahl zeigen“ gibt es auch im Bildformular.
 

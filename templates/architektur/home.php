@@ -46,10 +46,14 @@ $serviceCount = count($services);
     <?php if ($heroSlides !== []): ?>
     <aside class="plankopf" aria-label="Aktuelles Bild">
       <div class="plankopf__sets">
-        <?php foreach ($heroSlides as $i => $slide): $g = $slide['gallery']; $cats = array_column($g['categories'], 'name'); $meta = array_filter([$cats !== [] ? implode(', ', $cats) : '', $g['year']]); ?>
+        <?php foreach ($heroSlides as $i => $slide): $g = $slide['gallery']; $img = $slide['image']; ?>
         <dl class="plankopf__set<?= $i === 0 ? ' is-active' : '' ?>" data-hero-credit<?= $i === 0 ? '' : ' aria-hidden="true"' ?>>
+          <?php if ($g !== null): $cats = array_column($g['categories'], 'name'); $meta = array_filter([$cats !== [] ? implode(', ', $cats) : '', $g['year']]); ?>
           <div><dt>Projekt</dt><dd><a class="plankopf__title" href="<?= e(path('/projekte/' . eurl($g['slug']))) ?>"<?= $i === 0 ? '' : ' tabindex="-1"' ?>><?= e($g['title']) ?></a></dd></div>
           <div><dt>Kategorie · Jahr</dt><dd><?= $meta !== [] ? e(implode(' · ', $meta)) : '—' ?></dd></div>
+          <?php else: ?>
+          <div><dt>Motiv</dt><dd><span class="plankopf__title"><?= e($img['caption'] !== '' ? $img['caption'] : ($img['alt'] !== '' ? $img['alt'] : 'Architekturfotografie')) ?></span></dd></div>
+          <?php endif; ?>
           <div><dt>Blatt</dt><dd class="plankopf__no"><span class="plankopf__current"><?= sprintf('%02d', $i + 1) ?></span> / <?= sprintf('%02d', $slideCount) ?></dd></div>
         </dl>
         <?php endforeach; ?>

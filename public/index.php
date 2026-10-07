@@ -55,6 +55,7 @@ if ($appRoot === null || !is_file($appRoot . '/app/bootstrap.php')) {
 require $appRoot . '/app/bootstrap.php';
 unset($appRoot);
 
+use App\Controllers\AdminArchitekturController;
 use App\Controllers\AdminController;
 use App\Controllers\AdminGalleryController;
 use App\Controllers\AdminImageController;
@@ -148,6 +149,8 @@ $router->post('/admin/auswahl/sortieren', [AdminSelectionController::class, 'reo
 $router->post('/admin/auswahl/einstellungen', [AdminSelectionController::class, 'settings']);
 $router->get('/admin/startseite', [AdminController::class, 'homepage']);
 $router->post('/admin/startseite', [AdminController::class, 'homepageSave']);
+$router->get('/admin/architektur', [AdminArchitekturController::class, 'index']);
+$router->post('/admin/architektur', [AdminArchitekturController::class, 'save']);
 $router->get('/admin/filme', [AdminController::class, 'films']);
 $router->get('/admin/filme/neu', [AdminController::class, 'filmForm']);
 $router->get('/admin/filme/{id:\d+}', [AdminController::class, 'filmForm']);

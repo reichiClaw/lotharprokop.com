@@ -379,6 +379,23 @@ Nicht geprüft: Safari (`-webkit-text-stroke`, `:has()` für die Fortschrittslin
 |---|---|
 | Blattraster, Reihe mit drei kleinen Blättern: Bei „Angerhofer“ (Kategorien „People, Architektur, Industrie“) brach der Titel buchstabenweise um. Ursache: `.card__text` als Grid `auto 1fr auto` – die `auto`-Spalte der Kategorien nahm ihre volle Breite, der Titel (`overflow-wrap: anywhere`) schrumpfte auf Zeichenbreite. Lösung: `.card__text` als Flex mit Umbruch; passt die Kategoriezeile nicht neben den Titel, rutscht sie rechtsbündig in die nächste Zeile (mobil weiterhin linksbündig darunter). Geprüft gegen die Live-Seite mit eingespieltem lokalem CSS (1440 und 390). Asset-Version 15. | behoben |
 
+## Architekturseite: Bildfolge im Kopfbereich gezielt wählen (07.10.2026)
+
+Neue Admin-Seite `/admin/architektur`; Tabelle `hero_slides` um Spalte `site` erweitert (Migration 4, Bestand → `'main'`). Geprüft lokal mit `php -S` (Testbilder, 6 Galerien, davon 5 im Umfang, 1 Entwurf) per curl mit Sitzungs-Cookie und CSRF-Token sowie Chrome headless (Screenshots der Admin-Seite).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Migration 4 beim ersten Aufruf: `schema_version` 3 → 4, Spalte `site TEXT NOT NULL DEFAULT 'main'`, Index; Startseite und Architekturseite danach unverändert (automatische Folge, 3 Bilder) | ok |
+| Admin-Seite ohne eigene Auswahl: Hinweis „Zurzeit automatisch“, Liste der automatischen Titelbilder, Schaltfläche „Diese Auswahl übernehmen und bearbeiten“ | ok |
+| `slides_automatic`: 3 Einträge mit `site='architektur'` und Projektverweis angelegt, Hauptseiten-Folge unberührt | ok |
+| Bildwähler: Galerien im Umfang zuerst (auch der Entwurf), dann übrige, Zähler „1 im Kopfbereich“; `slide_pick` mit „automatisch“ setzt Verweis auf die Galerie im Umfang (Penthouse → Immobilien); Bild aus einer Galerie außerhalb des Umfangs (Jazzfestival) wird ohne Verweis aufgenommen und in `public/architektur/media/` synchronisiert | ok |
+| Startseite mit 5 eigenen Bildern: 4 verlinkte Folien, 1 Folie ohne Link (`<span class="hero__link">`), Plankopf zeigt dafür „Motiv“ mit Alternativtext; `data-hero-interval` 7000 (Konfiguration) | ok |
+| `slides`: Reihenfolge umgekehrt, ein Eintrag entfernt, Verweis auf 0 gesetzt, Verweis auf Galerie außerhalb des Umfangs (Jazzfestival) → wird verworfen (kein Verweis); Wechselzeit 10 s → Einstellung `architektur_hero_interval`, Startseite liefert 10000 ms; Hauptseite unverändert | ok |
+| Entferntes Bild bleibt erhalten (liegt in einer Galerie), verschwindet aber aus `public/architektur/media/` und bleibt in `public/media/` | ok |
+| Bildseite `/admin/bilder/<id>` listet „Bildfolge Architekturseite“ als Verwendung; Dashboard zeigt „4 eigene Bilder in der Bildfolge“ bzw. „automatisch“ | ok |
+| `slides_reset`: alle eigenen Einträge entfernt, keine Bilder gelöscht (alle anderweitig verwendet), Startseite wieder automatisch (3 Bilder) | ok |
+| `php -l` aller geänderten Dateien; Navigationseintrag nur bei `architektur.enabled` | ok |
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft

@@ -8,8 +8,8 @@ namespace App;
  *
  * Inhalte kommen aus derselben Datenbank. Welche Projekte dazugehören, bestimmen Kategorien
  * (Konfiguration 'architektur.categories'): Jede veröffentlichte Galerie mit mindestens einer
- * dieser Kategorien erscheint auf der Architekturseite – alles andere nicht. Es gibt keinen
- * eigenen Adminbereich; gepflegt wird alles unter /admin der Hauptseite.
+ * dieser Kategorien erscheint auf der Architekturseite – alles andere nicht. Gepflegt wird alles
+ * unter /admin der Hauptseite; die Bildfolge im Kopfbereich hat dort eine eigene Seite (/admin/architektur).
  */
 final class Architektur
 {
@@ -237,11 +237,31 @@ final class Architektur
     }
 
     /**
-     * Bildfolge im Kopfbereich: Titelbilder der hervorgehobenen Projekte. Keine eigene Pflege nötig –
-     * was auf der Startseite hervorgehoben ist, trägt auch den Kopf.
-     * @return array<int,array{image:array,gallery:array}>
+     * Bildfolge im Kopfbereich. Steht im Admin (Architekturseite → Kopfbereich) eine eigene Auswahl,
+     * gilt sie; sonst die Titelbilder der hervorgehobenen Projekte (automatisch).
+     * Ein Projektverweis zählt nur, wenn das Projekt veröffentlicht ist und im Umfang liegt.
+     * @return array<int,array{image:array,gallery:?array}>
      */
     public static function heroSlides(int $limit = 5): array
+    {
+        $manual = HeroSlides::forDisplay(self::KEY);
+        if ($manual === []) {
+            return self::heroSlidesAutomatic($limit);
+        }
+        $byId = [];
+        foreach (self::galleries() as $g) {
+            $byId[(int) $g['id']] = $g;
+        }
+        $slides = [];
+        foreach ($manual as $slide) {
+            $gallery = $slide['gallery'] !== null ? ($byId[(int) $slide['gallery']['id']] ?? null) : null;
+            $slides[] = ['image' => $slide['image'], 'gallery' => $gallery];
+        }
+        return $slides;
+    }
+
+    /** Automatische Bildfolge: Titelbilder der hervorgehobenen Projekte im Umfang. */
+    public static function heroSlidesAutomatic(int $limit = 5): array
     {
         $slides = [];
         foreach (self::featured($limit) as $g) {
@@ -252,9 +272,10 @@ final class Architektur
         return $slides;
     }
 
+    /** Wechselzeit: im Admin gesetzt, sonst Konfiguration 'architektur.hero_interval' (7 s). */
     public static function heroInterval(): int
     {
-        return max(3, (int) self::config('hero_interval', 7));
+        return HeroSlides::interval(self::KEY, max(HeroSlides::INTERVAL_MIN, (int) self::config('hero_interval', 7)));
     }
 
     /**
@@ -290,9 +311,15 @@ final class Architektur
         return $out;
     }
 
-    /** Soll ein Bild im media/-Ordner der Architekturseite liegen? Ja, wenn es zu einem veröffentlichten Projekt im Umfang gehört. */
+    /**
+     * Soll ein Bild im media/-Ordner der Architekturseite liegen? Ja, wenn es zu einem veröffentlichten
+     * Projekt im Umfang gehört oder in der Bildfolge des Kopfbereichs steht.
+     */
     public static function shouldBePublic(int $imageId): bool
     {
+        if (HeroSlides::usesImage($imageId, self::KEY) > 0) {
+            return true;
+        }
         $ids = self::categoryIds();
         if ($ids === []) {
             return false;

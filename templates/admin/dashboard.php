@@ -66,6 +66,8 @@ use App\Images;
     <br>Noch nicht angelegt (Konfiguration <code>architektur.categories</code>): <code><?= implode('</code>, <code>', array_map('e', $archMissing)) ?></code> – unter <a href="/admin/kategorien">Kategorien</a> mit genau diesem Slug anlegen oder die Konfiguration anpassen.
     <?php endif; ?>
     Texte: <a href="/admin/einstellungen">Einstellungen → Architekturfotografie</a>.
+    <?php $archSlides = App\HeroSlides::count(App\Architektur::KEY); ?>
+    <br>Kopfbereich: <?= $archSlides > 0 ? '<strong>' . $archSlides . '</strong> eigene ' . ($archSlides === 1 ? 'Bild' : 'Bilder') . ' in der Bildfolge' : 'automatisch (Titelbilder der hervorgehobenen Projekte)' ?> – <a href="/admin/architektur">Bildfolge bearbeiten</a>.
   </p>
 </section>
 <?php endif; ?>

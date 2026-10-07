@@ -85,7 +85,8 @@ return [
         // Kategorien (Slugs, siehe Admin → Kategorien), die den Umfang der Architekturseite bilden.
         // Eine Galerie erscheint dort, sobald sie mindestens eine dieser Kategorien trägt.
         'categories' => ['architektur', 'immobilien', 'baudokumentation', 'fertigstellung'],
-        // Wechselzeit der Bildfolge im Kopfbereich in Sekunden (Titelbilder der hervorgehobenen Projekte).
+        // Wechselzeit der Bildfolge im Kopfbereich in Sekunden; die Bilder selbst (und eine abweichende
+        // Wechselzeit) werden im Admin unter „Architekturseite“ gepflegt, sonst Titelbilder der hervorgehobenen Projekte.
         'hero_interval' => 7,
         // Betreff-Präfix für Anfragen über das Kontaktformular der Architekturseite (Empfänger: mail.to).
         'mail_subject_prefix' => '[Architekturfotografie] ',
