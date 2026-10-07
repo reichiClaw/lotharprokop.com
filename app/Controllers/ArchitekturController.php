@@ -27,6 +27,8 @@ final class ArchitekturController
             'heroInterval' => Architektur::heroInterval(),
             'featured' => Architektur::featured(6),
             'services' => Architektur::services(),
+            'previews' => Architektur::servicePreviews(),
+            'projectCount' => count(Architektur::galleries()),
             'process' => Architektur::PROCESS,
             'meta' => [
                 'title' => '',
@@ -48,11 +50,13 @@ final class ArchitekturController
                 return;
             }
         }
-        $galleries = Architektur::galleries($active ? (int) $active['id'] : null);
+        $all = Architektur::galleries();
+        $galleries = $active ? Architektur::galleries((int) $active['id']) : $all;
         View::render('projects', [
             'categories' => $categories,
             'active' => $active,
             'galleries' => $galleries,
+            'total' => count($all),
             'meta' => [
                 'title' => $active ? 'Projekte – ' . $active['name'] : 'Projekte',
                 'description' => $active
@@ -92,6 +96,7 @@ final class ArchitekturController
             'images' => $images,
             'preview' => $preview,
             'neighbours' => $neighbours,
+            'position' => $preview ? null : self::positionOf($gallery),
             'services' => self::servicesForGallery($gallery),
             'meta' => [
                 'title' => $gallery['title'],
@@ -107,6 +112,7 @@ final class ArchitekturController
     {
         View::render('services', [
             'services' => Architektur::services(),
+            'previews' => Architektur::servicePreviews(),
             'process' => Architektur::PROCESS,
             'meta' => [
                 'title' => 'Leistungen',
@@ -126,11 +132,15 @@ final class ArchitekturController
         $category = Architektur::findCategory($service['category']);
         $related = $category ? array_slice(Architektur::galleries((int) $category['id']), 0, 6) : [];
         $others = array_values(array_filter($services, static fn($s) => $s['slug'] !== $service['slug']));
+        $previews = Architektur::servicePreviews();
         View::render('service', [
             'service' => $service,
             'category' => $category,
             'related' => $related,
             'others' => $others,
+            'backdrop' => $related[0]['cover'] ?? ($previews[$service['slug']]['cover'] ?? null),
+            'previews' => $previews,
+            'position' => (int) array_search($service['slug'], array_keys(Architektur::SERVICES), true) + 1,
             'process' => Architektur::PROCESS,
             'meta' => [
                 'title' => $service['title'],
@@ -267,6 +277,18 @@ final class ArchitekturController
         header('Cache-Control: public, max-age=31536000, immutable');
         header('X-Content-Type-Options: nosniff');
         readfile($path);
+    }
+
+    /** Blattnummer des Projekts innerhalb des Umfangs („Blatt 03 / 09“), null wenn nicht gelistet. */
+    private static function positionOf(array $gallery): ?array
+    {
+        $all = Architektur::galleries();
+        foreach ($all as $i => $g) {
+            if ($g['id'] === $gallery['id']) {
+                return ['index' => $i + 1, 'total' => count($all)];
+            }
+        }
+        return null;
     }
 
     /** Leistungen, deren Kategorie das Projekt trägt (für den Verweis „Leistung“ auf der Projektseite). */

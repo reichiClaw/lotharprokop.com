@@ -350,6 +350,27 @@ Der Server lief mit dem Stand von PR #5 (`cursor/hero-smooth-animation-caa3`), d
 
 Nicht geprüft: PHP-FPM-Variante nur über den Live-Server (dort funktioniert die Basis-Pfad-Erkennung), Kontaktformular live (kein Testversand an den echten Empfänger).
 
+## Architekturseite: Redesign „Plan und Bau“ (07.10.2026)
+
+Rot (`#c8553d`), Barlow Condensed, ausdrucksstarke Bewegung, automatische Projektvorschauen im Leistungsindex. Geprüft lokal mit Testbildern in beiden Betriebsarten (eigene Domain `:8081`, Unterordner `:8080/architektur/`), Screenshots per Chrome-DevTools-Protokoll an gescrollten Positionen (1440×900, 1024×768, 768×1024, 390×844).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `php -l` aller geänderten PHP-Dateien und Templates | keine Fehler |
+| Alle Routen (Start, Leistungen, 5 Leistungsseiten, Projekte, Filter, 3 Projektseiten, Profil, Kontakt, Impressum, 404) in beiden Betriebsarten | 200 bzw. 404, keine PHP-Warnungen in der Ausgabe |
+| `architektur.js`, `barlow-condensed-300/500.woff2` (eigene Dateien), `inter.woff2` (durchgereicht) | 200 in beiden Betriebsarten |
+| Kopfbild: Titel zweizeilig (zweites Wort Kontur mit schwacher dunkler Füllung), Plankopf rechts mit Projekt/Kategorie · Jahr/Blatt, Fortschrittslinie rot, Kopfzeile oben transparent mit Verlauf, nach Scrollen schmal und opak | ok |
+| Leitsatz mit Umrisszahl 01 und Kennzahlen (Leistungen, Projekte, Maßstab) | ok |
+| Leistungsindex: Zeile 01 aktiv (rote Ziffer, rote Linie), Vorschaubild rechts haftend mit Planrahmen und Bildunterschrift; Vorschauen je Leistung aus der passenden Kategorie, keine Dopplung bei vier Projekten | ok |
+| Blattraster 1 groß → 2 mittel (versetzt) → 3 klein; Einblenden per `clip-path` – anfangs nicht ausgelöst, weil Chrome ein per `clip-path` unsichtbares Element im IntersectionObserver als nicht sichtbar wertet → Beschnitt auf die Kinder verlegt | behoben |
+| Projektübersicht: haftender Index mit Zählern (Alle 04, Architektur 02, …), Filter per fetch tauscht das Blattraster | ok |
+| Projektseite: Blatt 03 / 04, Plankopf haftet neben der Bildstrecke, Ansichten nummeriert, Nachbarstreifen mit abgedunkelten Titelbildern | ok |
+| Leistungen: Umrisszahl je Blatt, Referenzbild haftend rechts; Leistungsseite: Titel über abgedunkeltem Referenzbild, Kicker ohne doppelten Strich | ok |
+| Mobil (390): Plankopf unter dem Text, Index ohne Vorschau mit Thumbnails (ab 480 px), lange Komposita getrennt (`hyphens`), Fußzeile einspaltig | ok |
+| Fußzeile als Legende: Blatt, Stand, Maßstab, Urheber; Name in Barlow (Spezifität gegen `.site-footer p` korrigiert) | ok |
+
+Nicht geprüft: Wirkung mit den echten Fotografien (nur neutrale Testbilder), Safari (`-webkit-text-stroke`, `:has()` für die Fortschrittslinie – in aktuellen Versionen unterstützt), echte Touchgeräte.
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft

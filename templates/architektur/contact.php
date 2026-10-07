@@ -20,10 +20,11 @@ $errors = $state['errors'];
 $values = $state['values'];
 ?>
 <article class="contact">
-  <header class="page-head">
+  <header class="page-head page-head--giant">
     <p class="page-head__kicker">Anfrage</p>
     <h1 class="page-head__title">Kontakt</h1>
     <?php if ($intro !== ''): ?><p class="page-head__note"><?= e($intro) ?></p><?php endif; ?>
+    <span class="giant page-head__giant" aria-hidden="true">@</span>
   </header>
   <div class="contact__body">
     <div class="contact__direct">
@@ -40,10 +41,10 @@ $values = $state['values'];
 
       <h2 class="contact__sub">Hilfreich für ein erstes Angebot</h2>
       <ul class="list-lines contact__hints">
-        <li>Objekt und Ort, ggf. Pläne oder Links</li>
-        <li>Zweck der Bilder: Website, Exposé, Wettbewerb, Dokumentation</li>
-        <li>Zeitrahmen – bei Baudokumentationen der Bauzeitplan</li>
-        <li>Gewünschte Leistung: <?= e(implode(', ', array_column($services, 'title'))) ?></li>
+        <li><span class="list-lines__no">01</span>Objekt und Ort, ggf. Pläne oder Links</li>
+        <li><span class="list-lines__no">02</span>Zweck der Bilder: Website, Exposé, Wettbewerb, Dokumentation</li>
+        <li><span class="list-lines__no">03</span>Zeitrahmen – bei Baudokumentationen der Bauzeitplan</li>
+        <li><span class="list-lines__no">04</span>Gewünschte Leistung: <?= e(implode(', ', array_column($services, 'title'))) ?></li>
       </ul>
     </div>
 

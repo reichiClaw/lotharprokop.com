@@ -20,7 +20,11 @@ Eigenständig wirkender Auftritt für Architekturfotografie – dunkel, mit klar
 
 Die Zuordnung verbindet Leistungsseiten und Projekte: Auf einer Leistungsseite erscheinen die Projekte ihrer Kategorie, auf einer Projektseite die passenden Leistungen. Kurz- und Langtexte der Leistungen haben Standardwerte im Code; die Langtexte lassen sich im Admin überschreiben.
 
-**Gestaltung.** Nahezu schwarzer Grund (`#0b0b0c`), helles Grau für Text, Haarlinien in Anthrazit als einziges Gestaltungsmittel. Raster mit sichtbaren 1-px-Linien, leere Rasterzellen schraffiert, Nummerierung 01–05, versale leichte Headlines in Inter (keine Serifenschrift, keine Rundungen, keine Schatten, keine Verläufe außer über den Bildern). Der Kopfbereich zeigt die Titelbilder der hervorgehobenen Projekte als ruhige Bildfolge – dieselbe Mechanik wie auf der Hauptseite.
+**Gestaltung „Plan und Bau“.** Nahezu schwarzer Grund (`#0b0b0c`), helles Grau für Text, Haarlinien in Anthrazit. Die Oberfläche zitiert den Plansatz: Maßlinien mit Endstrichen und Beschriftung als Abschnittstrenner („02 — Leistungen“), große Umrisszahlen (nur Kontur) als Blattnummern, ein Plankopf (Datentabelle) im Kopfbild und auf den Projektseiten, ein Lineal mit Teilstrichen im linken Blattrand, Blattnummern („Blatt 03 / 09“) und nummerierte Ansichten („Ansicht 01 / 07“). Zwei Schriften: **Barlow Condensed** (300/500, OFL, `public/architektur/assets/fonts/`) für sehr große versale Titel und Ziffern, **Inter** für Lesetext. Ein Akzent, Rötel `#c8553d`, markiert Aktives: Marke, aktive Navigation, Fortschrittslinie, Blattnummer, Hover-Zustände.
+
+Bewegung: Titelwörter schieben sich beim Laden hoch, Maßlinien ziehen sich, Projektbilder steigen beim Scrollen gestaffelt aus der Unterkante auf (`clip-path`), das Kopfbild läuft leicht parallax und der Text blendet aus, die Fortschrittslinie im Plankopf füllt sich im Takt des Bildwechsels (rein CSS, pausiert mit dem Schalter). Alles respektiert `prefers-reduced-motion`.
+
+Der Kopfbereich zeigt die Titelbilder der hervorgehobenen Projekte als Bildfolge (Mechanik der Hauptseite); der Plankopf rechts unten wechselt mit: Projekt, Kategorie · Jahr, Blatt 01 / 05. Der Leistungsindex auf der Startseite zeigt beim Überfahren oder Fokussieren einer Zeile **automatisch** das Titelbild eines Projekts der zugehörigen Kategorie (hervorgehobene zuerst, je Leistung ein anderes Projekt; hat eine Kategorie noch keines, springt ein Projekt aus dem Umfang ein) – es gibt dafür nichts zu pflegen (`Architektur::servicePreviews()`). Projekte stehen im Blattraster: 1 groß (21:9) → 2 mittel → 3 klein, mit wechselnden Versätzen; die Projektübersicht hat links einen haftenden Index mit Zählern je Kategorie, die Projektseite einen haftenden Plankopf neben der Bildstrecke und am Ende zwei Flächen mit abgedunkelten Titelbildern der Nachbarprojekte.
 
 ## Seiten und URLs
 
@@ -28,11 +32,11 @@ Alle Pfade relativ zum Basis-Pfad (`/architektur` als Unterordner, `` unter eige
 
 | Pfad | Inhalt |
 |---|---|
-| `/` | Startseite: Bildfolge, Leitsatz, Leistungen 01–05, ausgewählte Projekte, Ablauf, Anfrage |
-| `/leistungen` | Alle fünf Leistungen mit Kurztext |
-| `/leistungen/{slug}` | Leistungsseite: Langtext, „Für wen“, „Sie erhalten“, Projekte der Kategorie |
-| `/projekte` | Alle Projekte im Umfang, Filter nach Kategorie (`?kategorie=…`, ohne JS als normale Seite) |
-| `/projekte/{slug}` | Projektseite: Fakten (Auftraggeber, Jahr, Kategorie, Umfang, Leistung), Bildserie im Layout der Galerie, vor/zurück innerhalb des Umfangs |
+| `/` | Startseite: Bildfolge mit Plankopf, Leitsatz, Leistungsindex 01–05 mit Projektvorschau, ausgewählte Projekte im Blattraster, Arbeitsweise, Anfrage |
+| `/leistungen` | Alle fünf Leistungen mit Lang- und Kurztext, „Für wen“, „Sie erhalten“ und je einem Referenzprojekt (automatisch) |
+| `/leistungen/{slug}` | Leistungsseite: Titel über abgedunkeltem Referenzbild, Langtext, Spezifikation, Projekte der Kategorie, weitere Leistungen |
+| `/projekte` | Alle Projekte im Umfang, haftender Index mit Zählern je Kategorie (`?kategorie=…`, ohne JS als normale Seite) |
+| `/projekte/{slug}` | Projektseite: Blattnummer, haftender Plankopf (Auftraggeber, Jahr, Kategorie, Umfang, Leistung), nummerierte Ansichten im Layout der Galerie, vor/zurück auf Titelbildern der Nachbarn |
 | `/profil` | Profiltext, Arbeitsweise, Leistungen |
 | `/kontakt` | Kontaktformular (gleiche Prüfungen wie die Hauptseite, eigener Betreff-Präfix) |
 | `/impressum`, `/datenschutz`, `/bildrechte` | Rechtstexte – dieselben wie auf der Hauptseite |
@@ -121,6 +125,8 @@ Nicht nötig: ein zweiter Upload, eine zweite Datenbank, ein zweites Adminkonto,
 | `public/architektur/index.php` | Front-Controller: Basis-Pfad erkennen, Canonical-Redirect, Sicherheits-Header, Routen |
 | `public/architektur/.htaccess` | Rewrite auf `index.php`, Schutz versteckter Dateien, Cache-Header |
 | `public/architektur/assets/css/architektur.css` | Stylesheet des dunklen Auftritts (ohne Build-Schritt) |
+| `public/architektur/assets/js/architektur.js` | seiteneigene Bewegung: Parallax im Kopfbild, Vorschaubild im Leistungsindex (ergänzt `site.js`) |
+| `public/architektur/assets/fonts/` | Barlow Condensed 300/500 (WOFF2, nur Latin) mit OFL-Lizenztext |
 | `public/architektur/media/` | öffentliche Bildvarianten des Auftritts (automatisch verwaltet, nicht im Repository) |
 | `app/Site.php` | Kontext des aktuellen Auftritts: Basis-Pfad/-URL, Name, Template-Präfix |
 | `app/Architektur.php` | Leistungen, Standardtexte, Umfang (Kategorien), Abfragen, Sichtbarkeit der Bilder |

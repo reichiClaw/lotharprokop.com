@@ -257,6 +257,39 @@ final class Architektur
         return max(3, (int) self::config('hero_interval', 7));
     }
 
+    /**
+     * Vorschaubild je Leistung – ohne eigene Pflege: das Titelbild des ersten Projekts der zugehörigen
+     * Kategorie (hervorgehobene zuerst). Jede Leistung bekommt nach Möglichkeit ein anderes Projekt;
+     * hat eine Kategorie noch kein Projekt, springt ein noch nicht verwendetes Projekt aus dem Umfang ein.
+     * @return array<string, array|null>  Leistungs-Slug => Galerie mit Titelbild (oder null, wenn es keine gibt)
+     */
+    public static function servicePreviews(): array
+    {
+        $pool = array_values(array_filter(self::galleries(), static fn($g) => !empty($g['cover']) && ($g['cover']['variants'] ?? []) !== []));
+        usort($pool, static fn($a, $b) => [(int) $b['featured'], (int) $a['featured_order']] <=> [(int) $a['featured'], (int) $b['featured_order']]);
+        $used = [];
+        $out = [];
+        foreach (self::SERVICES as $slug => $service) {
+            $pick = null;
+            $best = -1;
+            foreach ($pool as $g) {
+                $inCategory = in_array($service['category'], array_column($g['categories'], 'slug'), true);
+                $fresh = !in_array($g['id'], $used, true);
+                // Rangfolge: passende Kategorie und noch unbenutzt > passende Kategorie > unbenutzt > irgendeines.
+                $score = ($inCategory ? 2 : 0) + ($fresh ? 1 : 0);
+                if ($score > $best) {
+                    $best = $score;
+                    $pick = $g;
+                }
+            }
+            if ($pick !== null) {
+                $used[] = $pick['id'];
+            }
+            $out[$slug] = $pick;
+        }
+        return $out;
+    }
+
     /** Soll ein Bild im media/-Ordner der Architekturseite liegen? Ja, wenn es zu einem veröffentlichten Projekt im Umfang gehört. */
     public static function shouldBePublic(int $imageId): bool
     {

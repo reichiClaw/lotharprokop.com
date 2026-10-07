@@ -7,9 +7,10 @@
  */
 ?>
 <article class="legal">
-  <header class="page-head">
+  <header class="page-head page-head--giant">
     <p class="page-head__kicker">Rechtliches</p>
     <h1 class="page-head__title"><?= e($title) ?></h1>
+    <span class="giant page-head__giant" aria-hidden="true">§</span>
   </header>
   <div class="legal__body prose">
     <?php if (trim($text) === ''): ?>

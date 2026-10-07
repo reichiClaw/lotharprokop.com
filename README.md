@@ -57,4 +57,4 @@ Danach: `http://localhost:8080` (Website), `http://localhost:8080/architektur/` 
 
 ## Lizenzen
 
-Anwendungscode: Alle Rechte beim Auftraggeber. Schriften: Inter, Cormorant Garamond und IBM Plex Sans (letztere nur im Adminbereich) unter SIL Open Font License 1.1 (`public/assets/fonts/`). sRGB-Profil: siehe `app/resources/README.md`. Fotografien: © Lothar Prokop, nicht Teil der Code-Lizenz und nicht im Repository enthalten.
+Anwendungscode: Alle Rechte beim Auftraggeber. Schriften: Inter, Cormorant Garamond und IBM Plex Sans (letztere nur im Adminbereich) unter SIL Open Font License 1.1 (`public/assets/fonts/`); Barlow Condensed (Architekturseite, `public/architektur/assets/fonts/`) ebenfalls OFL 1.1. sRGB-Profil: siehe `app/resources/README.md`. Fotografien: © Lothar Prokop, nicht Teil der Code-Lizenz und nicht im Repository enthalten.
