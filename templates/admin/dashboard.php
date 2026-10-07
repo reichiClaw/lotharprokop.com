@@ -46,3 +46,25 @@ use App\Images;
     <?php endif; ?>
   </section>
 </div>
+
+<?php if (App\Architektur::enabled()):
+    $archSlugs = App\Architektur::categorySlugs();
+    $archCats = App\Architektur::allCategories();
+    $archMissing = array_diff($archSlugs, array_column($archCats, 'slug'));
+    $archProjects = App\Architektur::galleries();
+    $archUrl = App\Architektur::baseUrl() !== '' ? App\Architektur::baseUrl() : '/' . App\Architektur::DIR . '/';
+?>
+<section>
+  <h2 class="a-subtitle">Architekturseite</h2>
+  <p class="a-help">
+    <strong><?= count($archProjects) ?></strong> <?= count($archProjects) === 1 ? 'veröffentlichtes Projekt' : 'veröffentlichte Projekte' ?> im Umfang der Architekturseite –
+    <a href="<?= e($archUrl) ?>" rel="noopener" target="_blank">Seite ansehen</a>.
+    Dazu zählt jede Galerie mit einer dieser Kategorien:
+    <?php foreach ($archCats as $i => $c): ?><a href="/admin/galerien"><?= e($c['name']) ?></a> (<?= (int) $c['published_count'] ?>)<?= $i < count($archCats) - 1 ? ', ' : '' ?><?php endforeach; ?><?= $archCats === [] ? '—' : '' ?>.
+    <?php if ($archMissing !== []): ?>
+    <br>Noch nicht angelegt (Konfiguration <code>architektur.categories</code>): <code><?= implode('</code>, <code>', array_map('e', $archMissing)) ?></code> – unter <a href="/admin/kategorien">Kategorien</a> mit genau diesem Slug anlegen oder die Konfiguration anpassen.
+    <?php endif; ?>
+    Texte: <a href="/admin/einstellungen">Einstellungen → Architekturfotografie</a>.
+  </p>
+</section>
+<?php endif; ?>

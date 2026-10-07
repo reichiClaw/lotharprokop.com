@@ -32,10 +32,14 @@ use App\Images;
 
   <h2 class="a-subtitle">Texte</h2>
   <p class="a-help">Leerzeile = neuer Absatz. Zeilen mit <code>## </code> werden Zwischenüberschriften, Zeilen mit <code>- </code> Aufzählungen. E-Mail-Adressen und https-Links werden automatisch verlinkt. HTML wird nicht interpretiert.</p>
-  <?php foreach ($texts as $key => $def): ?>
+  <?php $group = null; foreach ($texts as $key => $def): ?>
+  <?php if (($def['group'] ?? null) !== $group): $group = $def['group'] ?? null; ?>
+  <h3 class="a-subtitle a-subtitle--sm"><?= e((string) $group) ?></h3>
+  <?php if (str_starts_with($key, App\Architektur::SETTINGS_PREFIX)): ?><p class="a-help">Felder mit grauem Vorschlagstext zeigen den eingebauten Standardtext; er gilt, solange das Feld leer bleibt.</p><?php endif; ?>
+  <?php endif; ?>
   <div class="a-field">
     <label for="<?= e($key) ?>"><?= e($def['label']) ?></label>
-    <textarea id="<?= e($key) ?>" name="<?= e($key) ?>" rows="<?= (int) $def['rows'] ?>"><?= e($values[$key] ?? '') ?></textarea>
+    <textarea id="<?= e($key) ?>" name="<?= e($key) ?>" rows="<?= (int) $def['rows'] ?>"<?= !empty($def['placeholder']) ? ' placeholder="' . e($def['placeholder']) . '"' : '' ?>><?= e($values[$key] ?? '') ?></textarea>
     <?php if (str_starts_with($key, 'legal_')): ?><p class="a-help a-warn">Rechtlich zu prüfender Inhalt – bitte von einer fachkundigen Stelle prüfen lassen (Impressumspflicht ECG/MedienG, DSGVO).</p><?php endif; ?>
   </div>
   <?php endforeach; ?>

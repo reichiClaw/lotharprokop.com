@@ -38,22 +38,33 @@ final class Settings
         self::$cache = null;
     }
 
-    /** Schlüssel der bearbeitbaren Texte mit Beschriftung (Adminbereich). */
+    /**
+     * Schlüssel der bearbeitbaren Texte mit Beschriftung (Adminbereich), gruppiert nach Auftritt.
+     * 'placeholder' zeigt den Standardtext, der gilt, solange das Feld leer ist.
+     */
     public static function editableTexts(): array
     {
-        return [
-            'site_tagline' => ['label' => 'Untertitel (Startseite)', 'rows' => 2],
-            'intro_text' => ['label' => 'Einführung Startseite', 'rows' => 4],
-            'about_short' => ['label' => 'Kurzvorstellung Startseite', 'rows' => 4],
-            'about_text' => ['label' => 'Vita – Haupttext', 'rows' => 10],
-            'about_services' => ['label' => 'Arbeitsfelder (eine Zeile pro Eintrag)', 'rows' => 6],
-            'about_quotes' => ['label' => 'Stimmen von Kunden (Zitat, Leerzeile, „— Name“)', 'rows' => 10],
-            'contact_intro' => ['label' => 'Einleitung Kontaktseite', 'rows' => 3],
-            'meta_description' => ['label' => 'Standard-Meta-Beschreibung (max. 160 Zeichen)', 'rows' => 2],
-            'legal_impressum' => ['label' => 'Impressum', 'rows' => 14],
-            'legal_datenschutz' => ['label' => 'Datenschutz', 'rows' => 20],
-            'legal_bildrechte' => ['label' => 'Bildrechte', 'rows' => 8],
+        $main = 'Hauptseite (lotharprokop.com)';
+        $texts = [
+            'site_tagline' => ['label' => 'Untertitel (Startseite)', 'rows' => 2, 'group' => $main],
+            'intro_text' => ['label' => 'Einführung Startseite', 'rows' => 4, 'group' => $main],
+            'about_short' => ['label' => 'Kurzvorstellung Startseite', 'rows' => 4, 'group' => $main],
+            'about_text' => ['label' => 'Vita – Haupttext', 'rows' => 10, 'group' => $main],
+            'about_services' => ['label' => 'Arbeitsfelder (eine Zeile pro Eintrag)', 'rows' => 6, 'group' => $main],
+            'about_quotes' => ['label' => 'Stimmen von Kunden (Zitat, Leerzeile, „— Name“)', 'rows' => 10, 'group' => $main],
+            'contact_intro' => ['label' => 'Einleitung Kontaktseite', 'rows' => 3, 'group' => $main],
+            'meta_description' => ['label' => 'Standard-Meta-Beschreibung (max. 160 Zeichen)', 'rows' => 2, 'group' => $main],
         ];
+        if (Architektur::enabled()) {
+            $texts += Architektur::editableTexts();
+        }
+        $legal = 'Rechtliches (gilt für beide Auftritte)';
+        $texts += [
+            'legal_impressum' => ['label' => 'Impressum', 'rows' => 14, 'group' => $legal],
+            'legal_datenschutz' => ['label' => 'Datenschutz', 'rows' => 20, 'group' => $legal],
+            'legal_bildrechte' => ['label' => 'Bildrechte', 'rows' => 8, 'group' => $legal],
+        ];
+        return $texts;
     }
 
     public static function editableFields(): array
