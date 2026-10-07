@@ -117,6 +117,11 @@ rcopy(APP_ROOT . '/public', $publicTarget, ['media', 'app-path.php']);
 @mkdir("$publicTarget/media", 0755, true);
 copy(APP_ROOT . '/public/media/.htaccess', "$publicTarget/media/.htaccess");
 copy(APP_ROOT . '/public/media/index.html', "$publicTarget/media/index.html");
+// Bildordner der Architekturseite ebenfalls leer ausliefern; er wird auf dem Server beim Abgleich gefüllt.
+rrmdir("$publicTarget/architektur/media");
+@mkdir("$publicTarget/architektur/media", 0755, true);
+copy(APP_ROOT . '/public/architektur/media/.htaccess', "$publicTarget/architektur/media/.htaccess");
+copy(APP_ROOT . '/public/architektur/media/index.html', "$publicTarget/architektur/media/index.html");
 if ($layout === 'split') {
     put("$publicTarget/app-path.php", "<?php\n// Anwendungsordner liegt neben diesem Webroot (siehe docs/INSTALL.md).\nreturn dirname(__DIR__) . '/$appDirName';\n");
 } else {
@@ -128,6 +133,9 @@ $setupKey = bin2hex(random_bytes(24));
 $publicMediaExpr = $layout === 'split'
     ? "dirname(__DIR__, 2) . '/htdocs/media'"
     : "dirname(__DIR__) . '/public/media'";
+$archMediaExpr = $layout === 'split'
+    ? "dirname(__DIR__, 2) . '/htdocs/architektur/media'"
+    : "dirname(__DIR__) . '/public/architektur/media'";
 put("$appDir/config/config.php", <<<PHP
 <?php
 /**
@@ -152,6 +160,14 @@ return [
         'enabled' => false,
         'to' => 'office@lotharprokop.com',
         'from' => 'website@' . preg_replace('~^https?://(www\\.)?~', '', '$baseUrl'),
+    ],
+
+    // Architekturseite (Webroot-Unterordner architektur/, siehe docs/ARCHITEKTUR.md).
+    // Sobald die eigene Domain auf den Ordner architektur/ zeigt: 'base_url' eintragen, z. B. 'https://DOMAIN'.
+    'architektur' => [
+        'enabled' => true,
+        'base_url' => '',
+        'public_media' => $archMediaExpr,
     ],
 ];
 
@@ -215,6 +231,10 @@ TXT;
 $readme .= $withContent
     ? "INHALTE: Datenbank, {$stats['originals']} Originale und Bildvarianten sind enthalten ({$stats['images']} Bilder). Beim ersten Aufruf der Website werden die öffentlichen\nBildvarianten automatisch angelegt (kann einige Sekunden dauern). Kontrolle: /admin → System → „Bilder ohne Varianten: keine“.\n"
     : "INHALTE: Dieses Paket enthält keine Galerien. Entweder ein Backup einspielen (docs/INSTALL.md) oder Inhalte im Admin anlegen.\n";
+$archWebroot = $layout === 'split' ? 'htdocs/architektur' : 'htdocs/public/architektur';
+$readme .= "\nARCHITEKTURSEITE: liegt als Unterordner  $archWebroot/  im Paket und ist nach dem Upload sofort unter https://DOMAIN/architektur/ erreichbar.\n"
+    . "Eigene Domain: im Hosting-Panel auf den Ordner  architektur  (im Webroot) zeigen lassen, dann in config/config.php unter 'architektur' die\n"
+    . "'base_url' eintragen (z. B. 'https://NEUE-DOMAIN'). Welche Galerien dort erscheinen, bestimmen Kategorien – Details: docs/ARCHITEKTUR.md.\n";
 $readme .= "\nVORAUSSETZUNGEN beim Hoster: PHP 8.1 oder neuer (im Hosting-Panel auswählen, getestet mit 8.3), Erweiterungen pdo_sqlite und imagick oder gd,\n"
     . "Apache mit mod_rewrite und .htaccess (AllowOverride). Prüfung: https://DOMAIN/check.php (danach löschen), später /admin → System.\n"
     . "\nVollständige Anleitung: docs/INSTALL.md im Anwendungsordner.\n";
