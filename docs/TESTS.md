@@ -176,6 +176,129 @@ Gleiche Umgebung wie beim Redesign (PHP 8.3.6 mit `php -S`, Chrome 148 headless 
 | „Alle ausgewählten Projekte übernehmen“: 8 fehlende Titelbilder ergänzt (13 Einträge), Schaltfläche danach nicht mehr vorhanden | keine Doppelungen |
 | `php -l` für alle geänderten PHP-Dateien, `node --check public/assets/js/site.js` | keine Fehler |
 
+## Flüssigere Bildfolge (05.10.2026)
+
+Umgebung: PHP 8.3.6 mit `php -S`, Chrome headless über das DevTools-Protokoll, die echten Fotografien aus dem Import (fünf Einträge, Wechselzeit 6 s). Anlass: Die Bewegung im Kopfbereich wirkte hakelig, feine Strukturen zeigten sichtbare Stufen. Befund: Die Bewegung lief zwar auf dem Compositor (`LayerTree`: 0 Neuzeichnungen in 3 s Standzeit), aber eine über Sekunden kriechende Vergrößerung bewegt die Bildkanten nur um Bruchteile eines Pixels pro Frame – beim Abtasten der Pixel entstehen dabei zwangsläufig sichtbare Stufen bzw. ein Kriechen feiner Strukturen. Dazu kamen: Richtungsumkehr beim Wechsel (ausgehendes Bild schrumpfte, eingehendes wuchs), Folgebilder wurden erst beim Einblenden dekodiert, und die Überblendung mit Ease-Kurve ließ die Helligkeit in der Mitte einbrechen. Lösung: Bewegung nur noch während der Überblendung (das neue Bild sinkt in 2,2 s mit Ease-out aus 1,03 in die Ruhelage), danach steht das Bild still.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Erstes Bild beim Laden: sinkt aus 1,03 ein (`1.0137` nach 0,4 s, `1.0012` nach 1,4 s) und steht ab ~2 s bei exakt 1,0 | kein Sprung, danach keine Bewegung |
+| Wechsel: ausgehende Folie erhält `is-leaving`, bleibt bei 1,0 und blendet linear aus; eingehende sinkt ein (1,0155 → 1,0062 → 1,0024 → 1,0008); Deckkraft beider Folien ergibt zu jedem Zeitpunkt ≈ 1 (0,799 + 0,200; 0,533 + 0,466; 0,255 + 0,744) | keine Richtungsumkehr, kein Helligkeitseinbruch |
+| Standzeit (4,5 s bis zum nächsten Wechsel): Skalierung konstant 1,0 | keine kriechende Bewegung mehr |
+| Nach der Überblendung: `is-leaving` entfernt, Folie unsichtbar auf 1,03 zurückgesetzt, `will-change` nur auf aktiver und ausgehender Folie | ok |
+| Folgebild wird vor dem Wechsel ins DOM genommen, `loading="lazy"` entfernt, `img.decode()` angestoßen; automatischer Wechsel erst, wenn das Bild geladen ist (Notbremse: eine Wechselzeit) | ok |
+| Strich-Klick, Pause/Fortsetzen (7 s ohne Wechsel, danach Wechsel nach 6,8 s), Fokus im Kopfbereich, `prefers-reduced-motion: reduce` (kein automatischer Wechsel über 8 s, Pause-Taste ausgeblendet) | wie zuvor |
+| Erreichbare Links im Kopfbereich in allen Zuständen | konstant 3 (Bild, Bildnachweis, „Arbeiten ansehen“) |
+| `node --check public/assets/js/site.js`, `php -l app/View.php` | keine Fehler |
+
+## Kleine Spielereien (Easter Eggs), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien; Admin-Schalter unter Einstellungen → „Kleine Spielereien“.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `<body data-eggs>` enthält ohne gespeicherte Einstellung alle vier (`darkroom shutter autofocus lightleak`) | ok |
+| Admin: Dunkelkammer und Lichteinfall abgehakt und gespeichert → Flash „Einstellungen gespeichert.“, Kästchen bleiben aus, `data-eggs="shutter autofocus"`, Tippen von „dunkelkammer“ bleibt wirkungslos | ok |
+| Admin: Autofokus abgeschaltet → 404-Seite ohne Foto (`[data-af]` fehlt); alle wieder eingeschaltet → vollständige Liste | ok |
+| Dunkelkammer per Tippen: `html.is-darkroom.is-developing`, Hintergrund `rgb(20, 6, 6)`, Bildfilter startet bei `contrast(0) brightness(3.4)` (Papierweiß) und steht nach 4,8 s auf dem Endzustand (`is-developing` entfernt); Esc beendet | ok |
+| Dunkelkammer per Gedrückthalten des Logos (Maus 1,7 s; Touch 1,65 s auf iPhone-13-Emulation): `.brand.is-pressing` nach 0,6 s, Modus an, keine Navigation durch den anschließenden Klick | ok |
+| Logo-Farbe im Rotlicht: Filterkette per Canvas gegen `--ink` (#ff8471) abgeglichen, Abweichung 3 von 441 | ok |
+| Verschluss: zwei Klicks innerhalb 60 ms → `.shutter.is-playing` sichtbar, Seite bleibt; Standbilder bei 60/120/190 ms zeigen ein sauberes Sechseck ohne Nahtlinien (Lamellen-Variante; die erste Variante mit `polygon(evenodd)` zeigte eine Antialiasing-Naht); einzelner Klick navigiert nach 280 ms zur Startseite | ok |
+| Lichteinfall: am Seitenende der Projektübersicht `.light-leak.is-on`, nach 2,7 s beendet; erneutes Erreichen des Endes ohne 320 px Zurückscrollen löst nicht aus, danach wieder | ok |
+| Autofokus (Maus): Bild `blur(14px)`, beim Bewegen `is-tracking is-hunting` mit Rahmenposition, nach 420 ms Ruhe `is-focused`, Status „Scharf“, Rahmen `rgb(61, 220, 132)`, Filter `none`; Verlassen setzt zurück; Tastaturfokus stellt mittig scharf | ok |
+| Autofokus (Touch): erstes Antippen stellt scharf ohne Navigation, zweites Antippen folgt dem Link zur Galerie | ok |
+| `prefers-reduced-motion: reduce`: 404-Foto sofort scharf, Logo-Klick navigiert ohne Verzögerung (39 ms) | ok |
+| Auslösegeräusch (Web Audio, synthetisch): `AudioContext` im Test durch `OfflineAudioContext` ersetzt, Doppelklick gerendert – zwei Anschläge bei 150 ms und 250 ms (passend zu Schließen/Öffnen der Blende), Spitzenpegel 0,27 (kein Clipping), danach Stille; keine Fehler | ok |
+| Admin: „Verschluss mit Auslösegeräusch“ abgehakt → `data-eggs` ohne `shutter_sound`; wieder angehakt → enthalten | ok |
+| JavaScript-Konsole auf Startseite, Projektübersicht, 404 in allen Zuständen | keine Fehler außer dem erwarteten 404-Status der Fehlerseite |
+| `php -l` (Settings, View, Galleries, AdminController, Templates), Syntaxprüfung `site.js` | keine Fehler |
+
+### Nicht getestet (Spielereien)
+
+- Safari/Firefox (Lamellen-Blende, `scale`-Eigenschaft am Fokusrahmen, `mix-blend-mode: screen` des Filmkorns)
+- Echte Touchgeräte (Kontextmenü beim Gedrückthalten des Logos nur per `contextmenu`-Handler und `-webkit-touch-callout` unterbunden)
+- Klang des Auslösegeräuschs mit dem Ohr (nur Pegel und Zeitpunkte geprüft); Stummschaltung/Autoplay-Regeln auf iOS
+
+## Bildauswahl („Ausgewählte Fotografien“), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 Bilder); Migration 3 (`featured_images`) lief beim ersten Aufruf.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne Auswahl: Startseite ohne Abschnitt `.selection`; `/auswahl` 200 mit Hinweis „Derzeit sind keine Bilder ausgewählt.“ | ok |
+| Admin-Navigation „Bildauswahl“; Seite zeigt alle Bilder nach Galerie gruppiert (Pelmondo 17, Polar 1, Claas 3, YSL 14, „Weitere Bilder“ 1 = Porträt) | ok |
+| Picker: Schaltfläche anfangs deaktiviert; 3 Bilder anhaken + „Alle wählen“ in zweiter Gruppe → Zähler „4 Bilder angehakt.“, Gruppe bleibt geöffnet, Beschriftung wechselt zu „Keine wählen“; Absenden → Flash „4 Bilder in die Auswahl aufgenommen.“ | ok |
+| Bereits ausgewählte Bilder im Picker markiert und deaktiviert (kein Doppeleintrag) | ok |
+| Reihenfolge per Pfeil: Statusmeldung „Reihenfolge gespeichert.“, nach Neuladen vertauscht | ok |
+| „Aus Auswahl nehmen“ → Flash, Zahl sinkt | ok |
+| Darstellung: 4 Bilder für die Startseite, Einleitungstext → Markierung „Startseite“ an genau 4 Einträgen; Startseite zeigt 4 Bilder, Link „Alle 6 ansehen“; `/auswahl` zeigt alle 6 mit Einleitung | ok |
+| Bildformular: Kontrollkästchen spiegelt Auswahl, Abhaken + Speichern entfernt, Verwendung listet „Bildauswahl“ | ok |
+| Startseite: Abschnitt direkt nach dem Kopfbereich, Bildpfade unter `/media/…` (alle 200), Lightbox öffnet mit „1 / 4“ | ok |
+| `/auswahl`: Titel, Canonical, `og:image`; Sitemap enthält `/auswahl` nur bei nicht leerer Auswahl | ok |
+| Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
+| JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
+
+## Scroll-Hinweis im Kopfbereich (Schalter), 06.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`; Kopfbereich mit einem Bild (bildschirmhoch).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne gespeicherten Wert: Hinweis vorhanden (`.hero--hint`, Link „Scrollen“ → `#weiter`), mittig (x = 640 von 1280), 14 px über der Unterkante, keine Überlappung mit der Fußzeile des Kopfbereichs | ok |
+| Erscheint verzögert: Deckkraft 0 beim Laden, 1 nach 2,3 s; Punkt wandert (4 verschiedene Positionen in 2 s) | ok |
+| Scrollen um 200 px → Deckkraft 0, `visibility: hidden`; zurück nach oben → wieder sichtbar | ok |
+| Klick → scrollt weich auf 816 px = Unterkante des Kopfbereichs minus Kopfzeile (`scroll-margin-top`); erster Abschnitt liegt direkt unter der Kopfzeile | ok |
+| Erste Fassung mit `href="#inhalt"` kollidierte mit dem Sprunglink-Ziel `<main id="inhalt">` (Klick scrollte nach oben) → Anker heißt `#weiter` | behoben |
+| Telefon 390 px: mittig, keine Überlappung mit der Fußzeile (Reserve unten 4,25 rem; mit 3,25 rem überlappte es um 11 px) | ok |
+| „Bewegung reduzieren“: sofort sichtbar, Punkt steht still | ok |
+| Admin → Einstellungen „Startseite: Kopfbereich“: Häkchen standardmäßig gesetzt; abhaken + speichern → Hinweis fehlt, `.hero__text` hat wieder normales Padding (51 px), übrige Einstellungen (Projekt-Darstellung, Spielereien) unverändert; wieder anhaken → Hinweis da | ok |
+| JavaScript-Konsole | keine Fehler |
+
+## Kopfbereich: beliebige Bilder aus der Bibliothek, 06.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`, 36 Bilder in 4 Galerien, 1 Bild im Kopfbereich.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Admin → Startseite: Abschnitt „Bilder aus der Bibliothek …“ mit 5 Gruppen / 36 Bildern, 1 bereits im Kopfbereich (gesperrt, Häkchen), Schaltfläche anfangs deaktiviert, Verweis „automatisch“ vorgewählt | ok |
+| 2 Bilder aus Pelmondo und Polar anhaken → Zähler „2 Bilder angehakt.“, Absenden → Flash „2 Bilder in die Bildfolge aufgenommen.“, Liste hat 3 Einträge, Projektverweis automatisch „Pelmondo“ bzw. „Polar“ | ok |
+| Picker danach: 3 Bilder gesperrt; dasselbe Bild kann nicht erneut gewählt werden | ok |
+| Startseite: Bildfolge mit 3 Bildern, 3 Striche, Bildnachweise „Bild: Pelmondo / Pelmondo / Polar“ | ok |
+| Entfernen der beiden Einträge über die Bildfolge → „2 Bild(er) entfernt“, Bilder weiterhin vorhanden (`/admin/bilder/{id}` 200, da in Galerien) | ok |
+| Bildauswahl-Seite nach Umbau auf das gemeinsame Partial: 5 Gruppen, 6 gesperrte Bilder wie zuvor | ok |
+| JavaScript-Konsole | keine Fehler |
+
+## Darstellung der Projekte auf der Startseite (Schalter), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`, 4 hervorgehobene Galerien, Bildauswahl mit 4 Bildern auf der Startseite.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne gespeicherten Wert: Startseite wie bisher (`.featured` ohne Modifikator, Rhythmus 1165/474/573/573 px), im Admin ist „Groß, im wechselnden Rhythmus“ vorgewählt | ok |
+| Admin → Einstellungen: Abschnitt „Startseite: Ausgewählte Projekte“ mit zwei Optionen samt Skizze; „Kompakte Übersicht“ wählen + speichern → Option bleibt gewählt, Spielereien-Häkchen unverändert | ok |
+| Kompakt, 1280 px: `.featured--compact`, 3 Spalten à 375 px, alle Kacheln 3:2 (auch Hochformat-Titelbilder), Haarlinie zur Bildauswahl darüber, `sizes` 30vw | ok |
+| Kompakt, 800 px: 2 Spalten à 358 px | ok |
+| Kompakt, 390 px: 2 Spalten à 169 px, Beschriftung untereinander | ok |
+| Zurück auf „Groß“: Startseite wieder exakt wie vorher | ok |
+| Ungültiger Wert wird nicht gespeichert (`Settings::homeProjectsLayout()` fällt auf „editorial“ zurück) | ok (Code) |
+| JavaScript-Konsole | keine Fehler |
+
+## HTTPS erzwingen (`.htaccess`), 05.10.2026
+
+Geprüft mit `curl -I` direkt gegen `lothar.drve.at` (Variante „ein Ordner“, Webroot-`.htaccess` = `deploy/webroot.htaccess`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `http://…/` → `301`, `Location: https://lothar.drve.at/` | ok |
+| Pfad und Query bleiben erhalten: `http://…/fotografie/pelmondo?x=1&y=2` → `https://…/fotografie/pelmondo?x=1&y=2`; kodierte Zeichen (`caf%C3%A9?q=a%20b`) unverändert | ok |
+| Assets: `http://…/assets/css/site.css?v=9` → `301` auf dieselbe https-Adresse | ok |
+| Unbekannter Pfad: `http://…/gibt-es-nicht` → `301` auf https, dort `404` | ok |
+| Gesperrte Pfade über http (`/config/config.php`, `/storage/database.sqlite`) → `404`, kein Inhalt | ok |
+| `/.well-known/acme-challenge/…` wird nicht umgeleitet (`404` über http) | ok |
+| Keine Schleife: `curl -IL http://…/fotografie?x=1` → genau 1 Umleitung, Ziel `200` | ok |
+| https unverändert: `/`, `/auswahl`, `/fotografie/pelmondo?x=1` → `200`; `/admin` → `302 /admin/login`; `/config/config.php`, `/storage/database.sqlite` → `404` | ok |
+| Variante mit Ziel aus `THE_REQUEST` verworfen: beim Hoster lieferte jede Anfrage mit Query `403` | — |
+
 ## Architekturseite (07.10.2026)
 
 Geprüft in der Entwicklungsumgebung mit PHP 8.3.6 (`php -S`), Google Chrome (1440 px und 390 px per Viewport-Emulation) sowie `curl`. Datenbasis: lokal erzeugte Testgalerien mit synthetischen Fassadenbildern – zwei Galerien `architektur` (eine davon zusätzlich `fertigstellung`), je eine `immobilien` und `baudokumentation`, eine Galerie `people` (nicht im Umfang) und ein Entwurf. Nicht committet.
@@ -215,13 +338,14 @@ Nicht geprüft: PHP-FPM statt mod_php (SCRIPT_NAME-Verhalten identisch erwartet,
 
 ## Nicht getestet
 
+- HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
 - Bildfolge mit den echten Fotografien (nur neutrale Testbilder), Wischen auf echten Touchgeräten
 - Ladezeiten der Bildfolge (nur geprüft, dass Folgebilder erst bei Bedarf im DOM landen; keine Messwerte)
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)
-- HTTPS (Secure-Cookie-Flag nur im Code, nicht im Betrieb geprüft)
+- Secure-Cookie-Flag unter HTTPS (nur im Code, nicht im Betrieb geprüft)
 - Safari/Firefox, iOS/Android auf echten Geräten (nur Chrome, davon mobile Größe per Viewport-Emulation)
 - Wirkung des Redesigns mit den echten Fotografien (lokal standen nur neutrale Testbilder zur Verfügung)
 - Ladezeiten, Core Web Vitals oder sonstige Performancewerte (nicht gemessen)

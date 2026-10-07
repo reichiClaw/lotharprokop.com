@@ -29,8 +29,9 @@ public/       EINZIGES öffentliches Verzeichnis (Document Root)
   index.php   Front-Controller
   check.php   Server-Check (Voraussetzungen prüfen; nach der Installation löschen)
   app-path.example.php  Vorlage für app-path.php (Pfad zum Anwendungsordner bei FTP-Hosting)
-  .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
+  .htaccess / .user.ini  HTTPS-Umleitung, Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
+  dokumente/  rechtliche PDFs (AGB, Rücktrittsrecht), verlinkt auf /agb
   media/      veröffentlichte Bildvarianten (werden automatisch verwaltet)
   architektur/  zweites Webroot der Architekturseite (docs/ARCHITEKTUR.md):
     index.php   Front-Controller, .htaccess, assets/css/architektur.css,
@@ -95,7 +96,7 @@ Hat der Hoster kein Verzeichnis oberhalb des Webroots (nur FTP-Zugang direkt ins
 
 Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot liegen darf. Erfordert Apache mit `mod_rewrite` und aktivem `.htaccess` (`AllowOverride All` bzw. mindestens `FileInfo Options Limit`).
 
-1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
+1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die http-Aufrufe auf https umleitet, alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
 2. Gesamten Inhalt von `htdocs/` inklusive versteckter Dateien in das Webroot laden.
 3. **Pflichtprüfung** nach dem Upload: `https://DOMAIN/config/config.php` und `https://DOMAIN/storage/database.sqlite` müssen `403` oder `404` liefern. Erscheint stattdessen Inhalt oder ein Download, ist `.htaccess` nicht aktiv – dann sofort die Dateien entfernen und Variante A verwenden.
 4. Weiter wie Variante A ab Schritt 3 (`/check.php` aufrufen und danach `public/check.php` löschen, `/admin/setup`, System-Seite).
@@ -205,13 +206,15 @@ Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript 
 
 **Entwürfe** sind öffentlich nicht erreichbar (404, nicht in Sitemap/Übersicht), ihre Bildvarianten liegen nicht in `public/media/`. Eingeloggt lässt sich ein Entwurf unter seiner späteren URL als Vorschau ansehen (Banner „Vorschau“, `noindex`).
 
-**Startseite** – Reihenfolge der hervorgehobenen Projekte sowie die Bildfolge im Kopfbereich: mehrere Bilder in frei sortierbarer Reihenfolge, je Bild optional das verknüpfte Projekt (macht das Bild anklickbar und erscheint als Bildnachweis), Wechselzeit in Sekunden. Bilder lassen sich einzeln hochladen, als Titelbild eines Projekts übernehmen oder in einem Schritt aus allen hervorgehobenen Projekten übernehmen. Bei einem einzelnen Bild wechselt nichts – der Kopfbereich verhält sich wie ein festes Startbild; ohne JavaScript zeigt er immer das erste Bild.
+**Startseite** – Reihenfolge der hervorgehobenen Projekte sowie die Bildfolge im Kopfbereich: mehrere Bilder in frei sortierbarer Reihenfolge, je Bild optional das verknüpfte Projekt (macht das Bild anklickbar und erscheint als Bildnachweis), Wechselzeit in Sekunden. Bilder lassen sich aus der gesamten Bibliothek wählen (Bildwähler nach Galerie gruppiert, Mehrfachauswahl; der Projektverweis wird auf Wunsch automatisch aus der Galerie des Bildes gesetzt), einzeln hochladen, als Titelbild eines Projekts übernehmen oder in einem Schritt aus allen hervorgehobenen Projekten übernehmen. Ein Bild, das aus dem Kopfbereich entfernt wird, bleibt erhalten, solange es anderswo verwendet wird. Bei einem einzelnen Bild wechselt nichts – der Kopfbereich verhält sich wie ein festes Startbild; ohne JavaScript zeigt er immer das erste Bild.
 
 **Kategorien** – anlegen, umbenennen, sortieren, löschen (Galerien bleiben erhalten). Doppelte Namen werden abgewiesen.
 
 **Filme** – Titel, Anbieter (YouTube / Vimeo), Video-ID oder -URL, Poster (eigenes Bild), Beschreibung, Status. Videos werden erst nach Klick geladen (youtube-nocookie bzw. Vimeo mit `dnt=1`).
 
-**Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte.
+**Bildauswahl** – frei aus allen Bildern (alle Galerien, auch Entwürfe, sowie Einzelbilder) zusammengestellte Reihe „Ausgewählte Fotografien“. Erscheint auf der Startseite direkt unter dem Kopfbereich (die ersten N Bilder, Zahl einstellbar) und vollständig unter `/auswahl` (mit Lightbox, in der Sitemap). Reihenfolge per Ziehen; ein Bild ist über die Auswahl auch dann öffentlich, wenn es sonst nur in Entwürfen liegt. Das Kontrollkästchen „In der Bildauswahl zeigen“ gibt es auch im Bildformular.
+
+**Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte, den Scroll-Hinweis am unteren Rand des Kopfbereichs (Einstellung `hero_scroll_hint`, Standard an), die Darstellung der „Ausgewählten Projekte“ auf der Startseite (groß im wechselnden Rhythmus oder als kompakte dreispaltige Übersicht, die sich von der Bildauswahl absetzt; Einstellung `home_projects_layout`) sowie vier einzeln abschaltbare Spielereien im Frontend (Dunkelkammer, Verschluss am Logo – wahlweise mit im Browser erzeugtem Auslösegeräusch, Autofokus auf der 404-Seite, Lichteinfall am Seitenende).
 
 **System** – Umgebungsinfos (PHP, Bildbibliothek, Upload-Limits, Schreibrechte, Speicherplatz, Anzahl Bilder ohne Varianten), „Fehlende Bildvarianten erzeugen“ (portionsweise, mit automatischer Fortsetzung), „Sichtbarkeit aller Bilder abgleichen“ (stellt `public/media/` aus den privaten Varianten wieder her) und „Datenbank herunterladen“ (Backup ohne Kommandozeile).
 
@@ -258,5 +261,6 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 - CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`)
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis
+- HTTPS erzwungen: beide `.htaccess`-Varianten leiten `http://` dauerhaft (`301`) auf dieselbe Adresse unter `https://` um (Pfad und Query bleiben erhalten; `X-Forwarded-Proto` wird berücksichtigt, `/.well-known/acme-challenge/` ist ausgenommen). Voraussetzung ist ein gültiges Zertifikat beim Hoster.
 - Security-Header inkl. Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
 - Kein Tracking, keine externen Ressourcen, Schriften lokal

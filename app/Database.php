@@ -177,6 +177,15 @@ SELECT CAST(s.value AS INTEGER),
  WHERE s.key = 'hero_image_id'
    AND CAST(s.value AS INTEGER) IN (SELECT id FROM images)
 SQL,
+            // Bildauswahl: frei aus allen Bildern zusammengestellte Reihe für Startseite und /auswahl.
+            3 => <<<'SQL'
+CREATE TABLE featured_images (
+    image_id INTEGER PRIMARY KEY REFERENCES images(id) ON DELETE CASCADE,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+CREATE INDEX idx_featured_images_order ON featured_images (sort_order, image_id)
+SQL,
         ];
     }
 }

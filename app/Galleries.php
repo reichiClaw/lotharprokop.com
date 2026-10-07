@@ -101,6 +101,18 @@ final class Galleries
         return self::withRelations(array_map([self::class, 'hydrate'], $rows));
     }
 
+    /** Eine zufällige veröffentlichte Galerie mit Titelbild (z. B. für die 404-Seite), sonst null. */
+    public static function randomWithCover(): ?array
+    {
+        $rows = Database::pdo()->query("SELECT * FROM galleries WHERE status = 'published' ORDER BY RANDOM() LIMIT 6")->fetchAll();
+        foreach (self::withRelations(array_map([self::class, 'hydrate'], $rows)) as $g) {
+            if (!empty($g['cover']) && ($g['cover']['variants'] ?? []) !== []) {
+                return $g;
+            }
+        }
+        return null;
+    }
+
     /** Alle Galerien für den Adminbereich. */
     public static function all(?string $status = null): array
     {

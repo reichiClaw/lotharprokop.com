@@ -11,6 +11,7 @@ $nav = [
     '/admin' => 'Übersicht',
     '/admin/galerien' => 'Galerien',
     '/admin/startseite' => 'Startseite',
+    '/admin/auswahl' => 'Bildauswahl',
     '/admin/kategorien' => 'Kategorien',
     '/admin/filme' => 'Filme',
     '/admin/einstellungen' => 'Einstellungen',
@@ -25,7 +26,7 @@ $nav = [
 <meta name="robots" content="noindex, nofollow">
 <title><?= e($meta['title'] !== '' ? $meta['title'] . ' – Verwaltung' : 'Verwaltung') ?></title>
 <link rel="icon" href="/assets/img/favicon.png" type="image/png">
-<link rel="stylesheet" href="/assets/css/admin.css?v=<?= e(App\Config::get('asset_version', '1')) ?>">
+<link rel="stylesheet" href="/assets/css/admin.css?v=<?= e(App\Config::get('asset_version', App\View::ASSET_VERSION)) ?>">
 <?php if ($loggedIn): ?><meta name="csrf-token" content="<?= e(Csrf::token()) ?>"><?php endif; ?>
 </head>
 <body class="admin">
@@ -52,6 +53,6 @@ $nav = [
   <?php endif; ?>
   <?= $content ?>
 </main>
-<script src="/assets/js/admin.js?v=<?= e(App\Config::get('asset_version', '1')) ?>" defer></script>
+<script src="/assets/js/admin.js?v=<?= e(App\Config::get('asset_version', App\View::ASSET_VERSION)) ?>" defer></script>
 </body>
 </html>

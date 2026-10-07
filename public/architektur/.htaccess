@@ -12,6 +12,12 @@ DirectoryIndex index.php
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Immer HTTPS (wie public/.htaccess; Regeln der übergeordneten .htaccess gelten hier nicht).
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   # Direktzugriff über /public/… (wenn der Projektordner selbst das Webroot ist) nicht anbieten;
   # interne Weiterleitungen aus der übergeordneten .htaccess (REDIRECT_STATUS gesetzt) sind ausgenommen.
   RewriteCond %{ENV:REDIRECT_STATUS} ^$

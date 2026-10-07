@@ -5,9 +5,13 @@
 /** @var int $slideInterval */
 /** @var int $featuredAddable */
 /** @var array $galleries */
+/** @var array $groups          Alle Bilder nach Galerie (Bildwähler) */
+/** @var array $slideImageIds   Bildkennung => true – schon im Kopfbereich */
+/** @var int $imageTotal */
 use App\Csrf;
 use App\HeroSlides;
 use App\Images;
+use App\View;
 ?>
 <div class="a-head">
   <h1 class="a-title">Startseite</h1>
@@ -61,9 +65,34 @@ use App\Images;
   <?php endif; ?>
 </section>
 
+<section id="bibliothek">
+  <h2 class="a-subtitle">Bilder aus der Bibliothek in den Kopfbereich aufnehmen <span class="a-muted">(aus allen <?= $imageTotal ?> Bildern)</span></h2>
+  <p class="a-help">Jedes vorhandene Bild lässt sich in die Bildfolge aufnehmen – Galerie aufklappen, Bilder anhaken, unten „In den Kopfbereich aufnehmen“. Bilder, die schon im Kopfbereich stehen, sind markiert. Neue Bilder werden hinten angehängt; Reihenfolge und Projektverweis lassen sich oben ändern.</p>
+  <?php
+  $linkOptions = '<div class="a-row-3"><div class="a-field"><label for="slide_pick_gallery">Verknüpftes Projekt</label><select id="slide_pick_gallery" name="slide_pick_gallery">'
+      . '<option value="auto">– automatisch: Galerie, in der das Bild liegt –</option>'
+      . '<option value="0">– kein Verweis –</option>';
+  foreach ($galleries as $g) {
+      $linkOptions .= '<option value="' . (int) $g['id'] . '">' . e($g['title']) . '</option>';
+  }
+  $linkOptions .= '</select></div></div>';
+  ?>
+  <?= View::partial('admin/partials/image-picker', [
+      'action' => '/admin/startseite',
+      'groups' => $groups,
+      'selectedIds' => $slideImageIds,
+      'submitLabel' => 'In den Kopfbereich aufnehmen',
+      'usedLabel' => 'bereits im Kopfbereich',
+      'usedCount' => 'im Kopfbereich',
+      'openFirst' => false,
+      'hidden' => '<input type="hidden" name="action" value="slide_pick">',
+      'options' => $linkOptions,
+  ]) ?>
+</section>
+
 <div class="a-grid-2">
 <section>
-  <h2 class="a-subtitle">Bild für den Kopfbereich hinzufügen</h2>
+  <h2 class="a-subtitle">Projekt-Titelbild oder neue Datei in den Kopfbereich</h2>
   <form method="post" action="/admin/startseite" enctype="multipart/form-data" class="a-form">
     <?= Csrf::field() ?>
     <input type="hidden" name="action" value="slide_add">

@@ -79,6 +79,10 @@ Beschreibungstexte sind leer gelassen; Vermutungen (Musikvideo, Making-of eines 
 - **WordPress-Bildvarianten** (`-1024x683.jpg` usw.): nicht übernommen, alle Varianten werden aus den Originalen neu berechnet.
 - **Die alte Datenschutzerklärung** (Seite und PDF): nicht übernommen, weil sie auf WordPress-Funktionen (Cookies, Kommentare, Jetpack, Gravatar, Google Fonts) bezogen war, die es nicht mehr gibt. Ein neuer Entwurf liegt in den Einstellungen (siehe Freigaben).
 
+## Rechtliche Dokumente (PDF)
+
+Die drei auf der alten Datenschutzseite verlinkten PDFs wurden unverändert übernommen (Stand April 2019) und liegen unter `public/dokumente/`: `agb-unternehmer.pdf` (AGB für Unternehmer, 9 Seiten), `agb-konsumenten.pdf` (AGB für Konsumenten, 8 Seiten), `ruecktrittsrecht-konsumenten.pdf` (Rücktrittsrecht für Konsumenten, 1 Seite). Sie sind auf der Seite `/agb` (Fußzeile „AGB“) verlinkt; der Einleitungstext darüber ist in den Einstellungen (`AGB – Einleitungstext`) änderbar. Die alten PDF-URLs leiten per 301 auf die neuen Pfade (siehe `REDIRECTS.md`). Die Dateien gehören zu den zu prüfenden rechtlichen Inhalten; eine aktualisierte Fassung ersetzt einfach die Datei gleichen Namens.
+
 ## Fehlende oder mangelhafte Originale
 
 - Alle 480 Bilder konnten in der auf der alten Site hinterlegten Größe geladen werden (412 mit ≥ 3200 px längster Kante, 62 mit 2000–3199 px). Hochgerechnet wurde nichts; bei Bildern unter 2400 px endet das `srcset` bei der Originalgröße.

@@ -16,6 +16,7 @@ use App\Images;
   <a class="a-stat" href="/admin/galerien?status=archived"><strong><?= $counts['archived'] ?></strong><span>archiviert</span></a>
   <a class="a-stat" href="/admin/galerien"><strong><?= $counts['images'] ?></strong><span>Bilder</span></a>
   <a class="a-stat" href="/admin/filme"><strong><?= $counts['films'] ?></strong><span>Filme online</span></a>
+  <a class="a-stat" href="/admin/auswahl"><strong><?= $counts['selection'] ?></strong><span>Bilder in der Auswahl</span></a>
 </div>
 
 <div class="a-grid-2">

@@ -58,6 +58,7 @@ unset($appRoot);
 use App\Controllers\AdminController;
 use App\Controllers\AdminGalleryController;
 use App\Controllers\AdminImageController;
+use App\Controllers\AdminSelectionController;
 use App\Controllers\PublicController;
 use App\Controllers\RedirectController;
 use App\Router;
@@ -73,6 +74,7 @@ $router = new Router();
 
 // Öffentliche Seiten
 $router->get('/', [PublicController::class, 'home']);
+$router->get('/auswahl', [PublicController::class, 'selection']);
 $router->get('/fotografie', [PublicController::class, 'portfolio']);
 $router->get('/fotografie/{slug:[a-z0-9-]+}', [PublicController::class, 'gallery']);
 $router->get('/film', [PublicController::class, 'films']);
@@ -82,6 +84,7 @@ $router->post('/kontakt', [PublicController::class, 'contactSubmit']);
 $router->get('/impressum', [PublicController::class, 'legal']);
 $router->get('/datenschutz', [PublicController::class, 'legal']);
 $router->get('/bildrechte', [PublicController::class, 'legal']);
+$router->get('/agb', [PublicController::class, 'legal']);
 $router->get('/sitemap.xml', [PublicController::class, 'sitemap']);
 $router->get('/robots.txt', [PublicController::class, 'robots']);
 
@@ -99,6 +102,8 @@ foreach (['shop', 'warenkorb', 'kasse', 'mein-konto', 'abstract-prints', 'blog',
     $router->get('/' . $gone, [RedirectController::class, 'gone']);
     $router->post('/' . $gone, [RedirectController::class, 'gone']);
 }
+// Rechtliche PDFs der alten Website liegen jetzt unter /dokumente/ (vor der pauschalen 410-Regel).
+$router->get('/wp-content/uploads/2019/04/{file:[^/]+\.pdf}', [RedirectController::class, 'document']);
 $router->get('/wp-content/{rest:.*}', [RedirectController::class, 'gone']);
 $router->get('/wp-includes/{rest:.*}', [RedirectController::class, 'gone']);
 $router->get('/wp-json/{rest:.*}', [RedirectController::class, 'gone']);
@@ -136,6 +141,11 @@ $router->post('/admin/bilder/upload', [AdminImageController::class, 'uploadStand
 
 $router->get('/admin/kategorien', [AdminController::class, 'categories']);
 $router->post('/admin/kategorien', [AdminController::class, 'categoriesSave']);
+$router->get('/admin/auswahl', [AdminSelectionController::class, 'index']);
+$router->post('/admin/auswahl/hinzufuegen', [AdminSelectionController::class, 'add']);
+$router->post('/admin/auswahl/entfernen', [AdminSelectionController::class, 'remove']);
+$router->post('/admin/auswahl/sortieren', [AdminSelectionController::class, 'reorder']);
+$router->post('/admin/auswahl/einstellungen', [AdminSelectionController::class, 'settings']);
 $router->get('/admin/startseite', [AdminController::class, 'homepage']);
 $router->post('/admin/startseite', [AdminController::class, 'homepageSave']);
 $router->get('/admin/filme', [AdminController::class, 'films']);
