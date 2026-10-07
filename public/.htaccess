@@ -19,8 +19,10 @@ DirectoryIndex index.php
   RewriteCond %{ENV:REDIRECT_STATUS} ^$
   RewriteCond %{REQUEST_URI} ^/public(/|$)
   RewriteRule ^ - [R=404,L]
-  # Vorhandene Dateien (Assets, Bildvarianten) direkt ausliefern, alles andere an den Front-Controller.
+  # Vorhandene Dateien (Assets, Bildvarianten) und Verzeichnisse (Architekturseite unter /architektur/,
+  # die ihre eigene .htaccess hat) direkt ausliefern, alles andere an den Front-Controller.
   RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^ index.php [L,QSA]
 </IfModule>
 

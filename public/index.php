@@ -13,6 +13,19 @@ if (PHP_SAPI === 'cli-server') {
     if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !$isDotfile && !$isScript) {
         return false;
     }
+    // Architekturseite als Unterordner – wie Apache mit der .htaccess in public/architektur/.
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    if ($requestPath === '/architektur' || str_starts_with($requestPath, '/architektur/')) {
+        if ($requestPath === '/architektur') {
+            header('Location: /architektur/', true, 301);
+            exit;
+        }
+        define('LP_SITE_DELEGATED', true);
+        $_SERVER['SCRIPT_NAME'] = '/architektur/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/architektur/index.php';
+        require __DIR__ . '/architektur/index.php';
+        return true;
+    }
 }
 
 define('PUBLIC_ROOT', __DIR__);
