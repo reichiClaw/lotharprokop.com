@@ -6,7 +6,7 @@ namespace App\Controllers;
 use App\Auth;
 use App\Categories;
 use App\Config;
-use App\Database;
+use App\ContactForm;
 use App\Films;
 use App\Galleries;
 use App\HeroSlides;
@@ -143,64 +143,11 @@ final class PublicController
             View::notFound();
             return;
         }
-        $values = [
-            'name' => trim((string) ($_POST['name'] ?? '')),
-            'email' => trim((string) ($_POST['email'] ?? '')),
-            'message' => trim((string) ($_POST['message'] ?? '')),
-        ];
-        $errors = [];
-        if (mb_strlen($values['name']) < 2 || mb_strlen($values['name']) > 100) {
-            $errors['name'] = 'Bitte einen Namen angeben.';
+        $result = ContactForm::handle($_POST, (string) Config::get('mail.subject_prefix'), 'Kontaktformular');
+        if ($result['status'] !== 200) {
+            http_response_code($result['status']);
         }
-        if (!filter_var($values['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($values['email']) > 200) {
-            $errors['email'] = 'Bitte eine gültige E-Mail-Adresse angeben.';
-        }
-        if (mb_strlen($values['message']) < 10 || mb_strlen($values['message']) > 5000) {
-            $errors['message'] = 'Bitte eine Nachricht mit mindestens 10 Zeichen eingeben.';
-        }
-        // Spam-Schutz: Honeypot-Feld, Mindestzeit, Rate-Limit pro IP.
-        $honeypot = (string) ($_POST['website'] ?? '');
-        $started = (int) ($_POST['_t'] ?? 0);
-        $tooFast = $started <= 0 || (time() - $started) < (int) Config::get('mail.min_seconds', 4);
-        if ($honeypot !== '' || $tooFast) {
-            // Bots keine Rückmeldung über die Ursache geben – als Fehler behandeln.
-            $errors['form'] = 'Die Nachricht konnte nicht gesendet werden. Bitte nutzen Sie E-Mail oder Telefon.';
-        }
-        $pdo = Database::pdo();
-        $pdo->prepare('DELETE FROM contact_submissions WHERE created_at < ?')->execute([time() - 86400]);
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM contact_submissions WHERE ip = ? AND created_at > ?');
-        $stmt->execute([client_ip(), time() - 3600]);
-        if ((int) $stmt->fetchColumn() >= (int) Config::get('mail.max_per_hour_per_ip', 5)) {
-            $errors['form'] = 'Zu viele Anfragen. Bitte später erneut versuchen oder direkt per E-Mail schreiben.';
-        }
-
-        if ($errors !== []) {
-            http_response_code(422);
-            self::contact($params, ['errors' => $errors, 'values' => $values]);
-            return;
-        }
-
-        $to = (string) Config::get('mail.to');
-        $from = (string) Config::get('mail.from');
-        $subject = (string) Config::get('mail.subject_prefix') . 'Anfrage von ' . preg_replace('/[\r\n]+/', ' ', $values['name']);
-        $body = "Name: {$values['name']}\nE-Mail: {$values['email']}\n\n{$values['message']}\n\n—\nGesendet über das Kontaktformular, IP " . client_ip();
-        $headers = [
-            'From: ' . $from,
-            'Reply-To: ' . $values['email'],
-            'Content-Type: text/plain; charset=utf-8',
-            'X-Mailer: PHP/' . PHP_VERSION,
-        ];
-        $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-        $sent = @mail($to, $encodedSubject, $body, implode("\r\n", $headers));
-        $pdo->prepare('INSERT INTO contact_submissions (ip, created_at) VALUES (?, ?)')->execute([client_ip(), time()]);
-
-        if (!$sent) {
-            error_log('Kontaktformular: mail() fehlgeschlagen.');
-            http_response_code(500);
-            self::contact($params, ['errors' => ['form' => 'Der Versand ist technisch fehlgeschlagen. Bitte schreiben Sie direkt an ' . Settings::get('contact_email', $to) . '.'], 'values' => $values]);
-            return;
-        }
-        self::contact($params, ['sent' => true]);
+        self::contact($params, ['errors' => $result['errors'], 'values' => $result['values'], 'sent' => $result['sent']]);
     }
 
     public static function legal(array $params): void
