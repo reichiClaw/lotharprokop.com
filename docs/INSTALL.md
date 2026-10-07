@@ -158,6 +158,15 @@ Wird per FTP ein neuer `storage/`-Stand eingespielt (z. B. Backup), lässt sich 
 
 Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inhalt des Webroots (ohne `media/`, ohne `app-path.php`) überschreiben – bei Variante „ein Ordner“ auch die `.htaccess` im Webroot aus `deploy/webroot.htaccess`. `config/config.php`, `storage/` und `media/` bleiben unverändert. Datenbankänderungen werden beim ersten Aufruf automatisch angewendet (idempotente Migrationen). Für die Architekturseite (`public/architektur/`, inklusive ihrer versteckten Dateien) siehe [ARCHITEKTUR.md](ARCHITEKTUR.md).
 
+Automatisiert (Python 3, nur Standardbibliothek): `tools/deploy-ftp.py` vergleicht das gebaute Release-Paket (`dist/release/htdocs`) per FTPS mit dem Server und lädt nur Unterschiede hoch – gleich große Dateien per SHA-256 verglichen, `config.php`, `storage/` und die Bildordner nie geschrieben, nichts gelöscht, statische Dateien vor PHP, jede Datei über `<name>.uploading~` und anschließende Umbenennung, Größen danach geprüft. Zugangsdaten über die Umgebungsvariablen `lotharprokop_FTP_HOST/USER/PASS`. Das Werkzeug ist auf Pure-FTPd bei World4You abgestimmt (nur explizites FTPS, TLS 1.2, Passiv-Modus) und kommt mit Netzen zurecht, die über einen Pool wechselnder öffentlicher IP-Adressen ins Internet gehen (Datenverbindung wird so lange neu aufgebaut, bis der Server sie annimmt – gewöhnliche FTP-Clients bleiben dort hängen und blockieren nach acht Sitzungen den Zugang für etwa 15 Minuten).
+
+```bash
+php bin/build-release.php --layout=single --base-url=https://DOMAIN
+python3 tools/deploy-ftp.py diff              # nur vergleichen
+python3 tools/deploy-ftp.py deploy --dry-run  # zeigen, was hochgeladen würde
+python3 tools/deploy-ftp.py deploy            # hochladen und prüfen
+```
+
 ### Apache
 
 `public/.htaccess` enthält Rewrite-Regeln (alle Anfragen auf nicht existierende Dateien gehen an `index.php`), Cache-Header, PHP-Limits und die Sperre versteckter Dateien sowie von `app-path.php`. `public/media/.htaccess` verhindert jede Skriptausführung im Bildverzeichnis und liefert dort nur `.jpg`/`.webp` aus; sie enthält bewusst keine `Options`-Direktive, weil manche Hoster `Options` in `.htaccess` nicht erlauben und dann alle Bilder mit Fehler 500 beantworten (das Verzeichnislisting ist bereits in `public/.htaccess` abgeschaltet und wird vererbt). `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/` und `docs/` enthalten jeweils eine `.htaccess` mit `Require all denied` als zweite Verteidigungslinie, falls sie doch einmal im Webroot landen. Voraussetzung: `AllowOverride All` (bei Shared Hosting Standard).

@@ -334,7 +334,21 @@ Anlass: Auf `lothar.drve.at` (Variante „ein Ordner“) war `/architektur` nich
 | Canonical-Redirect: `/architektur/leistungen?x=1` über die Hauptdomain | 301 → `https://EIGENE-DOMAIN/leistungen?x=1`; eigenes CSS unter der Hauptdomain weiterhin 200 (Vergleich über Host und Port) |
 | Update einer bestehenden Installation: `config.php` **ohne** Abschnitt `'architektur'`, leerer Ordner `architektur/media`, kein Marker | erster Aufruf 200, `architektur/media` automatisch mit 26 Bildordnern befüllt, Marker `storage/cache/architektur-synced` geschrieben, Bild-URL 200 `image/jpeg` |
 
-Nicht geprüft: PHP-FPM statt mod_php (SCRIPT_NAME-Verhalten identisch erwartet, da von Apache gesetzt), Wirkung des dunklen Layouts mit den echten Fotografien.
+### Live auf `lothar.drve.at` (07.10.2026)
+
+Der Server lief mit dem Stand von PR #5 (`cursor/hero-smooth-animation-caa3`), der nicht in `main` war; dieser Stand wurde vor dem Upload in den Branch gemergt, damit kein Rückschritt entsteht (Dry-Run von `tools/deploy-ftp.py` zeigte vorher 58 abweichende Dateien, danach genau die 41 der Architekturseite). Upload per `tools/deploy-ftp.py deploy` (41 Dateien, 580 Datenverbindungsversuche für 76 Transfers – NAT-Pool), alle Größen verifiziert.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Hauptseite `/`, `/fotografie`, `/auswahl`, `/vita`, `/kontakt`, `/impressum`, `/datenschutz`, `/agb`, Sitemap (72 URLs) | alle 200, Titel korrekt, keine PHP-Fehlermeldungen |
+| `/architektur` → 301 `/architektur/`; Start, Leistungen (5), Projekte, Profil, Kontakt, Impressum, Datenschutz, Sitemap, robots, eigenes CSS, `site.js`, `inter.woff2`, Favicon | alle 200 |
+| Erstabgleich der Bilder: Kategorie `architektur` existierte bereits aus dem Import (9 Galerien) – `public/architektur/media/` wurde beim ersten Aufruf automatisch befüllt, Bild-URL 200 `image/jpeg` | ok |
+| Galerie außerhalb des Umfangs (`/architektur/projekte/pelmondo`), unbekannte Seite | 404 |
+| `/app/bootstrap.php`, `/storage/database.sqlite`, `/config/config.php`, `/.htaccess`, `/architektur/.htaccess`, `/architektur/media/.htaccess`, `/templates/architektur/layout.php` | 404 |
+| `http://…/architektur/leistungen` | 301 → https |
+| Screenshot der Live-Startseite: Headline vor hellem Produktfoto (Galerie „ETA“) schwer lesbar → Abdunkelung im Kopfbereich verstärkt (Verlauf von unten und links, Textschatten), Asset-Version 13, nachgeliefert | behoben |
+
+Nicht geprüft: PHP-FPM-Variante nur über den Live-Server (dort funktioniert die Basis-Pfad-Erkennung), Kontaktformular live (kein Testversand an den echten Empfänger).
 
 ## Nicht getestet
 

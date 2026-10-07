@@ -123,9 +123,14 @@ class NatPoolFTPS(FTP_TLS):
             full = path.rstrip("/") + "/" + name
             yield full, kind, size, modified, mode
             # Protected trees (storage/, media/ …) are never written and can hold thousands of
-            # entries; each directory listing costs a data connection, so they are not descended.
-            if kind == "dir" and name not in skip_dirs:
-                yield from self.walk(full, skip_dirs)
+            # entries; each directory listing costs a data connection, so only their top level is
+            # listed (for the protective .htaccess / index.html) and nothing below it.
+            if kind == "dir":
+                if name in skip_dirs:
+                    for sub in self.listdir(full):
+                        yield full + "/" + sub[0], sub[1], sub[2], sub[3], sub[4]
+                else:
+                    yield from self.walk(full, skip_dirs)
 
     def download_bytes(self, path):
         buf = bytearray()
