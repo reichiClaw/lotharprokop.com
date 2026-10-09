@@ -274,7 +274,9 @@ final class Images
     {
         $dirs = [Site::MAIN => Config::publicMedia()];
         if (Architektur::enabled()) {
-            $dirs[Architektur::KEY] = Architektur::publicMedia();
+            foreach (Architektur::mediaDirectories() as $i => $dir) {
+                $dirs[$i === 0 ? Architektur::KEY : Architektur::KEY . '-' . $i] = $dir;
+            }
         }
         return $dirs;
     }

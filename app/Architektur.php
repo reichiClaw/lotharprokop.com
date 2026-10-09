@@ -119,6 +119,42 @@ final class Architektur
         return dirname(Config::publicMedia()) . '/' . self::DIR . '/media';
     }
 
+    /**
+     * Bildordner des Document-Root-Ordners direkt im Webroot (neben public/), falls vorhanden.
+     * World4You kann einer Domain nur diesen Ordner zuweisen, nicht public/architektur.
+     * null, wenn es den Ordner nicht gibt oder er mit dem Unterordner identisch ist.
+     */
+    public static function domainRootMedia(): ?string
+    {
+        $publicDir = dirname(Config::publicMedia());
+        $candidate = dirname($publicDir) . '/' . self::DIR;
+        if (!is_file($candidate . '/index.php')) {
+            return null;
+        }
+        $candidateReal = realpath($candidate);
+        $subReal = realpath($publicDir . '/' . self::DIR);
+        if ($candidateReal !== false && $subReal !== false && $candidateReal === $subReal) {
+            return null;
+        }
+        $media = $candidate . '/media';
+        if (!is_dir($media)) {
+            @mkdir($media, 0755, true);
+            @chmod($media, 0755);
+        }
+        return is_dir($media) ? $media : null;
+    }
+
+    /** Alle Bildordner, in die dieser Auftritt Varianten legt (Unterordner und ggf. Domain-Webroot). */
+    public static function mediaDirectories(): array
+    {
+        $dirs = [self::publicMedia()];
+        $extra = self::domainRootMedia();
+        if ($extra !== null && !in_array($extra, $dirs, true)) {
+            $dirs[] = $extra;
+        }
+        return $dirs;
+    }
+
     /** Text aus den Einstellungen, sonst Standardtext. */
     public static function text(string $key): string
     {

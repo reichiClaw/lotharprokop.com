@@ -4,9 +4,11 @@ declare(strict_types=1);
 /**
  * Front-Controller der Architekturseite.
  *
- * Dieses Verzeichnis (public/architektur) ist ein zweites Webroot derselben Installation:
- *  - als Unterordner der Hauptdomain erreichbar (https://lotharprokop.com/architektur/…) und
- *  - als Document Root einer eigenen Domain einsetzbar (Hoster-Panel: Domain → Ordner „architektur“).
+ * Dieses Verzeichnis ist ein zweites Webroot derselben Installation. Es gibt zwei Lagen:
+ *  - Unterordner public/architektur: erreichbar als https://HAUPTDOMAIN/architektur/…
+ *  - direkt im Webroot, neben public/ und app/: Document Root einer eigenen Domain.
+ *    World4You weist eine Domain nur einem Ordner direkt im Webroot zu; public/architektur
+ *    lässt sich dort nicht eintragen. Im Panel also den Ordner „architektur“ angeben.
  * Anwendung, Datenbank, Bilder und Adminbereich sind dieselben wie bei der Hauptseite;
  * der Basis-Pfad wird je Anfrage erkannt (siehe App\Site).
  */
@@ -22,17 +24,24 @@ if (PHP_SAPI === 'cli-server' && !defined('LP_SITE_DELEGATED')) {
     }
 }
 
-// Das Webroot der Hauptseite liegt eine Ebene höher; dort liegen media/ und die gemeinsamen Assets.
-define('PUBLIC_ROOT', dirname(__DIR__));
 define('SITE_ROOT', __DIR__);
 
 /*
- * Anwendungsverzeichnis finden – dieselbe Logik wie public/index.php, bezogen auf das Haupt-Webroot:
- * app-path.php des Haupt-Webroots, sonst eine Ebene über dem Haupt-Webroot (Repository-Struktur)
- * bzw. der Ordner „lotharprokop“ daneben (FTP-Installation).
+ * Zwei Lagen, ein Skript:
+ *  - Ordner direkt im Webroot (neben public/ und app/): gemeinsame Assets in public/assets,
+ *    Anwendung im Geschwisterordner app/.
+ *  - Unterordner public/architektur: das Haupt-Webroot ist die Ebene darüber.
+ * app-path.php des Haupt-Webroots, sonst eine Ebene darüber (Repository) bzw. „lotharprokop“ daneben.
  */
+$parent = dirname(__DIR__);
 $appRoot = null;
-if (is_file(PUBLIC_ROOT . '/app-path.php')) {
+if (is_file($parent . '/app/bootstrap.php') && is_file($parent . '/public/index.php')) {
+    define('PUBLIC_ROOT', $parent . '/public');
+    $appRoot = $parent;
+} else {
+    define('PUBLIC_ROOT', $parent);
+}
+if ($appRoot === null && is_file(PUBLIC_ROOT . '/app-path.php')) {
     $appRoot = rtrim((string) require PUBLIC_ROOT . '/app-path.php', '/');
 }
 if ($appRoot === null || !is_file($appRoot . '/app/bootstrap.php')) {

@@ -516,6 +516,7 @@ final class AdminController
             'Konfiguriertes Upload-Maximum' => human_bytes((int) Config::get('images.max_upload_bytes')),
             'storage beschreibbar' => is_writable($storage) ? 'ja' : 'NEIN',
             'public/media beschreibbar' => is_writable(Config::publicMedia()) ? 'ja' : 'NEIN',
+            'Architektur-Webroot beschreibbar' => ($archDomainMedia = \App\Architektur::domainRootMedia()) === null ? '– (Ordner nicht vorhanden)' : (is_writable($archDomainMedia) ? 'ja' : 'NEIN'),
             'Datenbank' => human_bytes((int) @filesize($storage . '/database.sqlite')),
             'Originale' => human_bytes(self::dirSize(Config::storage('originals'))),
             'Öffentliche Varianten' => human_bytes(self::dirSize(Config::publicMedia())),

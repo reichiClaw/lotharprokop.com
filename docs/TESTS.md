@@ -396,6 +396,15 @@ Neue Admin-Seite `/admin/architektur`; Tabelle `hero_slides` um Spalte `site` er
 | `slides_reset`: alle eigenen Einträge entfernt, keine Bilder gelöscht (alle anderweitig verwendet), Startseite wieder automatisch (3 Bilder) | ok |
 | `php -l` aller geänderten Dateien; Navigationseintrag nur bei `architektur.enabled` | ok |
 
+## Architektur-Webroot direkt im Webroot (09.10.2026)
+
+World4You weist eine Domain nur einem Ordner direkt im Webroot zu. `public/architektur` liegt eine Ebene zu tief. Die Variante „ein Ordner“ legt deshalb zusätzlich `architektur/` neben `public/` an (dieselbe `index.php`, erkennt die Lage selbst). Bilder werden in beide `media/`-Ordner abgeglichen (Marker `architektur-domainroot-synced`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `php -S` mit Document Root = `architektur/` neben `public/`: Startseite 200, eigenes CSS als Datei, `site.js` und eine Schrift aus `public/assets` durchgereicht, Favicon 200, keine PHP-Fehler, Links ohne Präfix `/architektur` | ok |
+| Unterordner `/architektur/` und Hauptseite danach unverändert 200 | ok |
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft

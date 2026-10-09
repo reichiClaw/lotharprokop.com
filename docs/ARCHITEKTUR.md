@@ -1,6 +1,6 @@
 # Architekturseite (zweiter Auftritt)
 
-Eigenständig wirkender Auftritt für Architekturfotografie – dunkel, mit klaren Linien – auf Basis derselben Anwendung wie `lotharprokop.com`: gleiche Datenbank, gleiche Bilder, gleicher Adminbereich. Die Seite liegt im Unterordner `public/architektur/` und ist sofort unter `https://DOMAIN/architektur/` erreichbar; sobald eine eigene Domain zugewiesen ist, wird derselbe Ordner deren Document Root. Es gibt nichts zu kopieren, nichts doppelt zu pflegen.
+Eigenständig wirkender Auftritt für Architekturfotografie – dunkel, mit klaren Linien – auf Basis derselben Anwendung wie `lotharprokop.com`: gleiche Datenbank, gleiche Bilder, gleicher Adminbereich. Die Seite liegt im Unterordner `public/architektur/` und ist sofort unter `https://DOMAIN/architektur/` erreichbar. Für eine eigene Domain legt die Variante „ein Ordner“ zusätzlich den Ordner `architektur/` direkt im Webroot an (neben `public/`); nur den kann das Hosting-Panel als Document Root zuweisen.
 
 ## Konzept
 
@@ -101,7 +101,7 @@ Prüfung nach dem Upload: `https://DOMAIN/architektur/` zeigt die dunkle Startse
 
 ## Eigene Domain zuweisen
 
-1. Im Hosting-Panel die neue Domain anlegen und auf den Ordner `architektur` **innerhalb des Webroots** der Hauptseite zeigen lassen (bei der FTP-Installation: `htdocs/architektur`; bei Variante „ein Ordner“: `htdocs/public/architektur`). SSL für die Domain aktivieren.
+1. Im Hosting-Panel die neue Domain anlegen und den Ordner **`architektur`** zuweisen – direkt im Webroot, neben `public/`. `public/architektur` nimmt das Panel nicht an (Pfad mit Schrägstrich, eine Ebene zu tief). Bei Variante „ein Ordner“ legt das Release diesen Ordner an (`htdocs/architektur/`, mit eigenem `index.php`, `.htaccess`, `assets/` und `media/`). Bei Variante „getrennt“ ist `htdocs/architektur` schon dieser Ordner. SSL für die Domain aktivieren. Der erste Aufruf irgendeiner Seite befüllt `architektur/media/` aus den vorhandenen Varianten (Marker `storage/cache/architektur-domainroot-synced`).
 2. In `config/config.php` eintragen:
 
    ```php

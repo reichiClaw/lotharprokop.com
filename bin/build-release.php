@@ -122,6 +122,17 @@ rrmdir("$publicTarget/architektur/media");
 @mkdir("$publicTarget/architektur/media", 0755, true);
 copy(APP_ROOT . '/public/architektur/media/.htaccess', "$publicTarget/architektur/media/.htaccess");
 copy(APP_ROOT . '/public/architektur/media/index.html', "$publicTarget/architektur/media/index.html");
+// Variante „ein Ordner“: World4You weist eine Domain nur einem Ordner direkt im Webroot zu.
+// public/architektur liegt eine Ebene zu tief. Deshalb derselbe Auftritt noch einmal als
+// htdocs/architektur/, neben public/. Die Hauptdomain bedient weiterhin public/architektur
+// (die Webroot-.htaccess leitet dorthin um); die eigene Domain bekommt diesen Ordner als Document Root.
+if ($layout === 'single') {
+    rrmdir("$webroot/architektur");
+    rcopy("$publicTarget/architektur", "$webroot/architektur", ['media']);
+    @mkdir("$webroot/architektur/media", 0755, true);
+    copy(APP_ROOT . '/public/architektur/media/.htaccess', "$webroot/architektur/media/.htaccess");
+    copy(APP_ROOT . '/public/architektur/media/index.html', "$webroot/architektur/media/index.html");
+}
 if ($layout === 'split') {
     put("$publicTarget/app-path.php", "<?php\n// Anwendungsordner liegt neben diesem Webroot (siehe docs/INSTALL.md).\nreturn dirname(__DIR__) . '/$appDirName';\n");
 } else {
@@ -232,8 +243,9 @@ $readme .= $withContent
     ? "INHALTE: Datenbank, {$stats['originals']} Originale und Bildvarianten sind enthalten ({$stats['images']} Bilder). Beim ersten Aufruf der Website werden die öffentlichen\nBildvarianten automatisch angelegt (kann einige Sekunden dauern). Kontrolle: /admin → System → „Bilder ohne Varianten: keine“.\n"
     : "INHALTE: Dieses Paket enthält keine Galerien. Entweder ein Backup einspielen (docs/INSTALL.md) oder Inhalte im Admin anlegen.\n";
 $archWebroot = $layout === 'split' ? 'htdocs/architektur' : 'htdocs/public/architektur';
+$domainFolder = $layout === 'split' ? 'architektur (im Webroot)' : 'architektur (direkt im Webroot, neben public – nicht public/architektur)';
 $readme .= "\nARCHITEKTURSEITE: liegt als Unterordner  $archWebroot/  im Paket und ist nach dem Upload sofort unter https://DOMAIN/architektur/ erreichbar.\n"
-    . "Eigene Domain: im Hosting-Panel auf den Ordner  architektur  (im Webroot) zeigen lassen, dann in config/config.php unter 'architektur' die\n"
+    . "Eigene Domain: im Hosting-Panel den Ordner  $domainFolder  zuweisen, dann in config/config.php unter 'architektur' die\n"
     . "'base_url' eintragen (z. B. 'https://NEUE-DOMAIN'). Welche Galerien dort erscheinen, bestimmen Kategorien – Details: docs/ARCHITEKTUR.md.\n";
 $readme .= "\nVORAUSSETZUNGEN beim Hoster: PHP 8.1 oder neuer (im Hosting-Panel auswählen, getestet mit 8.3), Erweiterungen pdo_sqlite und imagick oder gd,\n"
     . "Apache mit mod_rewrite und .htaccess (AllowOverride). Prüfung: https://DOMAIN/check.php (danach löschen), später /admin → System.\n"

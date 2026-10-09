@@ -88,4 +88,21 @@ if (App\Architektur::enabled()) {
         }
     }
     unset($archMarker);
+
+    // Ordner direkt im Webroot (Document Root einer eigenen Domain): dieselben Varianten noch einmal
+    // dorthin legen. Der Marker der Unterordner-Variante existiert auf bestehenden Installationen schon,
+    // deshalb ein eigener Marker, geschrieben erst nach erfolgreichem Abgleich.
+    $domainMedia = App\Architektur::domainRootMedia();
+    $domainMarker = App\Config::storage('cache') . '/architektur-domainroot-synced';
+    if ($domainMedia !== null && !is_file($domainMarker)) {
+        try {
+            App\Images::syncAll();
+            if (@file_put_contents($domainMarker, date('c')) === false) {
+                error_log('Marker für den Architektur-Webroot konnte nicht geschrieben werden.');
+            }
+        } catch (\Throwable $e) {
+            error_log('Abgleich der Bilder für den Architektur-Webroot fehlgeschlagen: ' . $e->getMessage());
+        }
+    }
+    unset($domainMedia, $domainMarker);
 }
