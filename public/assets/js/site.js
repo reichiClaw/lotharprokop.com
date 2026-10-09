@@ -36,11 +36,20 @@
     var dots = Array.prototype.slice.call(section.querySelectorAll('[data-hero-dot]'));
     var toggle = section.querySelector('[data-hero-toggle]');
     var interval = Math.max(2000, parseInt(box.getAttribute('data-hero-interval'), 10) || 6000);
+    var fadeMs = cssDuration('--dur-hero-fade', 1500);
     var index = 0;
     var timer = null;
     var paused = false;
 
+    function cssDuration(name, fallback) {
+      var raw = window.getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      var value = parseFloat(raw);
+      if (isNaN(value)) return fallback;
+      return raw.indexOf('ms') === -1 ? value * 1000 : value;
+    }
+
     // Aus dem <template> ein echtes Bild machen; das Laden beginnt erst hier.
+    // Das Bild wird sofort geladen und vorab dekodiert, damit beim Einblenden nichts mehr zu rechnen ist.
     function materialize(i) {
       var slot = slots[i];
       if (slot.tagName !== 'TEMPLATE') return slot;
@@ -49,7 +58,44 @@
       slot.parentNode.insertBefore(fragment, slot);
       slot.parentNode.removeChild(slot);
       slots[i] = el;
+      el.querySelectorAll('img').forEach(function (img) {
+        img.removeAttribute('loading');
+        if (img.decode) {
+          var decode = function () { img.decode().catch(function () {}); };
+          if (img.complete) decode(); else img.addEventListener('load', decode, { once: true });
+        }
+      });
       return el;
+    }
+
+    // Ruft cb auf, sobald die Bilder der Folie geladen sind (oder sofort, wenn das schon der Fall ist).
+    function whenLoaded(el, cb) {
+      var pending = Array.prototype.filter.call(el.querySelectorAll('img'), function (img) { return !img.complete; });
+      if (!pending.length) { cb(); return; }
+      var done = false;
+      function finish() {
+        if (done) return;
+        done = true;
+        cb();
+      }
+      pending.forEach(function (img) {
+        img.addEventListener('load', finish, { once: true });
+        img.addEventListener('error', finish, { once: true });
+      });
+      // Notbremse: nach einer Wechselzeit auf jeden Fall weiter.
+      window.setTimeout(finish, interval);
+    }
+
+    // Ausgehende Folie: blendet aus und wird danach unsichtbar in den Ausgangszustand zurückgesetzt.
+    function leave(el) {
+      el.classList.remove('is-active');
+      el.classList.add('is-leaving');
+      setHidden(el, true);
+      if (el._leaveTimer) window.clearTimeout(el._leaveTimer);
+      el._leaveTimer = window.setTimeout(function () {
+        el._leaveTimer = null;
+        el.classList.remove('is-leaving');
+      }, fadeMs + 50);
     }
 
     // Verborgene Folien enthalten Links: für Vorlesesoftware und Tastatur ausblenden.
@@ -70,9 +116,13 @@
       var el = materialize(i);
       index = i;
       if (previous && previous.tagName !== 'TEMPLATE') {
-        previous.classList.remove('is-active');
-        setHidden(previous, true);
+        leave(previous);
       }
+      if (el._leaveTimer) {
+        window.clearTimeout(el._leaveTimer);
+        el._leaveTimer = null;
+      }
+      el.classList.remove('is-leaving');
       el.classList.add('is-active');
       setHidden(el, false);
       credits.forEach(function (credit, k) {
@@ -88,14 +138,31 @@
       materialize((i + 1) % slots.length);
     }
 
+    var cycle = 0;
+
     function stop() {
-      if (timer) { window.clearInterval(timer); timer = null; }
+      cycle++;
+      if (timer) { window.clearTimeout(timer); timer = null; }
+    }
+
+    // Automatischer Wechsel: erst wenn das nächste Bild geladen ist, damit die Überblendung nicht ins Leere läuft.
+    function schedule() {
+      var current = cycle;
+      timer = window.setTimeout(function () {
+        timer = null;
+        var next = materialize((index + 1) % slots.length);
+        whenLoaded(next, function () {
+          if (current !== cycle) return; // inzwischen angehalten oder neu gestartet
+          show(index + 1);
+          schedule();
+        });
+      }, interval);
     }
 
     function start() {
       stop();
       if (paused || reduceMotion || document.hidden) return;
-      timer = window.setInterval(function () { show(index + 1); }, interval);
+      schedule();
     }
 
     dots.forEach(function (dot, k) {
@@ -124,6 +191,12 @@
       window.setTimeout(function () {
         if (!section.contains(document.activeElement)) start();
       }, 0);
+    });
+
+    // Das erste Bild ist beim Laden bereits aktiv; das Einsinken erst nach dem ersten gezeichneten Bild
+    // freigeben, damit es wie bei den Folgebildern als Übergang läuft statt sofort am Endpunkt zu stehen.
+    window.requestAnimationFrame(function () {
+      window.requestAnimationFrame(function () { box.classList.add('is-running'); });
     });
 
     // Das zweite Bild erst nach dem ersten Seitenaufbau vorbereiten.
@@ -392,6 +465,360 @@
     }, { passive: true });
   }
 
+  /* ==========================================================================
+     Spielereien (Easter Eggs) – einzeln im Adminbereich abschaltbar.
+     Das Layout schreibt die aktiven in <body data-eggs="darkroom shutter …">.
+     ========================================================================== */
+  function initEggs() {
+    var enabled = (document.body.getAttribute('data-eggs') || '').split(/\s+/).filter(Boolean);
+    function has(name) { return enabled.indexOf(name) !== -1; }
+    var brand = document.querySelector('.brand');
+    if (has('darkroom')) initDarkroom(brand);
+    if (has('shutter') && brand) initShutter(brand, has('shutter_sound'));
+    if (has('autofocus')) initAutofocus();
+    if (has('lightleak')) initLightLeak();
+  }
+
+  function isTypingTarget(el) {
+    return !!el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName));
+  }
+
+  /* ---------- Dunkelkammer ----------
+     „dunkelkammer“ tippen oder das Logo 1,5 s gedrückt halten: rotes Schutzlicht, die Bilder entwickeln sich
+     aus weißem Papier. Esc, erneutes Tippen oder Gedrückthalten schaltet das Licht wieder an. */
+  function initDarkroom(brand) {
+    var root = document.documentElement;
+    var WORD = 'dunkelkammer';
+    var typed = '';
+    var toast = null;
+    var toastTimer = null;
+    var developTimer = null;
+
+    function note(text) {
+      if (!toast) {
+        toast = document.createElement('button');
+        toast.type = 'button';
+        toast.className = 'egg-toast';
+        toast.addEventListener('click', leave);
+        document.body.appendChild(toast);
+      }
+      if (toastTimer) window.clearTimeout(toastTimer);
+      toast.textContent = text;
+      toast.hidden = false;
+      window.requestAnimationFrame(function () { toast.classList.add('is-visible'); });
+      toastTimer = window.setTimeout(function () { toast.classList.remove('is-visible'); }, 3600);
+    }
+
+    function isOn() { return root.classList.contains('is-darkroom'); }
+
+    function enter() {
+      // Jeder Abzug entwickelt sich etwas anders schnell – kein Gleichschritt.
+      document.querySelectorAll('img').forEach(function (img) {
+        img.style.setProperty('--develop-delay', Math.round(Math.random() * 1100) + 'ms');
+      });
+      root.classList.add('is-darkroom', 'is-developing');
+      if (developTimer) window.clearTimeout(developTimer);
+      developTimer = window.setTimeout(function () { root.classList.remove('is-developing'); }, 4800);
+      note('Dunkelkammer – Licht an: Esc oder hier antippen');
+    }
+
+    function leave() {
+      root.classList.remove('is-darkroom', 'is-developing');
+      if (developTimer) { window.clearTimeout(developTimer); developTimer = null; }
+      if (toast) { toast.classList.remove('is-visible'); if (toastTimer) window.clearTimeout(toastTimer); }
+    }
+
+    function toggle() { if (isOn()) leave(); else enter(); }
+
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && isOn()) { leave(); return; }
+      if (ev.metaKey || ev.ctrlKey || ev.altKey || isTypingTarget(ev.target)) return;
+      if (!ev.key || ev.key.length !== 1) return;
+      typed = (typed + ev.key.toLowerCase()).slice(-WORD.length);
+      if (typed === WORD) { typed = ''; toggle(); }
+    });
+
+    if (!brand) return;
+    var pressTimer = null;
+    var longPressed = false;
+    function cancelPress() {
+      if (pressTimer) { window.clearTimeout(pressTimer); pressTimer = null; }
+      brand.classList.remove('is-pressing');
+    }
+    brand.addEventListener('pointerdown', function (ev) {
+      if (ev.button !== 0) return;
+      longPressed = false;
+      brand.classList.add('is-pressing');
+      pressTimer = window.setTimeout(function () {
+        pressTimer = null;
+        longPressed = true;
+        brand.classList.remove('is-pressing');
+        toggle();
+      }, 1500);
+    });
+    ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (type) {
+      brand.addEventListener(type, cancelPress);
+    });
+    // Nach dem Gedrückthalten soll der Klick nicht zur Startseite führen (Capture-Phase: läuft vor dem Verschluss).
+    brand.addEventListener('click', function (ev) {
+      if (!longPressed) return;
+      longPressed = false;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+    }, true);
+    // Auf Touchgeräten öffnet langes Drücken sonst das Kontextmenü des Links.
+    brand.addEventListener('contextmenu', function (ev) {
+      if (pressTimer || longPressed) ev.preventDefault();
+    });
+  }
+
+  /* ---------- Verschluss am Logo ----------
+     Doppelklick schließt und öffnet eine sechsblättrige Blende über der Seite. Damit der erste Klick nicht schon
+     zur Startseite springt, wartet die Navigation kurz auf einen möglichen zweiten Klick. */
+  function initShutter(brand, withSound) {
+    if (reduceMotion) return;
+    var clickTimer = null;
+    var overlay = null;
+    var busy = false;
+    var sound = withSound ? createShutterSound() : null;
+
+    function play() {
+      if (busy) return;
+      busy = true;
+      if (sound) sound();
+      if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'shutter';
+        overlay.setAttribute('aria-hidden', 'true');
+        overlay.innerHTML = '<div class="shutter__iris"><i></i><i></i><i></i><i></i><i></i><i></i></div>';
+        document.body.appendChild(overlay);
+      }
+      var iris = overlay.firstChild;
+      var done = function () {
+        overlay.classList.remove('is-playing');
+        busy = false;
+      };
+      iris.addEventListener('animationend', done, { once: true });
+      window.setTimeout(done, 1500);
+      overlay.classList.add('is-playing');
+    }
+
+    brand.addEventListener('click', function (ev) {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+      ev.preventDefault();
+      if (clickTimer) {
+        window.clearTimeout(clickTimer);
+        clickTimer = null;
+        play();
+        return;
+      }
+      clickTimer = window.setTimeout(function () {
+        clickTimer = null;
+        if (window.location.pathname === '/') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          window.location.href = brand.href;
+        }
+      }, 280);
+    });
+  }
+
+  /* Auslösegeräusch einer Spiegelreflexkamera, mit Web Audio aus Rauschen und Sinus erzeugt – keine Audiodatei,
+     nichts zu laden. Zwei Anschläge: Spiegel hoch/Verschluss (wenn sich die Blende schließt) und Spiegel zurück
+     (wenn sie sich öffnet), zeitlich auf die CSS-Animation (440 ms, geschlossen bei 44–56 %) abgestimmt.
+     Der AudioContext entsteht erst im Doppelklick selbst, damit die Autoplay-Regeln der Browser erfüllt sind. */
+  function createShutterSound() {
+    var Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    var ctx = null;
+    var noise = null;
+
+    function noiseBuffer(seconds) {
+      var len = Math.ceil(ctx.sampleRate * seconds);
+      var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      var data = buf.getChannelData(0);
+      for (var i = 0; i < len; i++) data[i] = Math.random() * 2 - 1;
+      return buf;
+    }
+
+    // Kurzer, bandbegrenzter Rauschimpuls: das „Klacken“ von Metall und Mechanik.
+    function burst(out, at, freq, q, dur, gain) {
+      var src = ctx.createBufferSource();
+      src.buffer = noise;
+      var filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = freq;
+      filter.Q.value = q;
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0, at);
+      g.gain.linearRampToValueAtTime(gain, at + 0.0015);
+      g.gain.exponentialRampToValueAtTime(0.0004, at + dur);
+      src.connect(filter);
+      filter.connect(g);
+      g.connect(out);
+      src.start(at);
+      src.stop(at + dur + 0.02);
+    }
+
+    // Tieffrequenter Schlag: der Spiegel trifft auf den Anschlag.
+    function thump(out, at, f0, f1, dur, gain) {
+      var osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(f0, at);
+      osc.frequency.exponentialRampToValueAtTime(f1, at + dur);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(gain, at);
+      g.gain.exponentialRampToValueAtTime(0.0004, at + dur);
+      osc.connect(g);
+      g.connect(out);
+      osc.start(at);
+      osc.stop(at + dur + 0.02);
+    }
+
+    return function play() {
+      try {
+        if (!ctx) {
+          ctx = new Ctx();
+          noise = noiseBuffer(0.3);
+        }
+        if (ctx.state === 'suspended' && ctx.resume) {
+          var resumed = ctx.resume();
+          if (resumed && resumed.catch) resumed.catch(function () {});
+        }
+        var master = ctx.createGain();
+        master.gain.value = 0.32;
+        master.connect(ctx.destination);
+        var t = ctx.currentTime + 0.005;
+        // 1. Anschlag (~150 ms): Spiegel hoch, Verschluss läuft – die Blende ist fast zu.
+        thump(master, t + 0.15, 190, 70, 0.045, 0.55);
+        burst(master, t + 0.15, 1800, 0.8, 0.03, 0.7);
+        burst(master, t + 0.15, 6200, 1.0, 0.008, 0.5);
+        // 2. Anschlag (~250 ms): Spiegel zurück – die Blende öffnet sich. Etwas kräftiger, mit kurzem Nachklingen.
+        thump(master, t + 0.25, 230, 80, 0.05, 0.65);
+        burst(master, t + 0.25, 2600, 0.7, 0.045, 0.9);
+        burst(master, t + 0.25, 5200, 1.2, 0.012, 0.6);
+        burst(master, t + 0.27, 3400, 3.0, 0.09, 0.22);
+      } catch (e) {
+        // Ohne Ton geht die Blende trotzdem zu und auf.
+      }
+    };
+  }
+
+  /* ---------- Autofokus auf der 404-Seite ----------
+     Der Fokusrahmen folgt dem Zeiger; bleibt er kurz stehen, rastet er grün ein und das Bild wird scharf.
+     Touch: Antippen stellt scharf, erneutes Antippen folgt dem Link. Tastatur: Fokus stellt mittig scharf. */
+  function initAutofocus() {
+    var box = document.querySelector('[data-af]');
+    if (!box) return;
+    var frame = box.querySelector('.af__frame');
+    var status = box.querySelector('[data-af-status]');
+    var SETTLE_MS = 420;
+    var settle = null;
+
+    function say(text) { if (status) status.textContent = text; }
+
+    if (reduceMotion || !frame) {
+      box.classList.add('is-focused');
+      say('Scharf');
+      return;
+    }
+
+    function lock() {
+      settle = null;
+      box.classList.remove('is-hunting');
+      box.classList.add('is-focused');
+      say('Scharf');
+    }
+
+    function moveTo(clientX, clientY) {
+      var r = box.getBoundingClientRect();
+      var x = Math.min(Math.max(clientX - r.left, 0), r.width);
+      var y = Math.min(Math.max(clientY - r.top, 0), r.height);
+      frame.style.transform = 'translate(' + Math.round(x) + 'px, ' + Math.round(y) + 'px) translate(-50%, -50%)';
+      box.classList.add('is-tracking', 'is-hunting');
+      box.classList.remove('is-focused');
+      say('Fokus suchen …');
+      if (settle) window.clearTimeout(settle);
+      settle = window.setTimeout(lock, SETTLE_MS);
+    }
+
+    function release() {
+      if (settle) { window.clearTimeout(settle); settle = null; }
+      box.classList.remove('is-tracking', 'is-hunting', 'is-focused');
+      say('Fokus suchen …');
+    }
+
+    box.addEventListener('pointermove', function (ev) {
+      if (ev.pointerType === 'touch') return;
+      moveTo(ev.clientX, ev.clientY);
+    });
+    box.addEventListener('pointerleave', function (ev) {
+      if (ev.pointerType === 'touch') return;
+      release();
+    });
+    box.addEventListener('touchstart', function (ev) {
+      if (box.classList.contains('is-focused')) return; // zweites Antippen: Link folgt
+      var t = ev.touches[0];
+      moveTo(t.clientX, t.clientY);
+    }, { passive: true });
+    box.addEventListener('click', function (ev) {
+      if (box.classList.contains('is-focused')) return;
+      ev.preventDefault();
+      moveTo(ev.clientX, ev.clientY);
+    });
+    box.addEventListener('focus', function () {
+      var r = box.getBoundingClientRect();
+      moveTo(r.left + r.width / 2, r.top + r.height / 2);
+    });
+    box.addEventListener('blur', release);
+  }
+
+  /* ---------- Lichteinfall am Seitenende ----------
+     Wer die Projektübersicht oder eine Galerie bis ganz unten scrollt, sieht einmal einen warmen Lichteinfall.
+     Erst nach einem Stück Zurückscrollen kann er erneut ausgelöst werden. */
+  function initLightLeak() {
+    if (reduceMotion) return;
+    if (!document.querySelector('.portfolio, .project')) return;
+    var leak = null;
+    var armed = true;
+    var playing = false;
+    var ticking = false;
+
+    function play() {
+      if (!leak) {
+        leak = document.createElement('div');
+        leak.className = 'light-leak';
+        leak.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(leak);
+      }
+      playing = true;
+      leak.classList.add('is-on');
+      window.setTimeout(function () {
+        leak.classList.remove('is-on');
+        playing = false;
+      }, 2700);
+    }
+
+    function check() {
+      ticking = false;
+      var root = document.documentElement;
+      var max = root.scrollHeight - window.innerHeight;
+      if (max < 400) return; // zu kurze Seite: kein „Ende erreicht“
+      var y = window.pageYOffset || root.scrollTop || 0;
+      if (y >= max - 2) {
+        if (armed && !playing) { armed = false; play(); }
+      } else if (y < max - 320) {
+        armed = true;
+      }
+    }
+
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(check);
+    }, { passive: true });
+  }
+
   document.addEventListener('DOMContentLoaded', function () {
     initHeader();
     initHero();
@@ -399,5 +826,6 @@
     initFilter();
     initVideos();
     initLightbox();
+    initEggs();
   });
 })();

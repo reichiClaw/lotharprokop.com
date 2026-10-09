@@ -13,6 +13,19 @@ if (PHP_SAPI === 'cli-server') {
     if ($staticPath !== __DIR__ . '/' && is_file($staticPath) && !$isDotfile && !$isScript) {
         return false;
     }
+    // Architekturseite als Unterordner – wie Apache mit der .htaccess in public/architektur/.
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    if ($requestPath === '/architektur' || str_starts_with($requestPath, '/architektur/')) {
+        if ($requestPath === '/architektur') {
+            header('Location: /architektur/', true, 301);
+            exit;
+        }
+        define('LP_SITE_DELEGATED', true);
+        $_SERVER['SCRIPT_NAME'] = '/architektur/index.php';
+        $_SERVER['SCRIPT_FILENAME'] = __DIR__ . '/architektur/index.php';
+        require __DIR__ . '/architektur/index.php';
+        return true;
+    }
 }
 
 define('PUBLIC_ROOT', __DIR__);
@@ -42,9 +55,11 @@ if ($appRoot === null || !is_file($appRoot . '/app/bootstrap.php')) {
 require $appRoot . '/app/bootstrap.php';
 unset($appRoot);
 
+use App\Controllers\AdminArchitekturController;
 use App\Controllers\AdminController;
 use App\Controllers\AdminGalleryController;
 use App\Controllers\AdminImageController;
+use App\Controllers\AdminSelectionController;
 use App\Controllers\PublicController;
 use App\Controllers\RedirectController;
 use App\Router;
@@ -60,6 +75,7 @@ $router = new Router();
 
 // Öffentliche Seiten
 $router->get('/', [PublicController::class, 'home']);
+$router->get('/auswahl', [PublicController::class, 'selection']);
 $router->get('/fotografie', [PublicController::class, 'portfolio']);
 $router->get('/fotografie/{slug:[a-z0-9-]+}', [PublicController::class, 'gallery']);
 $router->get('/film', [PublicController::class, 'films']);
@@ -69,6 +85,7 @@ $router->post('/kontakt', [PublicController::class, 'contactSubmit']);
 $router->get('/impressum', [PublicController::class, 'legal']);
 $router->get('/datenschutz', [PublicController::class, 'legal']);
 $router->get('/bildrechte', [PublicController::class, 'legal']);
+$router->get('/agb', [PublicController::class, 'legal']);
 $router->get('/sitemap.xml', [PublicController::class, 'sitemap']);
 $router->get('/robots.txt', [PublicController::class, 'robots']);
 
@@ -86,6 +103,8 @@ foreach (['shop', 'warenkorb', 'kasse', 'mein-konto', 'abstract-prints', 'blog',
     $router->get('/' . $gone, [RedirectController::class, 'gone']);
     $router->post('/' . $gone, [RedirectController::class, 'gone']);
 }
+// Rechtliche PDFs der alten Website liegen jetzt unter /dokumente/ (vor der pauschalen 410-Regel).
+$router->get('/wp-content/uploads/2019/04/{file:[^/]+\.pdf}', [RedirectController::class, 'document']);
 $router->get('/wp-content/{rest:.*}', [RedirectController::class, 'gone']);
 $router->get('/wp-includes/{rest:.*}', [RedirectController::class, 'gone']);
 $router->get('/wp-json/{rest:.*}', [RedirectController::class, 'gone']);
@@ -123,8 +142,15 @@ $router->post('/admin/bilder/upload', [AdminImageController::class, 'uploadStand
 
 $router->get('/admin/kategorien', [AdminController::class, 'categories']);
 $router->post('/admin/kategorien', [AdminController::class, 'categoriesSave']);
+$router->get('/admin/auswahl', [AdminSelectionController::class, 'index']);
+$router->post('/admin/auswahl/hinzufuegen', [AdminSelectionController::class, 'add']);
+$router->post('/admin/auswahl/entfernen', [AdminSelectionController::class, 'remove']);
+$router->post('/admin/auswahl/sortieren', [AdminSelectionController::class, 'reorder']);
+$router->post('/admin/auswahl/einstellungen', [AdminSelectionController::class, 'settings']);
 $router->get('/admin/startseite', [AdminController::class, 'homepage']);
 $router->post('/admin/startseite', [AdminController::class, 'homepageSave']);
+$router->get('/admin/architektur', [AdminArchitekturController::class, 'index']);
+$router->post('/admin/architektur', [AdminArchitekturController::class, 'save']);
 $router->get('/admin/filme', [AdminController::class, 'films']);
 $router->get('/admin/filme/neu', [AdminController::class, 'filmForm']);
 $router->get('/admin/filme/{id:\d+}', [AdminController::class, 'filmForm']);

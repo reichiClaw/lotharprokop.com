@@ -14,6 +14,10 @@ Alle Regeln liegen in `public/index.php` (Routen) und `app/Controllers/RedirectC
 | `/filme` | `/film` | 301 |
 | `/kontaktneu`, `/contact` | `/kontakt` | 301 |
 | `/datenschutzerklaerung` | `/datenschutz` | 301 |
+| `/wp-content/uploads/2019/04/AGB_Unternehmer.pdf` | `/dokumente/agb-unternehmer.pdf` | 301 |
+| `/wp-content/uploads/2019/04/AGB_Konsumenten.pdf` | `/dokumente/agb-konsumenten.pdf` | 301 |
+| `/wp-content/uploads/2019/04/Rücktrittsrecht-Konsumenten.pdf` | `/dokumente/ruecktrittsrecht-konsumenten.pdf` | 301 |
+| `/wp-content/uploads/2019/04/Datenschutz.pdf` | `/datenschutz` | 301 |
 | `/shop`, `/warenkorb`, `/kasse`, `/mein-konto` | – | 410 |
 | `/abstract-prints`, `/blog`, `/journal`, `/beispiel-seite` | – | 410 |
 | `/feed`, `/comments/feed`, `/wp-json/…`, `/xmlrpc.php`, `/wp-login.php`, `/wp-admin/…`, `/wp-content/…`, `/wp-includes/…` | – | 410 |

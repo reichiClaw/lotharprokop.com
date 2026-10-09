@@ -161,6 +161,7 @@ final class AdminController
             'archived' => (int) $pdo->query("SELECT COUNT(*) FROM galleries WHERE status = 'archived'")->fetchColumn(),
             'images' => (int) $pdo->query('SELECT COUNT(*) FROM images')->fetchColumn(),
             'films' => (int) $pdo->query("SELECT COUNT(*) FROM films WHERE status = 'published'")->fetchColumn(),
+            'selection' => (int) $pdo->query('SELECT COUNT(*) FROM featured_images')->fetchColumn(),
         ];
         $recent = array_slice(Galleries::all(), 0, 8);
         usort($recent, fn($a, $b) => strcmp($b['updated_at'], $a['updated_at']));
@@ -241,6 +242,7 @@ final class AdminController
                 $addable++;
             }
         }
+        $library = Images::groupedByGallery();
         self::render('homepage', [
             'featured' => $featured,
             'others' => $others,
@@ -248,6 +250,9 @@ final class AdminController
             'slideInterval' => HeroSlides::interval(),
             'featuredAddable' => $addable,
             'galleries' => $all,
+            'groups' => $library['groups'],
+            'slideImageIds' => array_flip($inSlideshow),
+            'imageTotal' => $library['total'],
             'meta' => ['title' => 'Startseite'],
         ]);
     }
@@ -298,6 +303,25 @@ final class AdminController
             } else {
                 self::flash('error', 'Kein Projekt gewählt und keine Datei hochgeladen.');
             }
+        } elseif ($action === 'slide_pick') {
+            // Beliebige Bilder aus der Bibliothek; Verweis wahlweise automatisch aus der Galerie des Bildes.
+            $link = (string) ($_POST['slide_pick_gallery'] ?? 'auto');
+            $present = array_column(array_column(HeroSlides::all(), 'image'), 'id');
+            $ids = array_values(array_unique(array_map('intval', (array) ($_POST['add'] ?? []))));
+            $images = Images::findMany($ids);
+            $added = 0;
+            foreach ($ids as $imageId) {
+                if (!isset($images[$imageId]) || in_array($imageId, $present, true)) {
+                    continue;
+                }
+                $galleryId = $link === 'auto' ? Images::primaryGalleryId($imageId) : (int) $link;
+                HeroSlides::add($imageId, $galleryId);
+                $present[] = $imageId;
+                $added++;
+            }
+            self::flash($added > 0 ? 'ok' : 'error', $added > 0
+                ? $added . ' Bild' . ($added === 1 ? '' : 'er') . ' in die Bildfolge aufgenommen.'
+                : 'Kein Bild gewählt (oder alle gewählten stehen schon im Kopfbereich).');
         } elseif ($action === 'slides_featured') {
             $present = array_column(array_column(HeroSlides::all(), 'image'), 'id');
             $added = 0;
@@ -316,7 +340,7 @@ final class AdminController
     }
 
     /** Titelbild eines Projekts (mit Rückfall auf das erste Bild der Galerie). */
-    private static function galleryCover(int $galleryId): ?array
+    public static function galleryCover(int $galleryId): ?array
     {
         $gallery = Galleries::find($galleryId);
         if ($gallery === null) {
@@ -327,7 +351,7 @@ final class AdminController
     }
 
     /** Löscht ein Bild, wenn es nach einer Änderung nirgends mehr verwendet wird. */
-    private static function pruneImage(int $imageId): void
+    public static function pruneImage(int $imageId): void
     {
         $usage = Images::usages($imageId);
         if ($usage['galleries'] === [] && $usage['other'] === []) {
@@ -410,6 +434,10 @@ final class AdminController
         self::render('settings', [
             'texts' => Settings::editableTexts(),
             'fields' => Settings::editableFields(),
+            'eggs' => Settings::easterEggs(),
+            'projectLayouts' => Settings::homeProjectsLayouts(),
+            'projectLayout' => Settings::homeProjectsLayout(),
+            'scrollHint' => Settings::heroScrollHint(),
             'values' => Settings::all(),
             'portrait' => $portraitId > 0 ? Images::find($portraitId) : null,
             'meta' => ['title' => 'Einstellungen'],
@@ -436,6 +464,15 @@ final class AdminController
                 }
                 Settings::set($key, $value);
             }
+        }
+        // Kontrollkästchen: nicht angehakt = nicht im POST, deshalb jeden Schlüssel explizit setzen.
+        foreach (array_keys(Settings::easterEggs()) as $key) {
+            Settings::set($key, isset($_POST[$key]) ? '1' : '0');
+        }
+        Settings::set('hero_scroll_hint', isset($_POST['hero_scroll_hint']) ? '1' : '0');
+        $layout = (string) ($_POST['home_projects_layout'] ?? '');
+        if (array_key_exists($layout, Settings::homeProjectsLayouts())) {
+            Settings::set('home_projects_layout', $layout);
         }
         if (!empty($_FILES['portrait']['name'])) {
             try {
@@ -479,6 +516,7 @@ final class AdminController
             'Konfiguriertes Upload-Maximum' => human_bytes((int) Config::get('images.max_upload_bytes')),
             'storage beschreibbar' => is_writable($storage) ? 'ja' : 'NEIN',
             'public/media beschreibbar' => is_writable(Config::publicMedia()) ? 'ja' : 'NEIN',
+            'Architektur-Webroot beschreibbar' => ($archDomainMedia = \App\Architektur::domainRootMedia()) === null ? '– (Ordner nicht vorhanden)' : (is_writable($archDomainMedia) ? 'ja' : 'NEIN'),
             'Datenbank' => human_bytes((int) @filesize($storage . '/database.sqlite')),
             'Originale' => human_bytes(self::dirSize(Config::storage('originals'))),
             'Öffentliche Varianten' => human_bytes(self::dirSize(Config::publicMedia())),

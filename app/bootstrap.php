@@ -33,7 +33,14 @@ if (!is_file($configFile)) {
     exit("Konfiguration fehlt: config/config.php anlegen (Vorlage: config/config.example.php).\n");
 }
 
-$config = array_replace_recursive(require APP_ROOT . '/config/config.example.php', require $configFile);
+$userConfig = require $configFile;
+$config = array_replace_recursive(require APP_ROOT . '/config/config.example.php', $userConfig);
+// Die Kategorienliste der Architekturseite gilt so, wie sie in config.php steht – nicht positionsweise
+// mit der Vorlage zusammengeführt (sonst ließe sich kein Eintrag entfernen).
+if (isset($userConfig['architektur']['categories']) && is_array($userConfig['architektur']['categories'])) {
+    $config['architektur']['categories'] = $userConfig['architektur']['categories'];
+}
+unset($userConfig);
 App\Config::init($config);
 
 if (App\Config::get('debug')) {
@@ -68,3 +75,34 @@ if (is_file($syncMarker) && @unlink($syncMarker)) {
     }
 }
 unset($syncMarker);
+
+// Architekturseite nachträglich per FTP in eine bestehende Installation gespielt: ihr öffentlicher
+// Bildordner wird beim ersten Aufruf einmalig befüllt (Marker verhindert Wiederholungen).
+if (App\Architektur::enabled()) {
+    $archMarker = App\Config::storage('cache') . '/architektur-synced';
+    if (!is_file($archMarker) && @file_put_contents($archMarker, date('c')) !== false) {
+        try {
+            App\Images::syncAll();
+        } catch (\Throwable $e) {
+            error_log('Erstabgleich der Bilder für die Architekturseite fehlgeschlagen: ' . $e->getMessage());
+        }
+    }
+    unset($archMarker);
+
+    // Ordner direkt im Webroot (Document Root einer eigenen Domain): dieselben Varianten noch einmal
+    // dorthin legen. Der Marker der Unterordner-Variante existiert auf bestehenden Installationen schon,
+    // deshalb ein eigener Marker, geschrieben erst nach erfolgreichem Abgleich.
+    $domainMedia = App\Architektur::domainRootMedia();
+    $domainMarker = App\Config::storage('cache') . '/architektur-domainroot-synced';
+    if ($domainMedia !== null && !is_file($domainMarker)) {
+        try {
+            App\Images::syncAll();
+            if (@file_put_contents($domainMarker, date('c')) === false) {
+                error_log('Marker für den Architektur-Webroot konnte nicht geschrieben werden.');
+            }
+        } catch (\Throwable $e) {
+            error_log('Abgleich der Bilder für den Architektur-Webroot fehlgeschlagen: ' . $e->getMessage());
+        }
+    }
+    unset($domainMedia, $domainMarker);
+}

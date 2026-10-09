@@ -176,15 +176,245 @@ Gleiche Umgebung wie beim Redesign (PHP 8.3.6 mit `php -S`, Chrome 148 headless 
 | „Alle ausgewählten Projekte übernehmen“: 8 fehlende Titelbilder ergänzt (13 Einträge), Schaltfläche danach nicht mehr vorhanden | keine Doppelungen |
 | `php -l` für alle geänderten PHP-Dateien, `node --check public/assets/js/site.js` | keine Fehler |
 
+## Flüssigere Bildfolge (05.10.2026)
+
+Umgebung: PHP 8.3.6 mit `php -S`, Chrome headless über das DevTools-Protokoll, die echten Fotografien aus dem Import (fünf Einträge, Wechselzeit 6 s). Anlass: Die Bewegung im Kopfbereich wirkte hakelig, feine Strukturen zeigten sichtbare Stufen. Befund: Die Bewegung lief zwar auf dem Compositor (`LayerTree`: 0 Neuzeichnungen in 3 s Standzeit), aber eine über Sekunden kriechende Vergrößerung bewegt die Bildkanten nur um Bruchteile eines Pixels pro Frame – beim Abtasten der Pixel entstehen dabei zwangsläufig sichtbare Stufen bzw. ein Kriechen feiner Strukturen. Dazu kamen: Richtungsumkehr beim Wechsel (ausgehendes Bild schrumpfte, eingehendes wuchs), Folgebilder wurden erst beim Einblenden dekodiert, und die Überblendung mit Ease-Kurve ließ die Helligkeit in der Mitte einbrechen. Lösung: Bewegung nur noch während der Überblendung (das neue Bild sinkt in 2,2 s mit Ease-out aus 1,03 in die Ruhelage), danach steht das Bild still.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Erstes Bild beim Laden: sinkt aus 1,03 ein (`1.0137` nach 0,4 s, `1.0012` nach 1,4 s) und steht ab ~2 s bei exakt 1,0 | kein Sprung, danach keine Bewegung |
+| Wechsel: ausgehende Folie erhält `is-leaving`, bleibt bei 1,0 und blendet linear aus; eingehende sinkt ein (1,0155 → 1,0062 → 1,0024 → 1,0008); Deckkraft beider Folien ergibt zu jedem Zeitpunkt ≈ 1 (0,799 + 0,200; 0,533 + 0,466; 0,255 + 0,744) | keine Richtungsumkehr, kein Helligkeitseinbruch |
+| Standzeit (4,5 s bis zum nächsten Wechsel): Skalierung konstant 1,0 | keine kriechende Bewegung mehr |
+| Nach der Überblendung: `is-leaving` entfernt, Folie unsichtbar auf 1,03 zurückgesetzt, `will-change` nur auf aktiver und ausgehender Folie | ok |
+| Folgebild wird vor dem Wechsel ins DOM genommen, `loading="lazy"` entfernt, `img.decode()` angestoßen; automatischer Wechsel erst, wenn das Bild geladen ist (Notbremse: eine Wechselzeit) | ok |
+| Strich-Klick, Pause/Fortsetzen (7 s ohne Wechsel, danach Wechsel nach 6,8 s), Fokus im Kopfbereich, `prefers-reduced-motion: reduce` (kein automatischer Wechsel über 8 s, Pause-Taste ausgeblendet) | wie zuvor |
+| Erreichbare Links im Kopfbereich in allen Zuständen | konstant 3 (Bild, Bildnachweis, „Arbeiten ansehen“) |
+| `node --check public/assets/js/site.js`, `php -l app/View.php` | keine Fehler |
+
+## Kleine Spielereien (Easter Eggs), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien; Admin-Schalter unter Einstellungen → „Kleine Spielereien“.
+
+| Prüfung | Ergebnis |
+|---|---|
+| `<body data-eggs>` enthält ohne gespeicherte Einstellung alle vier (`darkroom shutter autofocus lightleak`) | ok |
+| Admin: Dunkelkammer und Lichteinfall abgehakt und gespeichert → Flash „Einstellungen gespeichert.“, Kästchen bleiben aus, `data-eggs="shutter autofocus"`, Tippen von „dunkelkammer“ bleibt wirkungslos | ok |
+| Admin: Autofokus abgeschaltet → 404-Seite ohne Foto (`[data-af]` fehlt); alle wieder eingeschaltet → vollständige Liste | ok |
+| Dunkelkammer per Tippen: `html.is-darkroom.is-developing`, Hintergrund `rgb(20, 6, 6)`, Bildfilter startet bei `contrast(0) brightness(3.4)` (Papierweiß) und steht nach 4,8 s auf dem Endzustand (`is-developing` entfernt); Esc beendet | ok |
+| Dunkelkammer per Gedrückthalten des Logos (Maus 1,7 s; Touch 1,65 s auf iPhone-13-Emulation): `.brand.is-pressing` nach 0,6 s, Modus an, keine Navigation durch den anschließenden Klick | ok |
+| Logo-Farbe im Rotlicht: Filterkette per Canvas gegen `--ink` (#ff8471) abgeglichen, Abweichung 3 von 441 | ok |
+| Verschluss: zwei Klicks innerhalb 60 ms → `.shutter.is-playing` sichtbar, Seite bleibt; Standbilder bei 60/120/190 ms zeigen ein sauberes Sechseck ohne Nahtlinien (Lamellen-Variante; die erste Variante mit `polygon(evenodd)` zeigte eine Antialiasing-Naht); einzelner Klick navigiert nach 280 ms zur Startseite | ok |
+| Lichteinfall: am Seitenende der Projektübersicht `.light-leak.is-on`, nach 2,7 s beendet; erneutes Erreichen des Endes ohne 320 px Zurückscrollen löst nicht aus, danach wieder | ok |
+| Autofokus (Maus): Bild `blur(14px)`, beim Bewegen `is-tracking is-hunting` mit Rahmenposition, nach 420 ms Ruhe `is-focused`, Status „Scharf“, Rahmen `rgb(61, 220, 132)`, Filter `none`; Verlassen setzt zurück; Tastaturfokus stellt mittig scharf | ok |
+| Autofokus (Touch): erstes Antippen stellt scharf ohne Navigation, zweites Antippen folgt dem Link zur Galerie | ok |
+| `prefers-reduced-motion: reduce`: 404-Foto sofort scharf, Logo-Klick navigiert ohne Verzögerung (39 ms) | ok |
+| Auslösegeräusch (Web Audio, synthetisch): `AudioContext` im Test durch `OfflineAudioContext` ersetzt, Doppelklick gerendert – zwei Anschläge bei 150 ms und 250 ms (passend zu Schließen/Öffnen der Blende), Spitzenpegel 0,27 (kein Clipping), danach Stille; keine Fehler | ok |
+| Admin: „Verschluss mit Auslösegeräusch“ abgehakt → `data-eggs` ohne `shutter_sound`; wieder angehakt → enthalten | ok |
+| JavaScript-Konsole auf Startseite, Projektübersicht, 404 in allen Zuständen | keine Fehler außer dem erwarteten 404-Status der Fehlerseite |
+| `php -l` (Settings, View, Galleries, AdminController, Templates), Syntaxprüfung `site.js` | keine Fehler |
+
+### Nicht getestet (Spielereien)
+
+- Safari/Firefox (Lamellen-Blende, `scale`-Eigenschaft am Fokusrahmen, `mix-blend-mode: screen` des Filmkorns)
+- Echte Touchgeräte (Kontextmenü beim Gedrückthalten des Logos nur per `contextmenu`-Handler und `-webkit-touch-callout` unterbunden)
+- Klang des Auslösegeräuschs mit dem Ohr (nur Pegel und Zeitpunkte geprüft); Stummschaltung/Autoplay-Regeln auf iOS
+
+## Bildauswahl („Ausgewählte Fotografien“), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S` mit 4 importierten Galerien (35 Bilder); Migration 3 (`featured_images`) lief beim ersten Aufruf.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne Auswahl: Startseite ohne Abschnitt `.selection`; `/auswahl` 200 mit Hinweis „Derzeit sind keine Bilder ausgewählt.“ | ok |
+| Admin-Navigation „Bildauswahl“; Seite zeigt alle Bilder nach Galerie gruppiert (Pelmondo 17, Polar 1, Claas 3, YSL 14, „Weitere Bilder“ 1 = Porträt) | ok |
+| Picker: Schaltfläche anfangs deaktiviert; 3 Bilder anhaken + „Alle wählen“ in zweiter Gruppe → Zähler „4 Bilder angehakt.“, Gruppe bleibt geöffnet, Beschriftung wechselt zu „Keine wählen“; Absenden → Flash „4 Bilder in die Auswahl aufgenommen.“ | ok |
+| Bereits ausgewählte Bilder im Picker markiert und deaktiviert (kein Doppeleintrag) | ok |
+| Reihenfolge per Pfeil: Statusmeldung „Reihenfolge gespeichert.“, nach Neuladen vertauscht | ok |
+| „Aus Auswahl nehmen“ → Flash, Zahl sinkt | ok |
+| Darstellung: 4 Bilder für die Startseite, Einleitungstext → Markierung „Startseite“ an genau 4 Einträgen; Startseite zeigt 4 Bilder, Link „Alle 6 ansehen“; `/auswahl` zeigt alle 6 mit Einleitung | ok |
+| Bildformular: Kontrollkästchen spiegelt Auswahl, Abhaken + Speichern entfernt, Verwendung listet „Bildauswahl“ | ok |
+| Startseite: Abschnitt direkt nach dem Kopfbereich, Bildpfade unter `/media/…` (alle 200), Lightbox öffnet mit „1 / 4“ | ok |
+| `/auswahl`: Titel, Canonical, `og:image`; Sitemap enthält `/auswahl` nur bei nicht leerer Auswahl | ok |
+| Sichtbarkeit (PHP-Skript): Bild einer auf Entwurf gesetzten Galerie ist in der Auswahl öffentlich (`is_public=1`, Ordner unter `public/media` vorhanden), nach Entfernen aus der Auswahl privat (Ordner entfernt), nach Wiederaufnahme wieder öffentlich | ok |
+| JavaScript-Konsole (Admin und öffentlich) | keine Fehler |
+
+## Scroll-Hinweis im Kopfbereich (Schalter), 06.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`; Kopfbereich mit einem Bild (bildschirmhoch).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne gespeicherten Wert: Hinweis vorhanden (`.hero--hint`, Link „Scrollen“ → `#weiter`), mittig (x = 640 von 1280), 14 px über der Unterkante, keine Überlappung mit der Fußzeile des Kopfbereichs | ok |
+| Erscheint verzögert: Deckkraft 0 beim Laden, 1 nach 2,3 s; Punkt wandert (4 verschiedene Positionen in 2 s) | ok |
+| Scrollen um 200 px → Deckkraft 0, `visibility: hidden`; zurück nach oben → wieder sichtbar | ok |
+| Klick → scrollt weich auf 816 px = Unterkante des Kopfbereichs minus Kopfzeile (`scroll-margin-top`); erster Abschnitt liegt direkt unter der Kopfzeile | ok |
+| Erste Fassung mit `href="#inhalt"` kollidierte mit dem Sprunglink-Ziel `<main id="inhalt">` (Klick scrollte nach oben) → Anker heißt `#weiter` | behoben |
+| Telefon 390 px: mittig, keine Überlappung mit der Fußzeile (Reserve unten 4,25 rem; mit 3,25 rem überlappte es um 11 px) | ok |
+| „Bewegung reduzieren“: sofort sichtbar, Punkt steht still | ok |
+| Admin → Einstellungen „Startseite: Kopfbereich“: Häkchen standardmäßig gesetzt; abhaken + speichern → Hinweis fehlt, `.hero__text` hat wieder normales Padding (51 px), übrige Einstellungen (Projekt-Darstellung, Spielereien) unverändert; wieder anhaken → Hinweis da | ok |
+| JavaScript-Konsole | keine Fehler |
+
+## Kopfbereich: beliebige Bilder aus der Bibliothek, 06.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`, 36 Bilder in 4 Galerien, 1 Bild im Kopfbereich.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Admin → Startseite: Abschnitt „Bilder aus der Bibliothek …“ mit 5 Gruppen / 36 Bildern, 1 bereits im Kopfbereich (gesperrt, Häkchen), Schaltfläche anfangs deaktiviert, Verweis „automatisch“ vorgewählt | ok |
+| 2 Bilder aus Pelmondo und Polar anhaken → Zähler „2 Bilder angehakt.“, Absenden → Flash „2 Bilder in die Bildfolge aufgenommen.“, Liste hat 3 Einträge, Projektverweis automatisch „Pelmondo“ bzw. „Polar“ | ok |
+| Picker danach: 3 Bilder gesperrt; dasselbe Bild kann nicht erneut gewählt werden | ok |
+| Startseite: Bildfolge mit 3 Bildern, 3 Striche, Bildnachweise „Bild: Pelmondo / Pelmondo / Polar“ | ok |
+| Entfernen der beiden Einträge über die Bildfolge → „2 Bild(er) entfernt“, Bilder weiterhin vorhanden (`/admin/bilder/{id}` 200, da in Galerien) | ok |
+| Bildauswahl-Seite nach Umbau auf das gemeinsame Partial: 5 Gruppen, 6 gesperrte Bilder wie zuvor | ok |
+| JavaScript-Konsole | keine Fehler |
+
+## Darstellung der Projekte auf der Startseite (Schalter), 05.10.2026
+
+Headless Chrome 148 (Puppeteer) gegen `php -S`, 4 hervorgehobene Galerien, Bildauswahl mit 4 Bildern auf der Startseite.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne gespeicherten Wert: Startseite wie bisher (`.featured` ohne Modifikator, Rhythmus 1165/474/573/573 px), im Admin ist „Groß, im wechselnden Rhythmus“ vorgewählt | ok |
+| Admin → Einstellungen: Abschnitt „Startseite: Ausgewählte Projekte“ mit zwei Optionen samt Skizze; „Kompakte Übersicht“ wählen + speichern → Option bleibt gewählt, Spielereien-Häkchen unverändert | ok |
+| Kompakt, 1280 px: `.featured--compact`, 3 Spalten à 375 px, alle Kacheln 3:2 (auch Hochformat-Titelbilder), Haarlinie zur Bildauswahl darüber, `sizes` 30vw | ok |
+| Kompakt, 800 px: 2 Spalten à 358 px | ok |
+| Kompakt, 390 px: 2 Spalten à 169 px, Beschriftung untereinander | ok |
+| Zurück auf „Groß“: Startseite wieder exakt wie vorher | ok |
+| Ungültiger Wert wird nicht gespeichert (`Settings::homeProjectsLayout()` fällt auf „editorial“ zurück) | ok (Code) |
+| JavaScript-Konsole | keine Fehler |
+
+## HTTPS erzwingen (`.htaccess`), 05.10.2026
+
+Geprüft mit `curl -I` direkt gegen `lothar.drve.at` (Variante „ein Ordner“, Webroot-`.htaccess` = `deploy/webroot.htaccess`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `http://…/` → `301`, `Location: https://lothar.drve.at/` | ok |
+| Pfad und Query bleiben erhalten: `http://…/fotografie/pelmondo?x=1&y=2` → `https://…/fotografie/pelmondo?x=1&y=2`; kodierte Zeichen (`caf%C3%A9?q=a%20b`) unverändert | ok |
+| Assets: `http://…/assets/css/site.css?v=9` → `301` auf dieselbe https-Adresse | ok |
+| Unbekannter Pfad: `http://…/gibt-es-nicht` → `301` auf https, dort `404` | ok |
+| Gesperrte Pfade über http (`/config/config.php`, `/storage/database.sqlite`) → `404`, kein Inhalt | ok |
+| `/.well-known/acme-challenge/…` wird nicht umgeleitet (`404` über http) | ok |
+| Keine Schleife: `curl -IL http://…/fotografie?x=1` → genau 1 Umleitung, Ziel `200` | ok |
+| https unverändert: `/`, `/auswahl`, `/fotografie/pelmondo?x=1` → `200`; `/admin` → `302 /admin/login`; `/config/config.php`, `/storage/database.sqlite` → `404` | ok |
+| Variante mit Ziel aus `THE_REQUEST` verworfen: beim Hoster lieferte jede Anfrage mit Query `403` | — |
+
+## Architekturseite (07.10.2026)
+
+Geprüft in der Entwicklungsumgebung mit PHP 8.3.6 (`php -S`), Google Chrome (1440 px und 390 px per Viewport-Emulation) sowie `curl`. Datenbasis: lokal erzeugte Testgalerien mit synthetischen Fassadenbildern – zwei Galerien `architektur` (eine davon zusätzlich `fertigstellung`), je eine `immobilien` und `baudokumentation`, eine Galerie `people` (nicht im Umfang) und ein Entwurf. Nicht committet.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Unterordner-Modus (`-t public`, Aufruf `/architektur/…`): `/`, `/leistungen`, fünf Leistungsseiten, `/projekte`, Projektseiten, `/profil`, `/kontakt`, `/impressum`, `/sitemap.xml`, `/robots.txt`, durchgereichte Assets (`site.js`, `inter.woff2`) | alle 200; `/architektur` → 301 `/architektur/`; Links, Bilder und Sitemap mit Präfix `/architektur` |
+| Eigene-Domain-Modus (`-t public/architektur`): dieselben Pfade ohne Präfix | alle 200; Sitemap und Canonical mit Host der Anfrage (`http://127.0.0.1:8081/…`), ohne konfigurierte `base_url` |
+| Galerie außerhalb des Umfangs (`people`) per direkter URL; Entwurf ohne Anmeldung | 404 / 404; Entwurf mit Anmeldung als Vorschau (`noindex`) |
+| Öffentliche Bildordner nach `bin/reprocess-images.php`: `public/media` 29 Bildordner, `public/architektur/media` 26 | ok – Bilder der Galerie `people` und des Entwurfs fehlen im Ordner der Architekturseite |
+| Browser-Konsole auf Start-, Projekt- und Kontaktseite | keine Fehler, keine CSP-Verstöße |
+| Kategoriefilter `/projekte` → „Immobilien“ | Grid per fetch ersetzt, URL `?kategorie=immobilien`, nur Projekte der Kategorie |
+| Lightbox auf `/projekte/wohnbau-am-hang`: öffnen per Klick, schließen mit Escape | ok |
+| Kontaktformular: gültige Eingabe mit Fake-`sendmail` | 200, Erfolgsmeldung, Betreff „[Architekturfotografie] Anfrage von …“, Herkunft „Kontaktformular der Architekturseite“; ohne `sendmail` 500 mit Hinweis auf die E-Mail-Adresse (wie Hauptseite) |
+| 404-Seite im dunklen Layout | ok |
+| 390 px: Start und `/projekte` – Wortmarke oben, Navigation darunter umbrechend (wie Hauptseite, kein Burger-Menü), kein horizontaler Überlauf | ok |
+| Admin: Dashboard-Abschnitt „Architekturseite“ (Anzahl Projekte im Umfang, Kategorien mit Zählern), Einstellungen → Gruppe „Architekturfotografie“ mit Platzhaltern | ok |
+| `php -l` für alle geänderten und neuen PHP-Dateien | keine Fehler |
+| `php bin/build-release.php` in beiden Varianten: `htdocs/architektur/` mit `index.php`, `.htaccess`, `assets/`, leerem `media/` (nur `.htaccess`, `index.html`); `config.php` mit Abschnitt `'architektur'` und passendem `public_media`; LIES-MICH mit Abschnitt „ARCHITEKTURSEITE“ | ok |
+
+### Apache (07.10.2026)
+
+Anlass: Auf `lothar.drve.at` (Variante „ein Ordner“) war `/architektur` nicht erreichbar – die Dateien lagen dort noch nicht (die reine Datei `architektur/assets/css/architektur.css` kam als HTML-404 der Hauptseite zurück). Beim Nachstellen unter echtem Apache 2.4 (`AllowOverride All`, `mod_rewrite`, `mod_headers`, mod_php) mit den Paketen aus `bin/build-release.php --with-content` zeigte sich zusätzlich ein Fehler, der nach dem Upload aufgetreten wäre: In der Variante „ein Ordner“ schreibt Apache intern auf `/public/architektur/index.php` um, `SCRIPT_NAME` lautet entsprechend (nachgemessen: `/public/architektur/sn.php` bei Anfrage `/architektur/sn.php`); die Basis-Pfad-Erkennung ergab `/public/architektur` → alle Routen 404. Behoben durch Abgleich mit dem angefragten Pfad (`Site::detectBasePath()`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Variante „ein Ordner“ (Document Root = Projektordner, `deploy/webroot.htaccess`): `/architektur/`, Leistungen, Projekte, Kontakt, Impressum, Sitemap, robots, eigenes CSS, durchgereichte `site.js`/`inter.woff2`, Bildvarianten aus `architektur/media` | alle 200, Links und Sitemap mit Präfix `/architektur`; Hauptseite weiterhin 200 |
+| `/architektur` ohne Schrägstrich (ein Ordner) | 301 → `/architektur/` (vorher hätte Apache nach `/public/architektur/` umgeleitet; eigene Regel in `webroot.htaccess`) |
+| `/public/architektur/`, `/public/architektur/index.php`, `/architektur/.htaccess`, `/config/config.php` | 404 / 404 / 404 / 403 |
+| Galerie außerhalb des Umfangs, unbekannte Seite | 404 (dunkle Fehlerseite) |
+| Variante „getrennt“ (Document Root = `htdocs`): dieselben Pfade | alle 200; `/architektur` → 301 `/architektur/`; `.htaccess`-Dateien 403 |
+| Eigene Domain (Document Root = `public/architektur`, `base_url` gesetzt): `/`, Leistungen, Projekt, Assets, Bilder, Sitemap mit Host der eigenen Domain; `/index.php` 404 | ok |
+| Canonical-Redirect: `/architektur/leistungen?x=1` über die Hauptdomain | 301 → `https://EIGENE-DOMAIN/leistungen?x=1`; eigenes CSS unter der Hauptdomain weiterhin 200 (Vergleich über Host und Port) |
+| Update einer bestehenden Installation: `config.php` **ohne** Abschnitt `'architektur'`, leerer Ordner `architektur/media`, kein Marker | erster Aufruf 200, `architektur/media` automatisch mit 26 Bildordnern befüllt, Marker `storage/cache/architektur-synced` geschrieben, Bild-URL 200 `image/jpeg` |
+
+### Live auf `lothar.drve.at` (07.10.2026)
+
+Der Server lief mit dem Stand von PR #5 (`cursor/hero-smooth-animation-caa3`), der nicht in `main` war; dieser Stand wurde vor dem Upload in den Branch gemergt, damit kein Rückschritt entsteht (Dry-Run von `tools/deploy-ftp.py` zeigte vorher 58 abweichende Dateien, danach genau die 41 der Architekturseite). Upload per `tools/deploy-ftp.py deploy` (41 Dateien, 580 Datenverbindungsversuche für 76 Transfers – NAT-Pool), alle Größen verifiziert.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Hauptseite `/`, `/fotografie`, `/auswahl`, `/vita`, `/kontakt`, `/impressum`, `/datenschutz`, `/agb`, Sitemap (72 URLs) | alle 200, Titel korrekt, keine PHP-Fehlermeldungen |
+| `/architektur` → 301 `/architektur/`; Start, Leistungen (5), Projekte, Profil, Kontakt, Impressum, Datenschutz, Sitemap, robots, eigenes CSS, `site.js`, `inter.woff2`, Favicon | alle 200 |
+| Erstabgleich der Bilder: Kategorie `architektur` existierte bereits aus dem Import (9 Galerien) – `public/architektur/media/` wurde beim ersten Aufruf automatisch befüllt, Bild-URL 200 `image/jpeg` | ok |
+| Galerie außerhalb des Umfangs (`/architektur/projekte/pelmondo`), unbekannte Seite | 404 |
+| `/app/bootstrap.php`, `/storage/database.sqlite`, `/config/config.php`, `/.htaccess`, `/architektur/.htaccess`, `/architektur/media/.htaccess`, `/templates/architektur/layout.php` | 404 |
+| `http://…/architektur/leistungen` | 301 → https |
+| Screenshot der Live-Startseite: Headline vor hellem Produktfoto (Galerie „ETA“) schwer lesbar → Abdunkelung im Kopfbereich verstärkt (Verlauf von unten und links, Textschatten), Asset-Version 13, nachgeliefert | behoben |
+
+Nicht geprüft: PHP-FPM-Variante nur über den Live-Server (dort funktioniert die Basis-Pfad-Erkennung), Kontaktformular live (kein Testversand an den echten Empfänger).
+
+## Architekturseite: Redesign „Plan und Bau“ (07.10.2026)
+
+Rot (`#c8553d`), Barlow Condensed, ausdrucksstarke Bewegung, automatische Projektvorschauen im Leistungsindex. Geprüft lokal mit Testbildern in beiden Betriebsarten (eigene Domain `:8081`, Unterordner `:8080/architektur/`), Screenshots per Chrome-DevTools-Protokoll an gescrollten Positionen (1440×900, 1024×768, 768×1024, 390×844).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `php -l` aller geänderten PHP-Dateien und Templates | keine Fehler |
+| Alle Routen (Start, Leistungen, 5 Leistungsseiten, Projekte, Filter, 3 Projektseiten, Profil, Kontakt, Impressum, 404) in beiden Betriebsarten | 200 bzw. 404, keine PHP-Warnungen in der Ausgabe |
+| `architektur.js`, `barlow-condensed-300/500.woff2` (eigene Dateien), `inter.woff2` (durchgereicht) | 200 in beiden Betriebsarten |
+| Kopfbild: Titel zweizeilig (zweites Wort Kontur mit schwacher dunkler Füllung), Plankopf rechts mit Projekt/Kategorie · Jahr/Blatt, Fortschrittslinie rot, Kopfzeile oben transparent mit Verlauf, nach Scrollen schmal und opak | ok |
+| Leitsatz mit Umrisszahl 01 und Kennzahlen (Leistungen, Projekte, Maßstab) | ok |
+| Leistungsindex: Zeile 01 aktiv (rote Ziffer, rote Linie), Vorschaubild rechts haftend mit Planrahmen und Bildunterschrift; Vorschauen je Leistung aus der passenden Kategorie, keine Dopplung bei vier Projekten | ok |
+| Blattraster 1 groß → 2 mittel (versetzt) → 3 klein; Einblenden per `clip-path` – anfangs nicht ausgelöst, weil Chrome ein per `clip-path` unsichtbares Element im IntersectionObserver als nicht sichtbar wertet → Beschnitt auf die Kinder verlegt | behoben |
+| Projektübersicht: haftender Index mit Zählern (Alle 04, Architektur 02, …), Filter per fetch tauscht das Blattraster | ok |
+| Projektseite: Blatt 03 / 04, Plankopf haftet neben der Bildstrecke, Ansichten nummeriert, Nachbarstreifen mit abgedunkelten Titelbildern | ok |
+| Leistungen: Umrisszahl je Blatt, Referenzbild haftend rechts; Leistungsseite: Titel über abgedunkeltem Referenzbild, Kicker ohne doppelten Strich | ok |
+| Mobil (390): Plankopf unter dem Text, Index ohne Vorschau mit Thumbnails (ab 480 px), lange Komposita getrennt (`hyphens`), Fußzeile einspaltig | ok |
+| Fußzeile als Legende: Blatt, Stand, Maßstab, Urheber; Name in Barlow (Spezifität gegen `.site-footer p` korrigiert) | ok |
+
+Nicht geprüft: Safari (`-webkit-text-stroke`, `:has()` für die Fortschrittslinie – in aktuellen Versionen unterstützt), echte Touchgeräte.
+
+### Live-Prüfung nach dem Deploy (07.10.2026, lothar.drve.at)
+
+`tools/deploy-ftp.py deploy`: 24 Dateien hochgeladen (Schriften, `architektur.js`, CSS, Templates, Controller, Doku), 103 unverändert, nichts gelöscht, alle Größen verifiziert. Danach per curl: alle Routen der Architekturseite 200 (`/architektur/`, Leistungen, 5 Leistungsseiten, Projekte, Projektseiten, Profil, Kontakt, Impressum, Datenschutz), unbekannte Pfade 404 mit eigener Fehlerseite, keine PHP-Fehlertexte; `architektur.css?v=14` 62 162 B `text/css`, `architektur.js` `application/javascript`, beide woff2 `font/woff2`; Hauptseite, Impressum, Datenschutz unverändert 200; `/app/`, `/storage/`, `/.htaccess`, `/app/View.php`, `/storage/database.sqlite` 404. Screenshots mit den echten Fotografien (Chrome headless, 1440×900 und 390×844): Kopfbild, Leistungsindex, Blattraster, Projektseite, Leistungsseite, Kontakt.
+
+| Befund live | Ergebnis |
+|---|---|
+| Blattraster, Reihe mit drei kleinen Blättern: Bei „Angerhofer“ (Kategorien „People, Architektur, Industrie“) brach der Titel buchstabenweise um. Ursache: `.card__text` als Grid `auto 1fr auto` – die `auto`-Spalte der Kategorien nahm ihre volle Breite, der Titel (`overflow-wrap: anywhere`) schrumpfte auf Zeichenbreite. Lösung: `.card__text` als Flex mit Umbruch; passt die Kategoriezeile nicht neben den Titel, rutscht sie rechtsbündig in die nächste Zeile (mobil weiterhin linksbündig darunter). Geprüft gegen die Live-Seite mit eingespieltem lokalem CSS (1440 und 390). Asset-Version 15. | behoben |
+
+## Architekturseite: Bildfolge im Kopfbereich gezielt wählen (07.10.2026)
+
+Neue Admin-Seite `/admin/architektur`; Tabelle `hero_slides` um Spalte `site` erweitert (Migration 4, Bestand → `'main'`). Geprüft lokal mit `php -S` (Testbilder, 6 Galerien, davon 5 im Umfang, 1 Entwurf) per curl mit Sitzungs-Cookie und CSRF-Token sowie Chrome headless (Screenshots der Admin-Seite).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Migration 4 beim ersten Aufruf: `schema_version` 3 → 4, Spalte `site TEXT NOT NULL DEFAULT 'main'`, Index; Startseite und Architekturseite danach unverändert (automatische Folge, 3 Bilder) | ok |
+| Admin-Seite ohne eigene Auswahl: Hinweis „Zurzeit automatisch“, Liste der automatischen Titelbilder, Schaltfläche „Diese Auswahl übernehmen und bearbeiten“ | ok |
+| `slides_automatic`: 3 Einträge mit `site='architektur'` und Projektverweis angelegt, Hauptseiten-Folge unberührt | ok |
+| Bildwähler: Galerien im Umfang zuerst (auch der Entwurf), dann übrige, Zähler „1 im Kopfbereich“; `slide_pick` mit „automatisch“ setzt Verweis auf die Galerie im Umfang (Penthouse → Immobilien); Bild aus einer Galerie außerhalb des Umfangs (Jazzfestival) wird ohne Verweis aufgenommen und in `public/architektur/media/` synchronisiert | ok |
+| Startseite mit 5 eigenen Bildern: 4 verlinkte Folien, 1 Folie ohne Link (`<span class="hero__link">`), Plankopf zeigt dafür „Motiv“ mit Alternativtext; `data-hero-interval` 7000 (Konfiguration) | ok |
+| `slides`: Reihenfolge umgekehrt, ein Eintrag entfernt, Verweis auf 0 gesetzt, Verweis auf Galerie außerhalb des Umfangs (Jazzfestival) → wird verworfen (kein Verweis); Wechselzeit 10 s → Einstellung `architektur_hero_interval`, Startseite liefert 10000 ms; Hauptseite unverändert | ok |
+| Entferntes Bild bleibt erhalten (liegt in einer Galerie), verschwindet aber aus `public/architektur/media/` und bleibt in `public/media/` | ok |
+| Bildseite `/admin/bilder/<id>` listet „Bildfolge Architekturseite“ als Verwendung; Dashboard zeigt „4 eigene Bilder in der Bildfolge“ bzw. „automatisch“ | ok |
+| `slides_reset`: alle eigenen Einträge entfernt, keine Bilder gelöscht (alle anderweitig verwendet), Startseite wieder automatisch (3 Bilder) | ok |
+| `php -l` aller geänderten Dateien; Navigationseintrag nur bei `architektur.enabled` | ok |
+
+## Architektur-Webroot direkt im Webroot (09.10.2026)
+
+World4You weist eine Domain nur einem Ordner direkt im Webroot zu. `public/architektur` liegt eine Ebene zu tief. Die Variante „ein Ordner“ legt deshalb zusätzlich `architektur/` neben `public/` an (dieselbe `index.php`, erkennt die Lage selbst). Bilder werden in beide `media/`-Ordner abgeglichen (Marker `architektur-domainroot-synced`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| `php -S` mit Document Root = `architektur/` neben `public/`: Startseite 200, eigenes CSS als Datei, `site.js` und eine Schrift aus `public/assets` durchgereicht, Favicon 200, keine PHP-Fehler, Links ohne Präfix `/architektur` | ok |
+| Unterordner `/architektur/` und Hauptseite danach unverändert 200 | ok |
+
 ## Nicht getestet
 
+- HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft
 - Wirkung von `.user.ini` unter PHP-FPM (auf `lothar.drve.at` nicht geprüft)
 - Bildfolge mit den echten Fotografien (nur neutrale Testbilder), Wischen auf echten Touchgeräten
 - Ladezeiten der Bildfolge (nur geprüft, dass Folgebilder erst bei Bedarf im DOM landen; keine Messwerte)
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)
-- HTTPS (Secure-Cookie-Flag nur im Code, nicht im Betrieb geprüft)
+- Secure-Cookie-Flag unter HTTPS (nur im Code, nicht im Betrieb geprüft)
 - Safari/Firefox, iOS/Android auf echten Geräten (nur Chrome, davon mobile Größe per Viewport-Emulation)
 - Wirkung des Redesigns mit den echten Fotografien (lokal standen nur neutrale Testbilder zur Verfügung)
 - Ladezeiten, Core Web Vitals oder sonstige Performancewerte (nicht gemessen)

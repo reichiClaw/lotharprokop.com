@@ -16,6 +16,7 @@ use App\Images;
   <a class="a-stat" href="/admin/galerien?status=archived"><strong><?= $counts['archived'] ?></strong><span>archiviert</span></a>
   <a class="a-stat" href="/admin/galerien"><strong><?= $counts['images'] ?></strong><span>Bilder</span></a>
   <a class="a-stat" href="/admin/filme"><strong><?= $counts['films'] ?></strong><span>Filme online</span></a>
+  <a class="a-stat" href="/admin/auswahl"><strong><?= $counts['selection'] ?></strong><span>Bilder in der Auswahl</span></a>
 </div>
 
 <div class="a-grid-2">
@@ -46,3 +47,27 @@ use App\Images;
     <?php endif; ?>
   </section>
 </div>
+
+<?php if (App\Architektur::enabled()):
+    $archSlugs = App\Architektur::categorySlugs();
+    $archCats = App\Architektur::allCategories();
+    $archMissing = array_diff($archSlugs, array_column($archCats, 'slug'));
+    $archProjects = App\Architektur::galleries();
+    $archUrl = App\Architektur::baseUrl() !== '' ? App\Architektur::baseUrl() : '/' . App\Architektur::DIR . '/';
+?>
+<section>
+  <h2 class="a-subtitle">Architekturseite</h2>
+  <p class="a-help">
+    <strong><?= count($archProjects) ?></strong> <?= count($archProjects) === 1 ? 'veröffentlichtes Projekt' : 'veröffentlichte Projekte' ?> im Umfang der Architekturseite –
+    <a href="<?= e($archUrl) ?>" rel="noopener" target="_blank">Seite ansehen</a>.
+    Dazu zählt jede Galerie mit einer dieser Kategorien:
+    <?php foreach ($archCats as $i => $c): ?><a href="/admin/galerien"><?= e($c['name']) ?></a> (<?= (int) $c['published_count'] ?>)<?= $i < count($archCats) - 1 ? ', ' : '' ?><?php endforeach; ?><?= $archCats === [] ? '—' : '' ?>.
+    <?php if ($archMissing !== []): ?>
+    <br>Noch nicht angelegt (Konfiguration <code>architektur.categories</code>): <code><?= implode('</code>, <code>', array_map('e', $archMissing)) ?></code> – unter <a href="/admin/kategorien">Kategorien</a> mit genau diesem Slug anlegen oder die Konfiguration anpassen.
+    <?php endif; ?>
+    Texte: <a href="/admin/einstellungen">Einstellungen → Architekturfotografie</a>.
+    <?php $archSlides = App\HeroSlides::count(App\Architektur::KEY); ?>
+    <br>Kopfbereich: <?= $archSlides > 0 ? '<strong>' . $archSlides . '</strong> eigene ' . ($archSlides === 1 ? 'Bild' : 'Bilder') . ' in der Bildfolge' : 'automatisch (Titelbilder der hervorgehobenen Projekte)' ?> – <a href="/admin/architektur">Bildfolge bearbeiten</a>.
+  </p>
+</section>
+<?php endif; ?>

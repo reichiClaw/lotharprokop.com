@@ -1,0 +1,48 @@
+# Apache-Konfiguration für das Webroot der Architekturseite (public/architektur).
+# Gilt sowohl als Unterordner der Hauptdomain (…/architektur/…) als auch als Document Root
+# einer eigenen Domain. Die Regeln der übergeordneten .htaccess werden dafür hier wiederholt.
+
+Options -Indexes -MultiViews
+DirectoryIndex index.php
+
+# Versteckte Dateien (.htaccess …) niemals ausliefern.
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Immer HTTPS (wie public/.htaccess; Regeln der übergeordneten .htaccess gelten hier nicht).
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+  # Direktzugriff über /public/… (wenn der Projektordner selbst das Webroot ist) nicht anbieten;
+  # interne Weiterleitungen aus der übergeordneten .htaccess (REDIRECT_STATUS gesetzt) sind ausgenommen.
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} ^/public(/|$)
+  RewriteRule ^ - [R=404,L]
+  # Vorhandene Dateien (eigenes CSS, Bildvarianten in media/) direkt ausliefern, alles andere –
+  # auch gemeinsame Assets wie assets/js/site.js und Schriften – an den Front-Controller.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(webp|jpg|jpeg|png|woff2|css|js)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.(css|js)$">
+    Header set Cache-Control "public, max-age=604800"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType image/webp .webp
+  AddType font/woff2 .woff2
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

@@ -66,10 +66,51 @@ final class Galleries
         return self::withRelations(array_map([self::class, 'hydrate'], $stmt->fetchAll()));
     }
 
+    /**
+     * Veröffentlichte Galerien, die mindestens eine der angegebenen Kategorien tragen (Umfang eines
+     * Auftritts), optional zusätzlich auf eine Kategorie eingeschränkt oder nur hervorgehobene.
+     * @param int[] $scopeCategoryIds
+     */
+    public static function publishedInCategories(array $scopeCategoryIds, ?int $categoryId = null, bool $featuredOnly = false): array
+    {
+        $scopeCategoryIds = array_values(array_unique(array_map('intval', $scopeCategoryIds)));
+        if ($scopeCategoryIds === []) {
+            return [];
+        }
+        $in = implode(',', array_fill(0, count($scopeCategoryIds), '?'));
+        $sql = "SELECT g.* FROM galleries g WHERE g.status = 'published'
+                AND EXISTS (SELECT 1 FROM gallery_categories gc WHERE gc.gallery_id = g.id AND gc.category_id IN ($in))";
+        $params = $scopeCategoryIds;
+        if ($categoryId !== null) {
+            $sql .= ' AND EXISTS (SELECT 1 FROM gallery_categories gc WHERE gc.gallery_id = g.id AND gc.category_id = ?)';
+            $params[] = $categoryId;
+        }
+        if ($featuredOnly) {
+            $sql .= ' AND g.featured = 1 ORDER BY g.featured_order, g.sort_order, g.id';
+        } else {
+            $sql .= ' ORDER BY g.sort_order, g.id';
+        }
+        $stmt = Database::pdo()->prepare($sql);
+        $stmt->execute($params);
+        return self::withRelations(array_map([self::class, 'hydrate'], $stmt->fetchAll()));
+    }
+
     public static function featured(): array
     {
         $rows = Database::pdo()->query("SELECT * FROM galleries WHERE status = 'published' AND featured = 1 ORDER BY featured_order, sort_order, id")->fetchAll();
         return self::withRelations(array_map([self::class, 'hydrate'], $rows));
+    }
+
+    /** Eine zufällige veröffentlichte Galerie mit Titelbild (z. B. für die 404-Seite), sonst null. */
+    public static function randomWithCover(): ?array
+    {
+        $rows = Database::pdo()->query("SELECT * FROM galleries WHERE status = 'published' ORDER BY RANDOM() LIMIT 6")->fetchAll();
+        foreach (self::withRelations(array_map([self::class, 'hydrate'], $rows)) as $g) {
+            if (!empty($g['cover']) && ($g['cover']['variants'] ?? []) !== []) {
+                return $g;
+            }
+        }
+        return null;
     }
 
     /** Alle Galerien für den Adminbereich. */
@@ -149,10 +190,13 @@ final class Galleries
         return array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
     }
 
-    /** Vorherige/nächste veröffentlichte Galerie (zyklisch). */
-    public static function neighbours(array $gallery): array
+    /**
+     * Vorherige/nächste veröffentlichte Galerie (zyklisch).
+     * @param array|null $within Liste, innerhalb derer geblättert wird (Standard: alle veröffentlichten)
+     */
+    public static function neighbours(array $gallery, ?array $within = null): array
     {
-        $all = self::published();
+        $all = $within ?? self::published();
         $index = null;
         foreach ($all as $i => $g) {
             if ($g['id'] === $gallery['id']) {

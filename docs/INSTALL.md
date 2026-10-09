@@ -11,7 +11,7 @@
   - `exif` – empfohlen (Ausrichtung mit GD; Imagick liest sie selbst)
   - `zip` – nur für `bin/backup.php`
 - Webserver mit Document Root auf `public/` bzw. dem Inhalt von `public/` (Apache mit `mod_rewrite` und `AllowOverride All`, alternativ nginx, siehe unten); Shell-Zugang ist **nicht** erforderlich
-- Schreibrechte des PHP-Prozesses auf `storage/` und `public/media/`
+- Schreibrechte des PHP-Prozesses auf `storage/`, `public/media/` und `public/architektur/media/`
 - Empfohlene PHP-Einstellungen: `upload_max_filesize` ≥ 40M, `post_max_size` ≥ 48M, `memory_limit` ≥ 256M (mit GD bei sehr großen Bildern 512M), `max_execution_time` ≥ 120
 
 Kein Node, kein Composer, kein Build-Schritt. Das Repository wird so ausgeliefert, wie es ist.
@@ -29,9 +29,13 @@ public/       EINZIGES öffentliches Verzeichnis (Document Root)
   index.php   Front-Controller
   check.php   Server-Check (Voraussetzungen prüfen; nach der Installation löschen)
   app-path.example.php  Vorlage für app-path.php (Pfad zum Anwendungsordner bei FTP-Hosting)
-  .htaccess / .user.ini  Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
+  .htaccess / .user.ini  HTTPS-Umleitung, Rewrite-Regeln, Schutz versteckter Dateien, PHP-Limits
   assets/     CSS, JS, Schriften, Logo
+  dokumente/  rechtliche PDFs (AGB, Rücktrittsrecht), verlinkt auf /agb
   media/      veröffentlichte Bildvarianten (werden automatisch verwaltet)
+  architektur/  zweites Webroot der Architekturseite (docs/ARCHITEKTUR.md):
+    index.php   Front-Controller, .htaccess, assets/css/architektur.css,
+    media/      eigene Bildvarianten (nur Projekte im Umfang der Architekturseite)
 storage/      privat: database.sqlite, originals/, derivatives/, sessions/, logs/, backups/, cache/
 templates/    HTML-Templates (öffentlich und Admin)
 dist/         Ausgabe von bin/build-release.php (nicht im Repository)
@@ -92,7 +96,7 @@ Hat der Hoster kein Verzeichnis oberhalb des Webroots (nur FTP-Zugang direkt ins
 
 Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot liegen darf. Erfordert Apache mit `mod_rewrite` und aktivem `.htaccess` (`AllowOverride All` bzw. mindestens `FileInfo Options Limit`).
 
-1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
+1. Paket mit `php bin/build-release.php --layout=single …` bauen. `dist/release/htdocs/` enthält dann den gesamten Projektordner mit einer zusätzlichen `.htaccess` im Webroot (Vorlage: `deploy/webroot.htaccess`), die http-Aufrufe auf https umleitet, alle Anfragen nach `public/` leitet und `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/`, `docs/` sowie alle versteckten Dateien mit 404 beantwortet.
 2. Gesamten Inhalt von `htdocs/` inklusive versteckter Dateien in das Webroot laden.
 3. **Pflichtprüfung** nach dem Upload: `https://DOMAIN/config/config.php` und `https://DOMAIN/storage/database.sqlite` müssen `403` oder `404` liefern. Erscheint stattdessen Inhalt oder ein Download, ist `.htaccess` nicht aktiv – dann sofort die Dateien entfernen und Variante A verwenden.
 4. Weiter wie Variante A ab Schritt 3 (`/check.php` aufrufen und danach `public/check.php` löschen, `/admin/setup`, System-Seite).
@@ -152,7 +156,16 @@ Wird per FTP ein neuer `storage/`-Stand eingespielt (z. B. Backup), lässt sich 
 
 ### Updates per FTP
 
-Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inhalt des Webroots (ohne `media/`, ohne `app-path.php`) überschreiben. `config/config.php`, `storage/` und `media/` bleiben unverändert. Datenbankänderungen werden beim ersten Aufruf automatisch angewendet (idempotente Migrationen).
+Neue Programmversion: `app/`, `templates/`, `bin/`, `data/`, `docs/` und den Inhalt des Webroots (ohne `media/`, ohne `app-path.php`) überschreiben – bei Variante „ein Ordner“ auch die `.htaccess` im Webroot aus `deploy/webroot.htaccess`. `config/config.php`, `storage/` und `media/` bleiben unverändert. Datenbankänderungen werden beim ersten Aufruf automatisch angewendet (idempotente Migrationen). Für die Architekturseite (`public/architektur/`, inklusive ihrer versteckten Dateien) siehe [ARCHITEKTUR.md](ARCHITEKTUR.md).
+
+Automatisiert (Python 3, nur Standardbibliothek): `tools/deploy-ftp.py` vergleicht das gebaute Release-Paket (`dist/release/htdocs`) per FTPS mit dem Server und lädt nur Unterschiede hoch – gleich große Dateien per SHA-256 verglichen, `config.php`, `storage/` und die Bildordner nie geschrieben, nichts gelöscht, statische Dateien vor PHP, jede Datei über `<name>.uploading~` und anschließende Umbenennung, Größen danach geprüft. Zugangsdaten über die Umgebungsvariablen `lotharprokop_FTP_HOST/USER/PASS`. Das Werkzeug ist auf Pure-FTPd bei World4You abgestimmt (nur explizites FTPS, TLS 1.2, Passiv-Modus) und kommt mit Netzen zurecht, die über einen Pool wechselnder öffentlicher IP-Adressen ins Internet gehen (Datenverbindung wird so lange neu aufgebaut, bis der Server sie annimmt – gewöhnliche FTP-Clients bleiben dort hängen und blockieren nach acht Sitzungen den Zugang für etwa 15 Minuten).
+
+```bash
+php bin/build-release.php --layout=single --base-url=https://DOMAIN
+python3 tools/deploy-ftp.py diff              # nur vergleichen
+python3 tools/deploy-ftp.py deploy --dry-run  # zeigen, was hochgeladen würde
+python3 tools/deploy-ftp.py deploy            # hochladen und prüfen
+```
 
 ### Apache
 
@@ -190,23 +203,29 @@ cp config/config.example.php config/config.php   # base_url auf http://localhost
 php -S 127.0.0.1:8080 -t public public/index.php
 ```
 
+Die Architekturseite ist damit unter `http://127.0.0.1:8080/architektur/` erreichbar; die Variante mit eigener Domain lässt sich mit `php -S 127.0.0.1:8081 -t public/architektur public/architektur/index.php` nachstellen (siehe [ARCHITEKTUR.md](ARCHITEKTUR.md)).
+
 ## Inhalte pflegen
 
 Alles Redaktionelle läuft über `/admin` (Login erforderlich). Ohne JavaScript funktionieren alle Funktionen über normale Formulare; mit JavaScript kommen Drag-and-drop, Upload-Fortschritt und Speichern ohne Seitenwechsel hinzu.
 
 **Galerien** – anlegen, bearbeiten, sortieren (Drag-and-drop oder Pfeile), Status `Entwurf` / `Veröffentlicht` / `Archiviert`, Löschen nur nach Eingabe des Slugs. Pro Galerie: Titel, URL-Slug (wird aus dem Titel vorgeschlagen; reservierte Wörter und Doppelungen werden abgefangen), Beschreibung, Kunde/Jahr/Credits (optional), Kategorien, Titelbild, Layout (`Ruhiges Raster` / `Einzelspalte` / `Editorial`), Startseite (hervorheben).
 
-**Bilder** – Mehrfachupload per Drag-and-drop oder Dateidialog (JPEG, PNG, WebP; bis 40 MB und 100 Megapixel; Prüfung des echten Dateityps; SVG und ausführbare Dateien werden abgelehnt). Pro Bild: Alt-Text, Bildunterschrift, Fokuspunkt (Klick ins Bild) für Zuschnitte auf Startseite/Übersicht, Ersetzen (neue Datei, Metadaten bleiben), Löschen mit Bestätigung. Wird ein Bild an mehreren Stellen genutzt (mehrere Galerien, Bildfolge der Startseite, Porträt, Filmposter), zeigt die Bildseite alle Verwendungen an und verlangt eine ausdrückliche Zusatzbestätigung.
+**Bilder** – Mehrfachupload per Drag-and-drop oder Dateidialog (JPEG, PNG, WebP; bis 40 MB und 100 Megapixel; Prüfung des echten Dateityps; SVG und ausführbare Dateien werden abgelehnt). Pro Bild: Alt-Text, Bildunterschrift, Fokuspunkt (Klick ins Bild) für Zuschnitte auf Startseite/Übersicht, Ersetzen (neue Datei, Metadaten bleiben), Löschen mit Bestätigung. Wird ein Bild an mehreren Stellen genutzt (mehrere Galerien, Bildfolge der Startseite oder der Architekturseite, Porträt, Filmposter), zeigt die Bildseite alle Verwendungen an und verlangt eine ausdrückliche Zusatzbestätigung.
 
 **Entwürfe** sind öffentlich nicht erreichbar (404, nicht in Sitemap/Übersicht), ihre Bildvarianten liegen nicht in `public/media/`. Eingeloggt lässt sich ein Entwurf unter seiner späteren URL als Vorschau ansehen (Banner „Vorschau“, `noindex`).
 
-**Startseite** – Reihenfolge der hervorgehobenen Projekte sowie die Bildfolge im Kopfbereich: mehrere Bilder in frei sortierbarer Reihenfolge, je Bild optional das verknüpfte Projekt (macht das Bild anklickbar und erscheint als Bildnachweis), Wechselzeit in Sekunden. Bilder lassen sich einzeln hochladen, als Titelbild eines Projekts übernehmen oder in einem Schritt aus allen hervorgehobenen Projekten übernehmen. Bei einem einzelnen Bild wechselt nichts – der Kopfbereich verhält sich wie ein festes Startbild; ohne JavaScript zeigt er immer das erste Bild.
+**Startseite** – Reihenfolge der hervorgehobenen Projekte sowie die Bildfolge im Kopfbereich: mehrere Bilder in frei sortierbarer Reihenfolge, je Bild optional das verknüpfte Projekt (macht das Bild anklickbar und erscheint als Bildnachweis), Wechselzeit in Sekunden. Bilder lassen sich aus der gesamten Bibliothek wählen (Bildwähler nach Galerie gruppiert, Mehrfachauswahl; der Projektverweis wird auf Wunsch automatisch aus der Galerie des Bildes gesetzt), einzeln hochladen, als Titelbild eines Projekts übernehmen oder in einem Schritt aus allen hervorgehobenen Projekten übernehmen. Ein Bild, das aus dem Kopfbereich entfernt wird, bleibt erhalten, solange es anderswo verwendet wird. Bei einem einzelnen Bild wechselt nichts – der Kopfbereich verhält sich wie ein festes Startbild; ohne JavaScript zeigt er immer das erste Bild.
 
 **Kategorien** – anlegen, umbenennen, sortieren, löschen (Galerien bleiben erhalten). Doppelte Namen werden abgewiesen.
 
 **Filme** – Titel, Anbieter (YouTube / Vimeo), Video-ID oder -URL, Poster (eigenes Bild), Beschreibung, Status. Videos werden erst nach Klick geladen (youtube-nocookie bzw. Vimeo mit `dnt=1`).
 
-**Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte.
+**Architekturseite** – Bildfolge im Kopfbereich der Architektur-Startseite gezielt zusammenstellen: Bilder aus der gesamten Bibliothek (Bildwähler, Galerien im Umfang der Architekturseite zuerst), Titelbild eines Projekts übernehmen oder eigene Datei hochladen; Reihenfolge per Ziehen, je Bild ein Projektverweis auf ein Projekt im Umfang (macht Bild und Plankopf anklickbar), Wechselzeit in Sekunden. Ohne eigene Auswahl zeigt die Seite automatisch die Titelbilder der hervorgehobenen Projekte im Umfang; diese Automatik lässt sich als Ausgangspunkt übernehmen und jederzeit wiederherstellen. Details: `docs/ARCHITEKTUR.md`.
+
+**Bildauswahl** – frei aus allen Bildern (alle Galerien, auch Entwürfe, sowie Einzelbilder) zusammengestellte Reihe „Ausgewählte Fotografien“. Erscheint auf der Startseite direkt unter dem Kopfbereich (die ersten N Bilder, Zahl einstellbar) und vollständig unter `/auswahl` (mit Lightbox, in der Sitemap). Reihenfolge per Ziehen; ein Bild ist über die Auswahl auch dann öffentlich, wenn es sonst nur in Entwürfen liegt. Das Kontrollkästchen „In der Bildauswahl zeigen“ gibt es auch im Bildformular.
+
+**Einstellungen** – Texte für Start, Vita, Kontakt, Meta-Beschreibung, Kontaktdaten, Social-Links, Porträt, Impressum/Datenschutz/Bildrechte, den Scroll-Hinweis am unteren Rand des Kopfbereichs (Einstellung `hero_scroll_hint`, Standard an), die Darstellung der „Ausgewählten Projekte“ auf der Startseite (groß im wechselnden Rhythmus oder als kompakte dreispaltige Übersicht, die sich von der Bildauswahl absetzt; Einstellung `home_projects_layout`) sowie vier einzeln abschaltbare Spielereien im Frontend (Dunkelkammer, Verschluss am Logo – wahlweise mit im Browser erzeugtem Auslösegeräusch, Autofokus auf der 404-Seite, Lichteinfall am Seitenende).
 
 **System** – Umgebungsinfos (PHP, Bildbibliothek, Upload-Limits, Schreibrechte, Speicherplatz, Anzahl Bilder ohne Varianten), „Fehlende Bildvarianten erzeugen“ (portionsweise, mit automatischer Fortsetzung), „Sichtbarkeit aller Bilder abgleichen“ (stellt `public/media/` aus den privaten Varianten wieder her) und „Datenbank herunterladen“ (Backup ohne Kommandozeile).
 
@@ -253,5 +272,6 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 - CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`)
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis
+- HTTPS erzwungen: beide `.htaccess`-Varianten leiten `http://` dauerhaft (`301`) auf dieselbe Adresse unter `https://` um (Pfad und Query bleiben erhalten; `X-Forwarded-Proto` wird berücksichtigt, `/.well-known/acme-challenge/` ist ausgenommen). Voraussetzung ist ein gültiges Zertifikat beim Hoster.
 - Security-Header inkl. Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
 - Kein Tracking, keine externen Ressourcen, Schriften lokal

@@ -38,22 +38,34 @@ final class Settings
         self::$cache = null;
     }
 
-    /** Schlüssel der bearbeitbaren Texte mit Beschriftung (Adminbereich). */
+    /**
+     * Schlüssel der bearbeitbaren Texte mit Beschriftung (Adminbereich), gruppiert nach Auftritt.
+     * 'placeholder' zeigt den Standardtext, der gilt, solange das Feld leer ist.
+     */
     public static function editableTexts(): array
     {
-        return [
-            'site_tagline' => ['label' => 'Untertitel (Startseite)', 'rows' => 2],
-            'intro_text' => ['label' => 'Einführung Startseite', 'rows' => 4],
-            'about_short' => ['label' => 'Kurzvorstellung Startseite', 'rows' => 4],
-            'about_text' => ['label' => 'Vita – Haupttext', 'rows' => 10],
-            'about_services' => ['label' => 'Arbeitsfelder (eine Zeile pro Eintrag)', 'rows' => 6],
-            'about_quotes' => ['label' => 'Stimmen von Kunden (Zitat, Leerzeile, „— Name“)', 'rows' => 10],
-            'contact_intro' => ['label' => 'Einleitung Kontaktseite', 'rows' => 3],
-            'meta_description' => ['label' => 'Standard-Meta-Beschreibung (max. 160 Zeichen)', 'rows' => 2],
-            'legal_impressum' => ['label' => 'Impressum', 'rows' => 14],
-            'legal_datenschutz' => ['label' => 'Datenschutz', 'rows' => 20],
-            'legal_bildrechte' => ['label' => 'Bildrechte', 'rows' => 8],
+        $main = 'Hauptseite (lotharprokop.com)';
+        $texts = [
+            'site_tagline' => ['label' => 'Untertitel (Startseite)', 'rows' => 2, 'group' => $main],
+            'intro_text' => ['label' => 'Einführung Startseite', 'rows' => 4, 'group' => $main],
+            'about_short' => ['label' => 'Kurzvorstellung Startseite', 'rows' => 4, 'group' => $main],
+            'about_text' => ['label' => 'Vita – Haupttext', 'rows' => 10, 'group' => $main],
+            'about_services' => ['label' => 'Arbeitsfelder (eine Zeile pro Eintrag)', 'rows' => 6, 'group' => $main],
+            'about_quotes' => ['label' => 'Stimmen von Kunden (Zitat, Leerzeile, „— Name“)', 'rows' => 10, 'group' => $main],
+            'contact_intro' => ['label' => 'Einleitung Kontaktseite', 'rows' => 3, 'group' => $main],
+            'meta_description' => ['label' => 'Standard-Meta-Beschreibung (max. 160 Zeichen)', 'rows' => 2, 'group' => $main],
         ];
+        if (Architektur::enabled()) {
+            $texts += Architektur::editableTexts();
+        }
+        $legal = 'Rechtliches (gilt für beide Auftritte)';
+        $texts += [
+            'legal_impressum' => ['label' => 'Impressum', 'rows' => 14, 'group' => $legal],
+            'legal_datenschutz' => ['label' => 'Datenschutz', 'rows' => 20, 'group' => $legal],
+            'legal_bildrechte' => ['label' => 'Bildrechte', 'rows' => 8, 'group' => $legal],
+            'legal_agb' => ['label' => 'AGB – Einleitungstext über den PDF-Dokumenten', 'rows' => 4, 'group' => $legal],
+        ];
+        return $texts;
     }
 
     public static function editableFields(): array
@@ -70,5 +82,87 @@ final class Settings
             'social_facebook' => 'Facebook-URL',
             'social_linkedin' => 'LinkedIn-URL',
         ];
+    }
+
+    /** Scroll-Hinweis am unteren Rand des bildschirmhohen Kopfbereichs; ohne gespeicherten Wert: an. */
+    public static function heroScrollHint(): bool
+    {
+        return (string) self::get('hero_scroll_hint', '1') === '1';
+    }
+
+    /**
+     * Darstellung der „Ausgewählten Projekte“ auf der Startseite (Adminbereich).
+     * editorial = wechselnder Rhythmus aus großen Karten wie bisher; compact = gleichförmiges, kleines Raster,
+     * das sich deutlich von den großen Fotografien der Bildauswahl darüber absetzt.
+     */
+    public static function homeProjectsLayouts(): array
+    {
+        return [
+            'editorial' => [
+                'label' => 'Groß, im wechselnden Rhythmus',
+                'help' => 'Wie bisher: volle Breite, kleiner rechts, zwei nebeneinander – die Projekte wirken wie eine zweite Bildstrecke.',
+            ],
+            'compact' => [
+                'label' => 'Kompakte Übersicht',
+                'help' => 'Kleine, gleich große Kacheln in drei Spalten (zwei auf dem Tablet). Setzt die Projekte sichtbar von den großen Fotografien der Bildauswahl ab.',
+            ],
+        ];
+    }
+
+    /** Gewählte Darstellung der Projekte auf der Startseite; ungültige oder fehlende Werte → „editorial“. */
+    public static function homeProjectsLayout(): string
+    {
+        $value = (string) self::get('home_projects_layout', 'editorial');
+        return array_key_exists($value, self::homeProjectsLayouts()) ? $value : 'editorial';
+    }
+
+    /**
+     * Kleine Spielereien im Frontend, einzeln abschaltbar (Adminbereich).
+     * Schlüssel ohne Präfix „egg_“ landen als Leerzeichen-getrennte Liste im data-eggs-Attribut des <body>.
+     */
+    public static function easterEggs(): array
+    {
+        return [
+            'egg_darkroom' => [
+                'label' => 'Dunkelkammer',
+                'help' => 'Wer irgendwo auf der Seite „dunkelkammer“ tippt oder das Logo etwa 1,5 Sekunden gedrückt hält, sieht die Seite im roten Schutzlicht; die Bilder entwickeln sich aus weißem Papier. Esc, erneutes Tippen oder Gedrückthalten beendet.',
+            ],
+            'egg_shutter' => [
+                'label' => 'Verschluss am Logo',
+                'help' => 'Doppelklick auf das Logo schließt und öffnet kurz eine Blende über der Seite.',
+            ],
+            'egg_shutter_sound' => [
+                'label' => 'Verschluss mit Auslösegeräusch',
+                'help' => 'Zur Blende klickt ein kurzes Spiegel-/Verschlussgeräusch (im Browser erzeugt, keine Audiodatei; nur nach der Nutzeraktion Doppelklick). Wirkt nur, wenn der Verschluss aktiv ist.',
+                'sub' => true,
+            ],
+            'egg_autofocus' => [
+                'label' => 'Autofokus auf der 404-Seite',
+                'help' => 'Die „Seite nicht gefunden“ zeigt ein unscharfes Foto; der Fokusrahmen folgt dem Zeiger und stellt beim Verweilen scharf.',
+            ],
+            'egg_lightleak' => [
+                'label' => 'Lichteinfall am Seitenende',
+                'help' => 'Wer bis ans Ende der Projektübersicht oder einer Galerie scrollt, sieht kurz einen warmen Lichteinfall wie bei analogem Film.',
+            ],
+        ];
+    }
+
+    /** Ist eine Spielerei aktiv? Ohne gespeicherten Wert gilt: aktiv. */
+    public static function eggEnabled(string $egg): bool
+    {
+        return (string) self::get('egg_' . $egg, '1') === '1';
+    }
+
+    /** Aktive Spielereien als Leerzeichen-getrennte Liste, z. B. „darkroom shutter“. */
+    public static function enabledEggs(): string
+    {
+        $out = [];
+        foreach (array_keys(self::easterEggs()) as $key) {
+            $egg = substr($key, 4);
+            if (self::eggEnabled($egg)) {
+                $out[] = $egg;
+            }
+        }
+        return implode(' ', $out);
     }
 }

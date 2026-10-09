@@ -59,6 +59,55 @@ final class Images
     }
 
     /**
+     * Alle Bilder nach Galerie gruppiert für die Bildwähler im Adminbereich (Bildauswahl, Kopfbereich).
+     * Ein Bild in mehreren Galerien erscheint mehrfach; Bilder ohne Galerie bilden eine eigene Gruppe am Ende.
+     *
+     * @return array{groups: list<array{title:string,status:?string,gallery:?array,images:array}>, total:int}
+     */
+    public static function groupedByGallery(): array
+    {
+        $byGallery = [];
+        $assigned = [];
+        $stmt = Database::pdo()->query('SELECT gallery_id, image_id FROM gallery_images ORDER BY gallery_id, sort_order, image_id');
+        foreach ($stmt as $row) {
+            $byGallery[(int) $row['gallery_id']][] = (int) $row['image_id'];
+            $assigned[(int) $row['image_id']] = true;
+        }
+        $all = self::all();
+        $images = [];
+        foreach ($all as $img) {
+            $images[$img['id']] = $img;
+        }
+        $groups = [];
+        foreach (Galleries::all() as $g) {
+            $ids = $byGallery[$g['id']] ?? [];
+            if ($ids === []) {
+                continue;
+            }
+            $groups[] = [
+                'title' => $g['title'],
+                'status' => $g['status'],
+                'gallery' => $g,
+                'images' => array_values(array_filter(array_map(fn($id) => $images[$id] ?? null, $ids))),
+            ];
+        }
+        $loose = array_values(array_filter($all, fn($img) => !isset($assigned[$img['id']])));
+        if ($loose !== []) {
+            $groups[] = ['title' => 'Weitere Bilder (Kopfbereich, Porträt, Filmposter, Einzelbilder)', 'status' => null, 'gallery' => null, 'images' => $loose];
+        }
+        return ['groups' => $groups, 'total' => count($all)];
+    }
+
+    /** Kennung der ersten veröffentlichten Galerie, in der das Bild liegt (sonst die erste überhaupt, sonst null). */
+    public static function primaryGalleryId(int $imageId): ?int
+    {
+        $stmt = Database::pdo()->prepare("SELECT g.id FROM gallery_images gi JOIN galleries g ON g.id = gi.gallery_id WHERE gi.image_id = ? ORDER BY CASE WHEN g.status = 'published' THEN 0 ELSE 1 END, g.sort_order, g.id LIMIT 1");
+        $stmt->execute([$imageId]);
+        $id = $stmt->fetchColumn();
+        return $id === false ? null : (int) $id;
+    }
+
+    /**
      * Legt ein neues Bild aus einer hochgeladenen Datei an.
      * @param array{tmp_name:string,name:string,size:int,error:int} $file
      */
@@ -156,8 +205,15 @@ final class Images
         if ($slides > 0) {
             $other[] = $slides > 1 ? 'Bildfolge Startseite (' . $slides . '×)' : 'Bildfolge Startseite';
         }
+        $archSlides = HeroSlides::usesImage($id, Architektur::KEY);
+        if ($archSlides > 0) {
+            $other[] = $archSlides > 1 ? 'Bildfolge Architekturseite (' . $archSlides . '×)' : 'Bildfolge Architekturseite';
+        }
         if (Settings::getInt('portrait_image_id') === $id) {
             $other[] = 'Porträt (Vita)';
+        }
+        if (FeaturedImages::contains($id)) {
+            $other[] = 'Bildauswahl (Startseite, /auswahl)';
         }
         $stmt = $pdo->prepare('SELECT title FROM films WHERE poster_image_id = ?');
         $stmt->execute([$id]);
@@ -177,6 +233,7 @@ final class Images
         $pdo = Database::pdo();
         $pdo->prepare('UPDATE galleries SET cover_image_id = NULL WHERE cover_image_id = ?')->execute([$id]);
         $pdo->prepare('UPDATE films SET poster_image_id = NULL WHERE poster_image_id = ?')->execute([$id]);
+        $pdo->prepare('DELETE FROM featured_images WHERE image_id = ?')->execute([$id]);
         foreach (['hero_image_id', 'portrait_image_id'] as $key) {
             if (Settings::getInt($key) === $id) {
                 Settings::set($key, null);
@@ -186,7 +243,7 @@ final class Images
         self::removeFiles($image);
     }
 
-    /** Soll ein Bild öffentlich sein? Ja, wenn es in einem veröffentlichten Inhalt verwendet wird. */
+    /** Soll ein Bild öffentlich sein? Ja, wenn es in einem veröffentlichten Inhalt verwendet wird (auch in der Bildauswahl). */
     public static function shouldBePublic(int $id): bool
     {
         $pdo = Database::pdo();
@@ -205,19 +262,46 @@ final class Images
         if ($stmt->fetchColumn()) {
             return true;
         }
-        return HeroSlides::usesImage($id) > 0 || Settings::getInt('portrait_image_id') === $id;
+        return HeroSlides::usesImage($id) > 0 || FeaturedImages::contains($id) || Settings::getInt('portrait_image_id') === $id;
     }
 
-    /** Gleicht den öffentlichen Ordner eines Bildes mit seinem Soll-Zustand ab. */
+    /**
+     * Öffentliche Bildordner aller Auftritte: Hauptseite (public/media) und Architekturseite
+     * (public/architektur/media). Jeder Auftritt erhält nur die Bilder seiner veröffentlichten Inhalte.
+     * @return array<string,string> Kennung → Ordner
+     */
+    public static function publicMediaDirs(): array
+    {
+        $dirs = [Site::MAIN => Config::publicMedia()];
+        if (Architektur::enabled()) {
+            foreach (Architektur::mediaDirectories() as $i => $dir) {
+                $dirs[$i === 0 ? Architektur::KEY : Architektur::KEY . '-' . $i] = $dir;
+            }
+        }
+        return $dirs;
+    }
+
+    /** Gleicht die öffentlichen Ordner eines Bildes (je Auftritt) mit ihrem Soll-Zustand ab. */
     public static function syncPublic(int $id): void
     {
         $image = self::find($id);
         if ($image === null) {
             return;
         }
-        $public = self::shouldBePublic($id);
-        $publicDir = Config::publicMedia() . '/' . $image['token'];
         $privateDir = Config::storage('derivatives') . '/' . $image['token'];
+        $public = self::shouldBePublic($id);
+        foreach (self::publicMediaDirs() as $site => $dir) {
+            $wanted = $site === Site::MAIN ? $public : Architektur::shouldBePublic($id);
+            self::syncDir($id, $privateDir, $dir . '/' . $image['token'], $wanted);
+        }
+        if ($image['is_public'] !== ($public ? 1 : 0)) {
+            Database::pdo()->prepare('UPDATE images SET is_public = ? WHERE id = ?')->execute([$public ? 1 : 0, $id]);
+        }
+    }
+
+    /** Ein öffentlicher Ordner eines Bildes: anlegen und füllen (Hardlink oder Kopie) bzw. entfernen. */
+    private static function syncDir(int $id, string $privateDir, string $publicDir, bool $public): void
+    {
         if ($public) {
             if (!is_dir($publicDir)) {
                 @mkdir($publicDir, 0755, true);
@@ -261,9 +345,6 @@ final class Images
             }
         } else {
             self::removeDir($publicDir);
-        }
-        if ($image['is_public'] !== ($public ? 1 : 0)) {
-            Database::pdo()->prepare('UPDATE images SET is_public = ? WHERE id = ?')->execute([$public ? 1 : 0, $id]);
         }
     }
 
@@ -339,10 +420,12 @@ final class Images
             self::syncPublic((int) $row['id']);
             $tokens[$row['token']] = true;
         }
-        foreach (scandir(Config::publicMedia()) ?: [] as $entry) {
-            $dir = Config::publicMedia() . '/' . $entry;
-            if ($entry !== '.' && $entry !== '..' && is_dir($dir) && !isset($tokens[$entry])) {
-                self::removeDir($dir);
+        foreach (self::publicMediaDirs() as $mediaDir) {
+            foreach (scandir($mediaDir) ?: [] as $entry) {
+                $dir = $mediaDir . '/' . $entry;
+                if ($entry !== '.' && $entry !== '..' && is_dir($dir) && !isset($tokens[$entry])) {
+                    self::removeDir($dir);
+                }
             }
         }
         self::$syncStats['sample'] = self::describePerms(Config::publicMedia(), array_key_first($tokens));
@@ -390,7 +473,8 @@ final class Images
     public static function variantUrl(array $image, array $variant, string $format, bool $admin = false): string
     {
         $file = 'w' . max((int) $variant['w'], (int) $variant['h']) . '.' . $format;
-        return $admin ? '/admin/media/' . $image['id'] . '/' . $file : '/media/' . $image['token'] . '/' . $file;
+        // Jeder Auftritt hat seinen eigenen media/-Ordner im Webroot; die Admin-Vorschau gibt es nur auf der Hauptseite.
+        return $admin ? '/admin/media/' . $image['id'] . '/' . $file : path('/media/' . $image['token'] . '/' . $file);
     }
 
     private static function assertUploadOk(array $file): void
@@ -421,7 +505,9 @@ final class Images
             @unlink($original);
         }
         self::removeDir(Config::storage('derivatives') . '/' . $image['token']);
-        self::removeDir(Config::publicMedia() . '/' . $image['token']);
+        foreach (self::publicMediaDirs() as $dir) {
+            self::removeDir($dir . '/' . $image['token']);
+        }
     }
 
     public static function removeDir(string $dir): void

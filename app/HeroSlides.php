@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace App;
 
 /**
- * Bildfolge im Kopfbereich der Startseite. Ein Eintrag besteht aus einem Bild und optional
+ * Bildfolge im Kopfbereich einer Startseite. Ein Eintrag besteht aus einem Bild und optional
  * dem Projekt, auf das es verweist. Bei nur einem Eintrag verhält sich der Kopfbereich wie
  * das frühere feste Startbild: ein Bild, kein Wechsel.
+ *
+ * Jeder Auftritt hat seine eigene Folge (Spalte site): die Hauptseite (Site::MAIN) und die
+ * Architekturseite (Architektur::KEY). Ohne Angabe ist immer die Hauptseite gemeint.
  */
 final class HeroSlides
 {
@@ -15,19 +18,19 @@ final class HeroSlides
     public const INTERVAL_MAX = 30;
 
     /** Alle Einträge für den Adminbereich, unabhängig vom Status des verknüpften Projekts. */
-    public static function all(): array
+    public static function all(string $site = Site::MAIN): array
     {
-        return self::withRelations(self::rows(), false);
+        return self::withRelations(self::rows($site), false);
     }
 
     /**
      * Einträge für die Startseite: nur Bilder mit fertigen Varianten, Verweise nur auf
      * veröffentlichte Projekte (ein Entwurf bleibt damit unerreichbar).
      */
-    public static function forDisplay(): array
+    public static function forDisplay(string $site = Site::MAIN): array
     {
         $out = [];
-        foreach (self::withRelations(self::rows(), true) as $slide) {
+        foreach (self::withRelations(self::rows($site), true) as $slide) {
             if ($slide['image']['variants'] !== []) {
                 $out[] = $slide;
             }
@@ -35,25 +38,34 @@ final class HeroSlides
         return $out;
     }
 
-    public static function count(): int
+    public static function count(string $site = Site::MAIN): int
     {
-        return (int) Database::pdo()->query('SELECT COUNT(*) FROM hero_slides')->fetchColumn();
+        $stmt = Database::pdo()->prepare('SELECT COUNT(*) FROM hero_slides WHERE site = ?');
+        $stmt->execute([$site]);
+        return (int) $stmt->fetchColumn();
     }
 
-    public static function usesImage(int $imageId): int
+    /** Wie oft ein Bild in der Bildfolge steht – eines Auftritts oder (null) aller Auftritte. */
+    public static function usesImage(int $imageId, ?string $site = Site::MAIN): int
     {
-        $stmt = Database::pdo()->prepare('SELECT COUNT(*) FROM hero_slides WHERE image_id = ?');
-        $stmt->execute([$imageId]);
+        if ($site === null) {
+            $stmt = Database::pdo()->prepare('SELECT COUNT(*) FROM hero_slides WHERE image_id = ?');
+            $stmt->execute([$imageId]);
+        } else {
+            $stmt = Database::pdo()->prepare('SELECT COUNT(*) FROM hero_slides WHERE image_id = ? AND site = ?');
+            $stmt->execute([$imageId, $site]);
+        }
         return (int) $stmt->fetchColumn();
     }
 
     /** Hängt ein Bild hinten an. Gibt die Kennung des neuen Eintrags zurück. */
-    public static function add(int $imageId, ?int $galleryId = null): int
+    public static function add(int $imageId, ?int $galleryId = null, string $site = Site::MAIN): int
     {
         $pdo = Database::pdo();
-        $max = (int) $pdo->query('SELECT COALESCE(MAX(sort_order), 0) FROM hero_slides')->fetchColumn();
-        $pdo->prepare('INSERT INTO hero_slides (image_id, gallery_id, sort_order) VALUES (?, ?, ?)')
-            ->execute([$imageId, self::validGalleryId($galleryId), $max + 1]);
+        $max = $pdo->prepare('SELECT COALESCE(MAX(sort_order), 0) FROM hero_slides WHERE site = ?');
+        $max->execute([$site]);
+        $pdo->prepare('INSERT INTO hero_slides (image_id, gallery_id, sort_order, site) VALUES (?, ?, ?, ?)')
+            ->execute([$imageId, self::validGalleryId($galleryId), (int) $max->fetchColumn() + 1, $site]);
         Images::syncPublic($imageId);
         return (int) $pdo->lastInsertId();
     }
@@ -66,11 +78,13 @@ final class HeroSlides
      * @param array $links       Kennung => Projekt-Kennung (0 = kein Verweis)
      * @return array<int,int>    Bildkennungen der entfernten Einträge (zur Nachpflege)
      */
-    public static function apply(array $order, array $remove, array $links): array
+    public static function apply(array $order, array $remove, array $links, string $site = Site::MAIN): array
     {
         $pdo = Database::pdo();
         $existing = [];
-        foreach ($pdo->query('SELECT id, image_id FROM hero_slides') as $row) {
+        $stmt = $pdo->prepare('SELECT id, image_id FROM hero_slides WHERE site = ?');
+        $stmt->execute([$site]);
+        foreach ($stmt as $row) {
             $existing[(int) $row['id']] = (int) $row['image_id'];
         }
         $removedImages = [];
@@ -107,16 +121,21 @@ final class HeroSlides
         return array_values(array_unique($removedImages));
     }
 
-    /** Wechselzeit in Sekunden. */
-    public static function interval(): int
+    /** Wechselzeit in Sekunden; $default gilt, solange im Admin nichts gesetzt wurde. */
+    public static function interval(string $site = Site::MAIN, int $default = self::INTERVAL_DEFAULT): int
     {
-        $seconds = Settings::getInt('hero_interval', self::INTERVAL_DEFAULT);
-        return self::clampInterval($seconds > 0 ? $seconds : self::INTERVAL_DEFAULT);
+        $seconds = Settings::getInt(self::intervalKey($site), $default);
+        return self::clampInterval($seconds > 0 ? $seconds : $default);
     }
 
-    public static function setInterval(int $seconds): void
+    public static function setInterval(int $seconds, string $site = Site::MAIN): void
     {
-        Settings::set('hero_interval', (string) self::clampInterval($seconds > 0 ? $seconds : self::INTERVAL_DEFAULT));
+        Settings::set(self::intervalKey($site), (string) self::clampInterval($seconds > 0 ? $seconds : self::INTERVAL_DEFAULT));
+    }
+
+    private static function intervalKey(string $site): string
+    {
+        return $site === Site::MAIN ? 'hero_interval' : $site . '_hero_interval';
     }
 
     private static function clampInterval(int $seconds): int
@@ -124,9 +143,11 @@ final class HeroSlides
         return max(self::INTERVAL_MIN, min(self::INTERVAL_MAX, $seconds));
     }
 
-    private static function rows(): array
+    private static function rows(string $site): array
     {
-        return Database::pdo()->query('SELECT id, image_id, gallery_id, sort_order FROM hero_slides ORDER BY sort_order, id')->fetchAll();
+        $stmt = Database::pdo()->prepare('SELECT id, image_id, gallery_id, sort_order FROM hero_slides WHERE site = ? ORDER BY sort_order, id');
+        $stmt->execute([$site]);
+        return $stmt->fetchAll();
     }
 
     /** Ergänzt Bild- und Projektdaten. */

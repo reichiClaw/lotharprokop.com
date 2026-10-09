@@ -290,4 +290,55 @@
     box.addEventListener('touchmove', function (ev) { fromEvent(ev); }, { passive: true });
     [fx, fy].forEach(function (inp) { inp.addEventListener('input', function () { apply(parseFloat(fx.value) || 0, parseFloat(fy.value) || 0); }); });
   })();
+
+  /* ---------- Bildauswahl: Zähler, „Alle wählen“ je Galerie, Startseiten-Markierung ---------- */
+  document.querySelectorAll('form[data-pick]').forEach(function (form) {
+    var submit = form.querySelector('[data-pick-submit]');
+    var counter = form.querySelector('[data-pick-count]');
+    function boxes(scope) {
+      return Array.prototype.filter.call((scope || form).querySelectorAll('input[type="checkbox"][name="add[]"]'), function (b) { return !b.disabled; });
+    }
+    function update() {
+      var n = boxes().filter(function (b) { return b.checked; }).length;
+      if (submit) submit.disabled = n === 0;
+      if (counter) counter.textContent = n === 0 ? 'Noch kein Bild angehakt.' : n + (n === 1 ? ' Bild angehakt.' : ' Bilder angehakt.');
+      form.querySelectorAll('[data-pick-all]').forEach(function (btn) {
+        var group = boxes(btn.closest('details'));
+        var all = group.length > 0 && group.every(function (b) { return b.checked; });
+        btn.textContent = all ? 'Keine wählen' : 'Alle wählen';
+        btn.hidden = group.length === 0;
+      });
+    }
+    form.addEventListener('change', update);
+    form.querySelectorAll('[data-pick-all]').forEach(function (btn) {
+      btn.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation(); // sonst klappt die <summary> gleichzeitig um
+        var details = btn.closest('details');
+        var group = boxes(details);
+        var all = group.every(function (b) { return b.checked; });
+        group.forEach(function (b) { b.checked = !all; });
+        if (details && !details.open) details.open = true;
+        update();
+      });
+    });
+    update();
+  });
+
+  // Die ersten N Bilder der Auswahl tragen die Markierung „Startseite“; nach dem Umsortieren nachziehen.
+  document.querySelectorAll('[data-sortable][data-home-count]').forEach(function (list) {
+    var limit = parseInt(list.getAttribute('data-home-count'), 10) || 0;
+    function mark() {
+      Array.prototype.forEach.call(list.children, function (li, i) {
+        var home = limit === 0 || i < limit;
+        li.classList.toggle('is-home', home);
+        var badge = li.querySelector('[data-home-badge]');
+        if (badge) badge.hidden = !home;
+      });
+    }
+    list.addEventListener('dragend', function () { window.setTimeout(mark, 0); });
+    list.addEventListener('click', function (ev) {
+      if (ev.target.closest('[data-move]')) window.setTimeout(mark, 0);
+    });
+  });
 })();

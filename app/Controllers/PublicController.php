@@ -6,7 +6,8 @@ namespace App\Controllers;
 use App\Auth;
 use App\Categories;
 use App\Config;
-use App\Database;
+use App\ContactForm;
+use App\FeaturedImages;
 use App\Films;
 use App\Galleries;
 use App\HeroSlides;
@@ -21,6 +22,7 @@ final class PublicController
     {
         $heroSlides = HeroSlides::forDisplay();
         $featured = Galleries::featured();
+        $selection = FeaturedImages::forHome();
         $portraitId = Settings::getInt('portrait_image_id');
         $portrait = $portraitId > 0 ? Images::find($portraitId) : null;
 
@@ -28,11 +30,28 @@ final class PublicController
             'heroSlides' => $heroSlides,
             'heroInterval' => HeroSlides::interval(),
             'featured' => $featured,
+            'selection' => $selection,
+            'selectionTotal' => FeaturedImages::count(),
             'portrait' => $portrait,
             'meta' => [
                 'title' => '',
                 'description' => Settings::get('meta_description', ''),
                 'image' => $heroSlides !== [] ? url(Picture::largestUrl($heroSlides[0]['image']) ?? '') : null,
+            ],
+        ]);
+    }
+
+    /** Bildauswahl: alle ausgewählten Fotografien, unabhängig von Galerien. */
+    public static function selection(array $params): void
+    {
+        $images = FeaturedImages::forDisplay();
+        View::render('selection', [
+            'images' => $images,
+            'intro' => FeaturedImages::intro(),
+            'meta' => [
+                'title' => 'Ausgewählte Fotografien',
+                'description' => 'Eine Auswahl fotografischer Arbeiten von Lothar Prokop, Ried im Innkreis – quer durch Werbung, Industrie, Porträt, Reportage und Landschaft.',
+                'image' => $images !== [] ? url(Picture::largestUrl($images[0]) ?? '') : null,
             ],
         ]);
     }
@@ -143,64 +162,11 @@ final class PublicController
             View::notFound();
             return;
         }
-        $values = [
-            'name' => trim((string) ($_POST['name'] ?? '')),
-            'email' => trim((string) ($_POST['email'] ?? '')),
-            'message' => trim((string) ($_POST['message'] ?? '')),
-        ];
-        $errors = [];
-        if (mb_strlen($values['name']) < 2 || mb_strlen($values['name']) > 100) {
-            $errors['name'] = 'Bitte einen Namen angeben.';
+        $result = ContactForm::handle($_POST, (string) Config::get('mail.subject_prefix'), 'Kontaktformular');
+        if ($result['status'] !== 200) {
+            http_response_code($result['status']);
         }
-        if (!filter_var($values['email'], FILTER_VALIDATE_EMAIL) || mb_strlen($values['email']) > 200) {
-            $errors['email'] = 'Bitte eine gültige E-Mail-Adresse angeben.';
-        }
-        if (mb_strlen($values['message']) < 10 || mb_strlen($values['message']) > 5000) {
-            $errors['message'] = 'Bitte eine Nachricht mit mindestens 10 Zeichen eingeben.';
-        }
-        // Spam-Schutz: Honeypot-Feld, Mindestzeit, Rate-Limit pro IP.
-        $honeypot = (string) ($_POST['website'] ?? '');
-        $started = (int) ($_POST['_t'] ?? 0);
-        $tooFast = $started <= 0 || (time() - $started) < (int) Config::get('mail.min_seconds', 4);
-        if ($honeypot !== '' || $tooFast) {
-            // Bots keine Rückmeldung über die Ursache geben – als Fehler behandeln.
-            $errors['form'] = 'Die Nachricht konnte nicht gesendet werden. Bitte nutzen Sie E-Mail oder Telefon.';
-        }
-        $pdo = Database::pdo();
-        $pdo->prepare('DELETE FROM contact_submissions WHERE created_at < ?')->execute([time() - 86400]);
-        $stmt = $pdo->prepare('SELECT COUNT(*) FROM contact_submissions WHERE ip = ? AND created_at > ?');
-        $stmt->execute([client_ip(), time() - 3600]);
-        if ((int) $stmt->fetchColumn() >= (int) Config::get('mail.max_per_hour_per_ip', 5)) {
-            $errors['form'] = 'Zu viele Anfragen. Bitte später erneut versuchen oder direkt per E-Mail schreiben.';
-        }
-
-        if ($errors !== []) {
-            http_response_code(422);
-            self::contact($params, ['errors' => $errors, 'values' => $values]);
-            return;
-        }
-
-        $to = (string) Config::get('mail.to');
-        $from = (string) Config::get('mail.from');
-        $subject = (string) Config::get('mail.subject_prefix') . 'Anfrage von ' . preg_replace('/[\r\n]+/', ' ', $values['name']);
-        $body = "Name: {$values['name']}\nE-Mail: {$values['email']}\n\n{$values['message']}\n\n—\nGesendet über das Kontaktformular, IP " . client_ip();
-        $headers = [
-            'From: ' . $from,
-            'Reply-To: ' . $values['email'],
-            'Content-Type: text/plain; charset=utf-8',
-            'X-Mailer: PHP/' . PHP_VERSION,
-        ];
-        $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-        $sent = @mail($to, $encodedSubject, $body, implode("\r\n", $headers));
-        $pdo->prepare('INSERT INTO contact_submissions (ip, created_at) VALUES (?, ?)')->execute([client_ip(), time()]);
-
-        if (!$sent) {
-            error_log('Kontaktformular: mail() fehlgeschlagen.');
-            http_response_code(500);
-            self::contact($params, ['errors' => ['form' => 'Der Versand ist technisch fehlgeschlagen. Bitte schreiben Sie direkt an ' . Settings::get('contact_email', $to) . '.'], 'values' => $values]);
-            return;
-        }
-        self::contact($params, ['sent' => true]);
+        self::contact($params, ['errors' => $result['errors'], 'values' => $result['values'], 'sent' => $result['sent']]);
     }
 
     public static function legal(array $params): void
@@ -210,19 +176,41 @@ final class PublicController
             'impressum' => ['key' => 'legal_impressum', 'title' => 'Impressum'],
             'datenschutz' => ['key' => 'legal_datenschutz', 'title' => 'Datenschutz'],
             'bildrechte' => ['key' => 'legal_bildrechte', 'title' => 'Bildrechte'],
+            'agb' => ['key' => 'legal_agb', 'title' => 'Allgemeine Geschäftsbedingungen', 'documents' => self::DOCUMENTS],
         ];
         $page = $map[$path] ?? null;
         if ($page === null) {
             View::notFound();
             return;
         }
+        $documents = [];
+        foreach ($page['documents'] ?? [] as $doc) {
+            $file = PUBLIC_ROOT . $doc['href'];
+            if (!is_file($file)) {
+                continue;
+            }
+            $doc['size'] = human_bytes((int) filesize($file));
+            $documents[] = $doc;
+        }
+        $text = (string) Settings::get($page['key'], '');
+        if ($text === '' && $documents !== []) {
+            $text = 'Die Allgemeinen Geschäftsbedingungen und die Rücktrittsbelehrung stehen hier als PDF zum Lesen und Herunterladen bereit.';
+        }
         View::render('legal', [
             'title' => $page['title'],
-            'text' => (string) Settings::get($page['key'], ''),
+            'text' => $text,
+            'documents' => $documents,
             'slug' => $path,
             'meta' => ['title' => $page['title'], 'robots' => 'noindex, follow', 'description' => $page['title'] . ' – Lothar Prokop Fotografie'],
         ]);
     }
+
+    /** Rechtliche Dokumente (PDF) unter public/dokumente/, übernommen von der alten Website. */
+    private const DOCUMENTS = [
+        ['title' => 'AGB für Unternehmer', 'href' => '/dokumente/agb-unternehmer.pdf', 'pages' => 9],
+        ['title' => 'AGB für Konsumenten', 'href' => '/dokumente/agb-konsumenten.pdf', 'pages' => 8],
+        ['title' => 'Rücktrittsrecht für Konsumenten', 'href' => '/dokumente/ruecktrittsrecht-konsumenten.pdf', 'pages' => 1],
+    ];
 
     public static function sitemap(array $params): void
     {
@@ -234,6 +222,9 @@ final class PublicController
             ['loc' => url('/vita'), 'priority' => '0.6'],
             ['loc' => url('/kontakt'), 'priority' => '0.5'],
         ];
+        if (FeaturedImages::count() > 0) {
+            $urls[] = ['loc' => url('/auswahl'), 'priority' => '0.8'];
+        }
         foreach (Categories::withPublished() as $c) {
             $urls[] = ['loc' => url('/fotografie?kategorie=' . eurl($c['slug'])), 'priority' => '0.6'];
         }

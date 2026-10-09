@@ -1,0 +1,10 @@
+# Nur Bilddateien ausliefern, keinerlei Skriptausführung.
+# Bewusst ohne "Options": manche Hoster erlauben Options in .htaccess nicht (Fehler 500).
+# Verzeichnislisting ist bereits in public/.htaccess abgeschaltet und wird hierher vererbt.
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .phar .pl .py .cgi
+<FilesMatch "\.(?!(webp|jpg|jpeg)$)[^.]+$">
+  Require all denied
+</FilesMatch>

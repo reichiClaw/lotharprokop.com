@@ -5,6 +5,7 @@ namespace App\Controllers;
 
 use App\Auth;
 use App\Csrf;
+use App\FeaturedImages;
 use App\Galleries;
 use App\Images;
 use App\View;
@@ -185,6 +186,7 @@ final class AdminImageController
         AdminController::render('image-form', [
             'image' => $image,
             'usage' => Images::usages($image['id']),
+            'inSelection' => FeaturedImages::contains($image['id']),
             'backGallery' => ctype_digit($back) ? (int) $back : null,
             'meta' => ['title' => 'Bild bearbeiten'],
         ]);
@@ -205,6 +207,9 @@ final class AdminImageController
             (float) ($_POST['focus_x'] ?? 0.5),
             (float) ($_POST['focus_y'] ?? 0.5),
         );
+        if (array_key_exists('featured', $_POST)) {
+            FeaturedImages::toggle($id, (string) $_POST['featured'] === '1');
+        }
         if (Csrf::wantsJson()) {
             json_response(['ok' => true]);
         }

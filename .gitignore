@@ -8,8 +8,12 @@
 /public/media/*
 !/public/media/.htaccess
 !/public/media/index.html
+/public/architektur/media/*
+!/public/architektur/media/.htaccess
+!/public/architektur/media/index.html
 
 # Lokales
 .DS_Store
 Thumbs.db
 *.log
+__pycache__/

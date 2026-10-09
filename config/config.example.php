@@ -67,4 +67,31 @@ return [
         'min_seconds' => 4, // Formular schneller ausgefüllt = wahrscheinlich Bot
         'max_per_hour_per_ip' => 5,
     ],
+
+    // Architekturseite – zweiter Auftritt derselben Installation im Webroot-Unterordner public/architektur
+    // (siehe docs/ARCHITEKTUR.md). Gleiche Datenbank, gleiche Bilder, gleicher Adminbereich; gezeigt
+    // werden ausschließlich Projekte mit einer der unten genannten Kategorien.
+    'architektur' => [
+        'enabled' => true,
+        'site_name' => 'Lothar Prokop Architekturfotografie',
+        // Eigene Domain, sobald zugewiesen (ohne abschließenden Schrägstrich), z. B. 'https://architekturfotografie.example'.
+        // Leer = die Seite läuft unter base_url + '/architektur'.
+        'base_url' => '',
+        // Mit eigener Domain Aufrufe über die Hauptdomain (…/architektur/…) dauerhaft dorthin umleiten.
+        'canonical_redirect' => true,
+        // Pfadpräfix wird aus dem Ort des Front-Controllers erkannt ('' bei eigener Domain, '/architektur' als
+        // Unterordner). Nur setzen, wenn die automatische Erkennung beim Hoster nicht greift.
+        'base_path' => null,
+        // Kategorien (Slugs, siehe Admin → Kategorien), die den Umfang der Architekturseite bilden.
+        // Eine Galerie erscheint dort, sobald sie mindestens eine dieser Kategorien trägt.
+        'categories' => ['architektur', 'immobilien', 'baudokumentation', 'fertigstellung'],
+        // Wechselzeit der Bildfolge im Kopfbereich in Sekunden; die Bilder selbst (und eine abweichende
+        // Wechselzeit) werden im Admin unter „Architekturseite“ gepflegt, sonst Titelbilder der hervorgehobenen Projekte.
+        'hero_interval' => 7,
+        // Betreff-Präfix für Anfragen über das Kontaktformular der Architekturseite (Empfänger: mail.to).
+        'mail_subject_prefix' => '[Architekturfotografie] ',
+        // Öffentlicher Bildordner der Architekturseite; Standard: <Haupt-Webroot>/architektur/media.
+        // Bei getrennter FTP-Installation wie 'paths.public_media' ausdrücklich setzen.
+        'public_media' => '',
+    ],
 ];

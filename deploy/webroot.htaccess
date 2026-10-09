@@ -7,9 +7,21 @@ Options -Indexes -MultiViews
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
+  # Immer HTTPS: unverschlüsselte Aufrufe dauerhaft auf https:// umleiten (gleicher Host, gleicher Pfad).
+  # X-Forwarded-Proto berücksichtigt Hoster, die TLS vor dem Webserver beenden (sonst Umleitungsschleife).
+  # Nur für die eigentliche Anfrage, nicht für interne Unteranfragen (z. B. Fehlerseiten des Hosters).
+  # Ausgenommen: ACME-Prüfpfade für Zertifikatsausstellung.
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteCond %{ENV:REDIRECT_STATUS} ^$
+  RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   # Private Ordner und versteckte Dateien: nicht vorhanden melden.
   RewriteRule ^(app|config|storage|templates|bin|data|docs|deploy|dist)(/|$) - [R=404,L]
   RewriteRule (^|/)\.(?!well-known/) - [R=404,L]
+  # Architekturseite (zweites Webroot public/architektur, docs/ARCHITEKTUR.md) ohne Schrägstrich:
+  # sichtbar umleiten, sonst würde Apache intern auf /public/architektur/ verweisen.
+  RewriteRule ^architektur$ /architektur/ [R=301,L]
   # Alles andere aus public/ bedienen; nicht existierende Pfade an den Front-Controller.
   RewriteCond %{REQUEST_URI} !^/public/
   RewriteRule ^(.*)$ public/$1 [L]
