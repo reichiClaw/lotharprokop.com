@@ -483,26 +483,33 @@ Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Se
 - Verhalten hinter dem Proxy/OPcache des Hosters, PHP-FPM
 - Browser außer Chrome (headless, nur der Admin-Hinweis); Screenreader; Ladezeiten
 
-## Passwort vergessen (11.11.2026)
+## Anmeldung mit E-Mail-Adresse, „Passwort vergessen“ (11.11.2026)
 
-`/admin/passwort-vergessen`: neues Passwort mit dem Einrichtungsschlüssel aus `config/config.php`. Geprüft an der lokalen Apache-Instanz (2.4.58 + mod_php, Aufbau wie beim Hoster) mit einem Skript, dazu einmal im Browser.
+Geprüft an der lokalen Apache-Instanz (2.4.58 + mod_php, Aufbau wie beim Hoster) mit einem Skript; als `sendmail` diente ein Ersatz, der jede Nachricht in eine Datei schreibt bzw. auf Wunsch fehlschlägt. Ausgangspunkt war der Stand, der live läuft (Schema-Version 4, ein Konto mit Benutzernamen), über den die geänderten Dateien kopiert wurden.
 
 | Prüfung | Ergebnis |
 |---|---|
-| Ohne Adminkonto: Seite leitet auf `/admin/setup`, `POST` 404 | ok |
-| Anmeldeseite verlinkt „Passwort vergessen?“; Seite 200 mit `no-store` und `noindex`, ohne PHP-Meldung | ok |
-| Ohne CSRF-Token 403 | ok |
-| Falscher Schlüssel, leerer Schlüssel, Felder als Liste (`setup_key[]=…`): 403, dieselbe Meldung, keine PHP-Meldung, Passwort unverändert, Fehlversuch gezählt | ok |
-| `setup_key` in `config.php` leer (gesendet: leer bzw. der frühere Schlüssel) oder nur 19 Zeichen lang (gesendet: derselbe): 403 mit derselben Meldung, Passwort unverändert | ok |
-| Richtiger Schlüssel, Passwörter ungleich bzw. Passwort zu kurz: Meldung, Passwort unverändert | ok |
-| Ausgesperrt nach 5 falschen Anmeldungen (richtiges Passwort: 429): Zurücksetzen gelingt trotzdem (Schlüssel mit Leerzeichen und Zeilenumbruch drumherum eingefügt), Hinweis auf der Anmeldeseite nennt das Konto; Anmeldung mit dem neuen Passwort sofort möglich, mit dem alten 401 | ok |
-| Eine zweite, vorher angemeldete Sitzung ist danach abgemeldet; Eintrag in `php-error.log` mit Konto und Adresse | ok |
-| 5 falsche Schlüssel von einer Adresse: der 6. Versuch mit richtigem Schlüssel 429 | ok |
-| Angemeldet zurücksetzen: eigene Sitzung danach beendet, Hinweis auf der Anmeldeseite | ok |
-| Zwei Konten: Seite fragt nach dem Benutzernamen; ohne bzw. mit unbekanntem Namen Meldung mit den vorhandenen Namen (nur nach richtigem Schlüssel – mit falschem Schlüssel nennt die Meldung keine Namen); mit Namen wird nur dieses Konto geändert | ok |
-| Chrome (headless), Entwicklungsserver: Verweis auf der Anmeldeseite angeklickt, falscher Schlüssel → Meldung, richtiger Schlüssel → Anmeldeseite mit Hinweis, Anmeldung mit dem neuen Passwort → Übersicht | ok |
+| Nach dem Einspielen: Migration auf Version 5 beim ersten Aufruf; Anmeldung mit dem bisherigen Benutzernamen (auch in anderer Schreibweise); Feld heißt „E-Mail-Adresse oder Benutzername“; Hinweis in der Übersicht und auf der Kontoseite | ok |
+| Seite „Passwort vergessen“ weist auf das Konto ohne E-Mail-Adresse hin; Anforderung für dieses Konto: neutrale Antwort, keine E-Mail | ok |
+| Einrichtungsschlüssel: mit ungültiger E-Mail-Adresse bleibt alles unverändert; mit Adresse werden Passwort und Anmeldename in einem Schritt gesetzt (Adresse kleingeschrieben gespeichert); Anmeldung mit der Adresse in beliebiger Schreibweise, alter Benutzername und altes Passwort 401; vorherige Sitzung beendet; Feld heißt danach „E-Mail-Adresse“, Hinweis in der Übersicht weg | ok |
+| Einrichtungsschlüssel falsch, leer in `config.php`, kürzer als 24 Zeichen, Felder als Liste: 403 mit derselben Meldung, nichts geändert; 5 falsche Schlüssel → 429 auch mit dem richtigen, Anmeldeseite währenddessen erreichbar | ok |
+| Link anfordern: unbekannte Adresse und bekannte Adresse – dieselbe Antwort, beide nach 1,0 s; E-Mail nur für die bekannte; `To` ist die gespeicherte Adresse, `From` `website@lotharprokop.com`, Betreff und Text UTF-8, kein `X-Mailer`; Link beginnt mit `base_url`; Token steht nicht im Klartext in der Datenbank | ok |
+| Anforderung über einen fremden Host-Header (`falsch.example`): Link in der E-Mail trotzdem `https://www.lotharprokop.com/…` | ok |
+| Link öffnen: 200, Konto genannt, `Referrer-Policy: no-referrer`, `no-store`; mehrfaches Öffnen verbraucht ihn nicht; ungültiger, fehlender oder als Liste übergebener Token 410 ohne PHP-Meldung | ok |
+| Neues Passwort über den Link: ohne CSRF-Token 403; Passwörter ungleich bzw. zu kurz → Meldung; gültig → Anmeldeseite mit Hinweis, Anmeldung mit neuem Passwort, altes 401, andere Sitzung beendet, Eintrag im Log | ok |
+| Nach 5 falschen Anmeldungen ausgesperrt (richtiges Passwort 429): Link anfordern und Passwort setzen gelingt, Anmeldung danach sofort möglich | ok |
+| Verbrauchter Link: Seite 410; erneutes Absenden mit gültigem CSRF-Token 410, Passwort unverändert | ok |
+| Zweiter Link entwertet den ersten; abgelaufener Link 410 | ok |
+| Obergrenzen: 4. Anforderung für ein Konto in einer Stunde – neutrale Antwort, keine E-Mail; 6. Anforderung von einer Adresse in 15 Minuten 429; Anmeldung währenddessen weiter möglich | ok |
+| Versand schlägt fehl: 500 mit Fehlermeldung statt Erfolgsmeldung, kein gültiger Link bleibt zurück | ok |
+| Kontoseite, E-Mail-Adresse ändern: falsches Passwort, ungültige Adresse, Adresse eines anderen Kontos (auch in anderer Schreibweise) → Meldung; ohne CSRF-Token 403, abgemeldet 302; gültig → gespeichert, weiter angemeldet; offener Link an die alte Adresse 410 | ok |
+| Passwort auf der Kontoseite ändern entwertet einen offenen Link | ok |
+| Zwei Konten: Schlüssel-Seite fragt nach dem Konto, ändert nur dieses, lehnt die Adresse des anderen Kontos ab | ok |
+| Ersteinrichtung: Benutzername statt E-Mail-Adresse wird abgelehnt; mit Adresse angelegt und angemeldet | ok |
+| Kontaktformular nach dem Umbau des Versands (11 Fälle wie oben, Entwicklungsserver): unverändert; Kopfzeilen `From`, `Reply-To`, jetzt zusätzlich `MIME-Version` und `Content-Transfer-Encoding` | ok |
+| Chrome (headless), Entwicklungsserver, Konto mit Benutzernamen: Anmeldeseite → „Passwort vergessen?“ → Hinweis → Schlüssel-Seite mit E-Mail-Adresse → Anmeldeseite; Link angefordert, Adresse aus der Datei-E-Mail geöffnet, neues Passwort gesetzt, angemeldet, Kontoseite zeigt die Adresse; derselbe Link danach ungültig | ok |
 
-Nicht getestet: auf dem Live-Server; andere Browser.
+Nicht getestet: auf dem Live-Server; ob E-Mails beim Hoster tatsächlich versendet werden und ankommen (lokal nur der Ersatz-`sendmail`); andere Browser.
 
 ## Nicht getestet
 

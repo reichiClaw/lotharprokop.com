@@ -5,8 +5,8 @@ declare(strict_types=1);
 /**
  * Adminkonto über die Kommandozeile anlegen (empfohlener Weg der Ersteinrichtung).
  *   php bin/create-user.php                – interaktiv
- *   php bin/create-user.php name           – Passwort wird abgefragt
- *   LP_PASSWORD=… php bin/create-user.php name  – nicht interaktiv (z. B. Deployment)
+ *   php bin/create-user.php name@example.org   – Passwort wird abgefragt
+ *   LP_PASSWORD=… php bin/create-user.php name@example.org  – nicht interaktiv (z. B. Deployment)
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -16,7 +16,7 @@ require dirname(__DIR__) . '/app/bootstrap.php';
 
 $username = $argv[1] ?? '';
 if ($username === '') {
-    fwrite(STDOUT, "Benutzername: ");
+    fwrite(STDOUT, "E-Mail-Adresse (Anmeldename): ");
     $username = trim((string) fgets(STDIN));
 }
 $password = getenv('LP_PASSWORD') ?: '';
@@ -30,4 +30,4 @@ try {
     fwrite(STDERR, 'Fehler: ' . $e->getMessage() . "\n");
     exit(1);
 }
-echo "Benutzer „{$username}“ angelegt. Anmeldung unter /admin/login\n";
+echo "Konto „" . mb_strtolower(trim($username)) . "“ angelegt. Anmeldung unter /admin/login\n";

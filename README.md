@@ -48,7 +48,7 @@ Danach `https://DOMAIN/check.php` aufrufen (prüft PHP, Erweiterungen, Limits, P
 
 ```bash
 cp config/config.example.php config/config.php     # base_url: http://localhost:8080, debug: true
-php bin/create-user.php admin                       # Adminkonto
+php bin/create-user.php office@example.org          # Adminkonto (Anmeldung mit E-Mail-Adresse)
 php bin/import-legacy.php                           # optional: Bestandsinhalte von der alten Site laden
 php -S 127.0.0.1:8080 -t public public/index.php
 ```

@@ -220,7 +220,7 @@ UPLOAD PER FTP – Variante „getrennt“ (empfohlen)
    Falls „NICHT beschreibbar“: Ordner  $appDirName/storage  (mit Unterordnern) und  htdocs/media  für PHP beschreibbar machen (chmod 755/775).
    Danach check.php vom Server LÖSCHEN (mit Adminkonto antwortet es ohnehin nur noch mit ?key=<setup_key>).
 4. https://DOMAIN/admin/setup aufrufen. Einrichtungsschlüssel: siehe  $appDirName/config/config.php  ('setup_key').
-   Benutzername und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
+   E-Mail-Adresse (Anmeldename) und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
 5. In  $appDirName/config/config.php  'base_url' prüfen (aktuell: $baseUrl).
 
 TXT
@@ -236,7 +236,7 @@ UPLOAD PER FTP – Variante „ein Ordner“ (nur wenn das Webroot nicht änderb
    Falls „NICHT beschreibbar“: Ordner  storage  (mit Unterordnern) und  public/media  für PHP beschreibbar machen.
    Danach public/check.php vom Server LÖSCHEN (mit Adminkonto antwortet es ohnehin nur noch mit ?key=<setup_key>).
 4. https://DOMAIN/admin/setup aufrufen. Einrichtungsschlüssel: siehe  config/config.php  ('setup_key').
-   Benutzername und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
+   E-Mail-Adresse (Anmeldename) und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
 5. In  config/config.php  'base_url' prüfen (aktuell: $baseUrl).
 
 TXT;

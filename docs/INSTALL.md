@@ -87,7 +87,7 @@ Der Anwendungsordner liegt **neben** dem Webroot, also eine Ebene höher als all
 
    `htdocs/app-path.php` verweist auf `dirname(__DIR__) . '/lotharprokop'`. Liegt der Ordner woanders oder heißt anders, den Pfad dort anpassen (absolute Pfade sind erlaubt). Ohne Datei sucht `index.php` automatisch in `../`, `../lotharprokop` und `../lotharprokop-app`.
 3. `https://DOMAIN/check.php` aufrufen. Der Server-Check zeigt PHP-Version, Erweiterungen, Upload-Limits, `mod_rewrite`, gefundenen Anwendungsordner, Konfiguration und Schreibrechte in einer Tabelle (OK / Hinweis / Fehlt). Meldet er „NICHT beschreibbar“: `lotharprokop/storage/` (mit Unterordnern) und `htdocs/media/` für PHP beschreibbar machen (bei Shared Hosting läuft PHP meist als Kontobenutzer, dann reicht `755`). **Danach `check.php` vom Server löschen** – die Seite gibt Details zur Serverumgebung preis.
-4. `https://DOMAIN/admin/setup` aufrufen, `setup_key` aus `lotharprokop/config/config.php` sowie Benutzername und Passwort (mindestens 12 Zeichen) eingeben. Danach ist `/admin/setup` dauerhaft deaktiviert (404); den `setup_key` in der Datei zusätzlich leeren.
+4. `https://DOMAIN/admin/setup` aufrufen, `setup_key` aus `lotharprokop/config/config.php` sowie E-Mail-Adresse (Anmeldename) und Passwort (mindestens 12 Zeichen) eingeben. Danach ist `/admin/setup` dauerhaft deaktiviert (404); den `setup_key` in der Datei zusätzlich leeren.
 5. Unter `/admin` → **System** prüfen: PHP-Version, Bildbibliothek, Upload-Limits, Schreibrechte, „Bilder ohne Varianten: keine“.
 
 Hat der Hoster kein Verzeichnis oberhalb des Webroots (nur FTP-Zugang direkt ins Webroot): Variante B.
@@ -133,28 +133,33 @@ In `config/config.php` steht ein langer, zufälliger `setup_key` (vom Release-Bu
 **B) Kommandozeile (wenn vorhanden)**
 
 ```bash
-php bin/create-user.php lothar          # Passwort wird abgefragt
-LP_PASSWORD='…' php bin/create-user.php lothar   # nicht interaktiv
+php bin/create-user.php office@example.org          # Passwort wird abgefragt
+LP_PASSWORD='…' php bin/create-user.php office@example.org   # nicht interaktiv
 ```
 
-Passwörter: mindestens 12 Zeichen, Speicherung mit `password_hash()` (bcrypt). Nach 5 Fehlversuchen innerhalb von 15 Minuten wird die Kombination IP/Benutzername 15 Minuten gesperrt (persistent in der Datenbank).
+Passwörter: mindestens 12 Zeichen, Speicherung mit `password_hash()` (bcrypt). Nach 5 Fehlversuchen innerhalb von 15 Minuten wird die Kombination IP/Anmeldename 15 Minuten gesperrt (persistent in der Datenbank).
 
-### Passwort vergessen
+### Anmeldename und „Passwort vergessen“
 
-Auf der Anmeldeseite führt „Passwort vergessen?“ zu `/admin/passwort-vergessen`. Dort setzt der Einrichtungsschlüssel ein neues Passwort – der Nachweis ist also der Zugriff auf die Dateien des Servers, nicht eine E-Mail:
+**Anmeldename ist eine E-Mail-Adresse.** Neue Konten werden nur mit E-Mail-Adresse angelegt (gespeichert in Kleinbuchstaben, bei der Anmeldung spielt die Schreibweise keine Rolle). Konten aus älteren Ständen behalten ihren Benutzernamen, bis er geändert wird: `/admin` → Name oben rechts → **Konto** → „E-Mail-Adresse für die Anmeldung“ (mit dem aktuellen Passwort). Solange ein solches Konto existiert, heißt das Feld auf der Anmeldeseite „E-Mail-Adresse oder Benutzername“, und die Übersicht erinnert daran.
+
+**Passwort vergessen – Link per E-Mail.** Auf der Anmeldeseite führt „Passwort vergessen?“ zu `/admin/passwort-vergessen`. Nach Eingabe der Anmelde-Adresse geht ein Link an genau diese Adresse; über ihn wird ein neues Passwort festgelegt.
+
+- Der Link gilt 60 Minuten und nur einmal; ein neuer Link entwertet frühere. In der Datenbank steht nur der SHA-256 des Tokens. Der Link führt immer auf die Adresse aus `base_url`, nie auf den Host der Anfrage.
+- Die Seite antwortet für bekannte und unbekannte Adressen gleich („Wenn zu … ein Konto gehört …“) und gleich schnell. Einzige Ausnahme: Nimmt der Server die E-Mail nicht zum Versand an, meldet die Seite den Fehler – eine Erfolgsmeldung ohne Versand gibt es nicht.
+- Grenzen: höchstens 3 E-Mails pro Konto und Stunde, höchstens 5 Anforderungen je Adresse (IP) in 15 Minuten. Diese Zähler sind von der Anmeldesperre getrennt: Wer nach Fehlversuchen ausgesperrt ist, kann trotzdem einen Link anfordern, und Anforderungen sperren die Anmeldung nicht.
+- Das neue Passwort beendet alle Sitzungen des Kontos und hebt die Anmeldesperre für dieses Konto und die eigene Adresse auf. Ein Passwort- oder Adresswechsel im Admin entwertet offene Links.
+- Versand über `mail()` mit dem Absender `mail.from` (leer: `website@<Domain aus base_url>`), unabhängig davon, ob das Kontaktformular (`mail.enabled`) eingeschaltet ist. Ob E-Mails tatsächlich ankommen, hängt vom Hoster ab (SPF der Absenderdomain).
+
+**Notweg – Einrichtungsschlüssel.** Kommt keine E-Mail an oder hat das Konto noch keine E-Mail-Adresse, setzt `/admin/passwort-schluessel` das Passwort mit dem `setup_key` aus `config/config.php` neu – der Nachweis ist dann der Zugriff auf die Dateien des Servers:
 
 1. Per FTP `config/config.php` herunterladen und den Wert bei `'setup_key'` kopieren. Ist er leer, einen eigenen Schlüssel aus mindestens 24 zufälligen Buchstaben und Ziffern eintragen und die Datei hochladen.
-2. Schlüssel und neues Passwort (mindestens 12 Zeichen) auf der Seite eingeben. Gibt es mehrere Konten, fragt die Seite zusätzlich nach dem Benutzernamen.
+2. Schlüssel und neues Passwort auf der Seite eingeben; im selben Schritt lässt sich der Anmeldename auf eine E-Mail-Adresse umstellen. Gibt es mehrere Konten, fragt die Seite, welches gemeint ist.
 3. Anmelden und den `setup_key` wieder leeren.
 
-Dabei gilt:
+Ohne Schlüssel in `config.php` – oder mit einem kürzeren als 24 Zeichen – ändert diese Seite nichts; sie antwortet in allen Fällen mit derselben Meldung und verrät nicht, ob ein Schlüssel hinterlegt ist. Nach 5 falschen Schlüsseln von einer Adresse ist sie für diese Adresse 15 Minuten gesperrt. Solange ein `setup_key` in `config.php` steht, kann jeder, der ihn kennt, das Passwort neu setzen; die Datei ist nicht über HTTP erreichbar, steckt aber in jedem Backup-Archiv (siehe unten).
 
-- Ohne Schlüssel in `config.php` – oder mit einem kürzeren als 24 Zeichen – ändert die Seite nichts. Sie antwortet in allen Fällen mit derselben Meldung und verrät nicht, ob ein Schlüssel hinterlegt ist.
-- Das neue Passwort beendet alle bestehenden Sitzungen des Kontos und hebt die Sperre nach Fehlversuchen für dieses Konto und die eigene Adresse auf. Eine Sperre bei der Anmeldung verhindert das Zurücksetzen nicht.
-- Nach 5 falschen Schlüsseln von einer Adresse innerhalb von 15 Minuten ist das Zurücksetzen für diese Adresse 15 Minuten gesperrt.
-- Jedes Zurücksetzen wird mit Konto und Adresse in `storage/logs/php-error.log` vermerkt.
-
-Solange ein `setup_key` in `config.php` steht, kann jeder, der ihn kennt, das Passwort neu setzen. Die Datei ist nicht über HTTP erreichbar; sie steckt aber in jedem Backup-Archiv (siehe unten).
+Jedes Zurücksetzen wird mit Konto und Adresse in `storage/logs/php-error.log` vermerkt.
 
 ### Wartung ohne Kommandozeile
 
@@ -167,7 +172,7 @@ Alles, was `bin/` per Shell erledigt, gibt es für FTP-Hosting auch im Browser u
 | Datenbank sichern | „Datenbank herunterladen“ (konsistente Kopie per `VACUUM INTO`) | `php bin/backup.php` |
 | Originale sichern | per FTP `storage/originals/` herunterladen | in `bin/backup.php` enthalten |
 | Adminkonto anlegen | `/admin/setup` mit `setup_key` | `php bin/create-user.php` |
-| Passwort vergessen | `/admin/passwort-vergessen` mit `setup_key` | – |
+| Passwort vergessen | `/admin/passwort-vergessen` (Link per E-Mail), Notweg `/admin/passwort-schluessel` mit `setup_key` | – |
 | Passwort ändern | `/admin/passwort` | – |
 
 Wird per FTP ein neuer `storage/`-Stand eingespielt (z. B. Backup), lässt sich eine leere Datei `storage/cache/needs-sync` anlegen: Beim nächsten Aufruf gleicht die Anwendung `media/` automatisch ab und löscht die Markierung.
@@ -296,7 +301,7 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 - CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`); ohne gültiges Token Antwort 403
 - Kontaktformular: Honeypot, signierter Zeitstempel (Formular muss vom Server ausgegeben und mindestens einige Sekunden alt sein), höchstens 5 Nachrichten je Absenderadresse (IPv6: je /64-Netz) und `mail.max_per_hour` insgesamt pro Stunde, keine Zeilenumbrüche in Kopfzeilen
 - Weiterleitungen führen nie auf fremde Hosts: lokale Ziele werden bereinigt (`//host`, `/\host`), das Rücksprungziel nach der Anmeldung muss unter `/admin` liegen
-- Passwort vergessen: neues Passwort nur mit dem Einrichtungsschlüssel aus `config/config.php` (mindestens 24 Zeichen, Vergleich mit `hash_equals`, Sperre nach 5 Fehlversuchen je Adresse); ohne Schlüssel ist die Funktion aus
+- Passwort vergessen: einmal gültiger Link (60 Minuten, 256 Bit Zufall, gespeichert nur als SHA-256) an die Anmelde-Adresse; gleiche Antwort und Antwortzeit für bekannte und unbekannte Adressen; Obergrenzen je Konto und je Adresse; Link-Ziel aus `base_url`. Notweg mit dem Einrichtungsschlüssel aus `config/config.php` (mindestens 24 Zeichen, `hash_equals`, Sperre nach 5 Fehlversuchen je Adresse) – ohne Schlüssel ist er aus
 - Entwürfe sind für Besucher von nicht vorhandenen Seiten nicht zu unterscheiden; `check.php` antwortet nach dem Anlegen des Adminkontos nur noch mit Einrichtungsschlüssel
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis

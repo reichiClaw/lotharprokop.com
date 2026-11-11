@@ -70,7 +70,7 @@ final class AdminController
             return;
         }
         try {
-            Auth::createUser((string) ($_POST['username'] ?? ''), $password);
+            Auth::createUser(is_string($_POST['username'] ?? null) ? $_POST['username'] : '', $password);
         } catch (\InvalidArgumentException $e) {
             self::render('setup', ['disabled' => false, 'error' => $e->getMessage(), 'meta' => ['title' => 'Einrichtung']]);
             return;
@@ -107,64 +107,10 @@ final class AdminController
         if (!Auth::attempt($username, $password)) {
             usleep(300000);
             http_response_code(401);
-            self::render('login', ['error' => 'Benutzername oder Passwort ist falsch.', 'username' => $username, 'meta' => ['title' => 'Anmelden']]);
+            self::render('login', ['error' => 'Die Zugangsdaten sind falsch.', 'username' => $username, 'meta' => ['title' => 'Anmelden']]);
             return;
         }
         redirect($after === '/admin' || str_starts_with($after, '/admin/') ? $after : '/admin');
-    }
-
-    /* Passwort vergessen: neues Passwort mit dem Einrichtungsschlüssel aus config/config.php setzen. */
-
-    public static function resetForm(array $params): void
-    {
-        if (!Auth::hasUsers()) {
-            redirect('/admin/setup');
-        }
-        self::render('reset', ['askUsername' => count(Auth::usernames()) > 1, 'meta' => ['title' => 'Passwort zurücksetzen']]);
-    }
-
-    public static function reset(array $params): void
-    {
-        if (!Auth::hasUsers()) {
-            View::notFound();
-            return;
-        }
-        Csrf::verify();
-        $field = static fn(string $name): string => is_string($_POST[$name] ?? null) ? $_POST[$name] : '';
-        $username = trim($field('username'));
-        $data = ['askUsername' => count(Auth::usernames()) > 1, 'username' => $username, 'meta' => ['title' => 'Passwort zurücksetzen']];
-        $wait = Auth::resetLockedFor();
-        if ($wait > 0) {
-            http_response_code(429);
-            self::render('reset', $data + ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($wait / 60) . ' Minuten erneut versuchen.']);
-            return;
-        }
-        if (!Auth::resetKeyMatches($field('setup_key'))) {
-            Auth::noteResetFailure();
-            usleep(500000);
-            http_response_code(403);
-            // Dieselbe Meldung für „falsch“, „nicht gesetzt“ und „zu kurz“ – die Seite verrät nicht, ob ein Schlüssel hinterlegt ist.
-            self::render('reset', $data + ['error' => 'Der Einrichtungsschlüssel stimmt nicht. Er muss genau so in config/config.php bei \'setup_key\' stehen und mindestens ' . Auth::RESET_KEY_MIN . ' Zeichen lang sein.']);
-            return;
-        }
-        $password = $field('password');
-        if ($password !== $field('password2')) {
-            self::render('reset', $data + ['error' => 'Die Passwörter stimmen nicht überein.']);
-            return;
-        }
-        try {
-            $name = Auth::resetPassword($username, $password);
-        } catch (\InvalidArgumentException $e) {
-            self::render('reset', $data + ['error' => $e->getMessage()]);
-            return;
-        }
-        error_log('Passwort für das Konto ' . $name . ' mit dem Einrichtungsschlüssel neu gesetzt (Adresse ' . client_ip() . ').');
-        // Eine eigene Sitzung mit dem alten Passwort ist jetzt ungültig – leeren und mit neuer Kennung fortsetzen.
-        Auth::startSession();
-        session_regenerate_id(true);
-        $_SESSION = [];
-        self::flash('ok', 'Das Passwort für „' . $name . '“ wurde neu gesetzt. Bitte anmelden – und danach den Wert setup_key in config/config.php leeren.');
-        redirect('/admin/login');
     }
 
     public static function logout(array $params): void
@@ -177,7 +123,36 @@ final class AdminController
     public static function passwordForm(array $params): void
     {
         Auth::requireLogin();
-        self::render('password', ['meta' => ['title' => 'Passwort ändern']]);
+        self::render('password', ['meta' => ['title' => 'Konto']]);
+    }
+
+    /** Anmeldenamen auf eine (andere) E-Mail-Adresse ändern – nur mit dem aktuellen Passwort. */
+    public static function loginEmail(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verify();
+        $field = static fn(string $name): string => is_string($_POST[$name] ?? null) ? $_POST[$name] : '';
+        $userId = (int) Auth::userId();
+        $username = Auth::username();
+        $data = ['email' => trim($field('email')), 'meta' => ['title' => 'Konto']];
+        $locked = Auth::lockedFor($username);
+        if ($locked > 0) {
+            http_response_code(429);
+            self::render('password', $data + ['emailError' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($locked / 60) . ' Minuten erneut versuchen.']);
+            return;
+        }
+        if (!Auth::attempt($username, $field('current'))) {
+            self::render('password', $data + ['emailError' => 'Das aktuelle Passwort ist falsch.']);
+            return;
+        }
+        try {
+            $email = Auth::changeLogin($userId, $field('email'));
+        } catch (\InvalidArgumentException $e) {
+            self::render('password', $data + ['emailError' => $e->getMessage()]);
+            return;
+        }
+        self::flash('ok', 'Die Anmeldung erfolgt ab jetzt mit ' . $email . '. An diese Adresse geht auch der Link bei „Passwort vergessen?“.');
+        redirect('/admin/passwort');
     }
 
     public static function password(array $params): void
@@ -193,21 +168,21 @@ final class AdminController
         $locked = Auth::lockedFor($username);
         if ($locked > 0) {
             http_response_code(429);
-            self::render('password', ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($locked / 60) . ' Minuten erneut versuchen.', 'meta' => ['title' => 'Passwort ändern']]);
+            self::render('password', ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($locked / 60) . ' Minuten erneut versuchen.', 'meta' => ['title' => 'Konto']]);
             return;
         }
         if (!Auth::attempt($username, $current)) {
-            self::render('password', ['error' => 'Das aktuelle Passwort ist falsch.', 'meta' => ['title' => 'Passwort ändern']]);
+            self::render('password', ['error' => 'Das aktuelle Passwort ist falsch.', 'meta' => ['title' => 'Konto']]);
             return;
         }
         if ($new !== (string) ($_POST['password2'] ?? '')) {
-            self::render('password', ['error' => 'Die neuen Passwörter stimmen nicht überein.', 'meta' => ['title' => 'Passwort ändern']]);
+            self::render('password', ['error' => 'Die neuen Passwörter stimmen nicht überein.', 'meta' => ['title' => 'Konto']]);
             return;
         }
         try {
             Auth::changePassword($userId, $new);
         } catch (\InvalidArgumentException $e) {
-            self::render('password', ['error' => $e->getMessage(), 'meta' => ['title' => 'Passwort ändern']]);
+            self::render('password', ['error' => $e->getMessage(), 'meta' => ['title' => 'Konto']]);
             return;
         }
         self::flash('ok', 'Das Passwort wurde geändert.');
@@ -628,7 +603,7 @@ final class AdminController
             'Originale' => human_bytes(self::dirSize(Config::storage('originals'))),
             'Öffentliche Varianten' => human_bytes(self::dirSize(Config::publicMedia())),
             'HTTPS' => is_https() ? 'ja' : 'nein',
-            'Kontaktformular' => Config::get('mail.enabled') ? 'aktiv → ' . Config::get('mail.to') . ' (Absender ' . \App\ContactForm::fromAddress() . ')' : 'deaktiviert',
+            'Kontaktformular' => Config::get('mail.enabled') ? 'aktiv → ' . Config::get('mail.to') . ' (Absender ' . \App\Mailer::from() . ')' : 'deaktiviert',
         ];
         $missing = self::imagesWithoutVariants();
         self::render('system', [

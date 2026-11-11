@@ -192,6 +192,19 @@ SQL,
 ALTER TABLE hero_slides ADD COLUMN site TEXT NOT NULL DEFAULT 'main';
 CREATE INDEX idx_hero_slides_site ON hero_slides (site, sort_order, id)
 SQL,
+            // Passwort vergessen: einmal gültige Links per E-Mail. Gespeichert wird nur der SHA-256 des
+            // Tokens. IF NOT EXISTS, damit zwei gleichzeitige erste Aufrufe nach dem Update nicht kollidieren.
+            5 => <<<'SQL'
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash TEXT NOT NULL UNIQUE,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    used_at INTEGER
+);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets (user_id, created_at)
+SQL,
         ];
     }
 }

@@ -17,7 +17,7 @@ use App\Csrf;
     <form method="post" action="/admin/setup" class="a-form">
       <?= Csrf::field() ?>
       <div class="a-field"><label for="setup_key">Einrichtungsschlüssel</label><input type="password" id="setup_key" name="setup_key" required autocomplete="off"></div>
-      <div class="a-field"><label for="username">Benutzername</label><input type="text" id="username" name="username" required autocomplete="username" pattern="[A-Za-z0-9._-]{3,40}"></div>
+      <div class="a-field"><label for="username">E-Mail-Adresse (damit melden Sie sich an; dorthin geht auch der Link bei „Passwort vergessen?“)</label><input type="email" id="username" name="username" required autocomplete="username" maxlength="190"></div>
       <div class="a-field"><label for="password">Passwort (mindestens 12 Zeichen)</label><input type="password" id="password" name="password" required minlength="12" autocomplete="new-password"></div>
       <div class="a-field"><label for="password2">Passwort wiederholen</label><input type="password" id="password2" name="password2" required minlength="12" autocomplete="new-password"></div>
       <button type="submit" class="a-btn">Adminkonto anlegen</button>

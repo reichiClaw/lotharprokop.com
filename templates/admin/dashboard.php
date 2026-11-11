@@ -11,6 +11,13 @@ use App\Images;
   <a class="a-btn" href="/admin/galerien/neu">Neue Galerie</a>
 </div>
 
+<?php if (!App\Auth::isEmail(App\Auth::username())): ?>
+<div class="a-flash a-flash--warn" role="status">
+  <strong>E-Mail-Adresse für die Anmeldung fehlt:</strong> Sie melden sich noch mit einem Benutzernamen an. Erst mit einer
+  E-Mail-Adresse funktioniert „Passwort vergessen?“ per E-Mail. <a href="/admin/passwort">Jetzt eintragen</a>
+</div>
+<?php endif; ?>
+
 <?php if (!empty($calledAs)): ?>
 <div class="a-flash a-flash--warn" role="status">
   <strong>Adresse in der Konfiguration prüfen:</strong> In <code>config/config.php</code> steht als <code>base_url</code>

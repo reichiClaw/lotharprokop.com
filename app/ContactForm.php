@@ -33,12 +33,7 @@ final class ContactForm
     /** Absenderadresse: eingetragen ('mail.from') oder aus der Domain von base_url abgeleitet (website@DOMAIN). */
     public static function fromAddress(): string
     {
-        $from = trim((string) Config::get('mail.from', ''));
-        if ($from !== '') {
-            return $from;
-        }
-        $host = (string) parse_url(Config::baseUrl(), PHP_URL_HOST);
-        return 'website@' . (preg_replace('~^www\.~i', '', $host) ?: 'localhost');
+        return Mailer::from();
     }
 
     /** Zufälliges Geheimnis dieser Installation, im privaten Speicher abgelegt (nie ausgeliefert). */
@@ -114,16 +109,9 @@ final class ContactForm
         }
 
         $to = (string) Config::get('mail.to');
-        $from = self::fromAddress();
         $subject = $subjectPrefix . 'Anfrage von ' . preg_replace('/[\r\n]+/', ' ', $values['name']);
         $body = "Name: {$values['name']}\nE-Mail: {$values['email']}\n\n{$values['message']}\n\n—\nGesendet über das {$origin}, IP " . client_ip();
-        $headers = [
-            'From: ' . $from,
-            'Reply-To: ' . $values['email'],
-            'Content-Type: text/plain; charset=utf-8',
-        ];
-        $encodedSubject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
-        $sent = @mail($to, $encodedSubject, $body, implode("\r\n", $headers));
+        $sent = Mailer::send($to, $subject, $body, $values['email']);
         $pdo->prepare('INSERT INTO contact_submissions (ip, created_at) VALUES (?, ?)')->execute([self::rateKey(), time()]);
 
         if (!$sent) {
