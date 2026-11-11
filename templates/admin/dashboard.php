@@ -16,7 +16,8 @@ use App\Images;
   <strong>Adresse in der Konfiguration prüfen:</strong> In <code>config/config.php</code> steht als <code>base_url</code>
   <code><?= e(App\Config::baseUrl() ?: '(leer)') ?></code>, aufgerufen wird die Website aber über <code><?= e($calledAs) ?></code>.
   Solange das nicht übereinstimmt, verweisen Canonical-Angaben, <code>sitemap.xml</code>, <code>robots.txt</code> und Vorschaubilder für
-  soziale Netzwerke auf die eingetragene Adresse. Abhilfe: <code>'base_url' =&gt; '<?= e($calledAs) ?>'</code> eintragen.
+  soziale Netzwerke auf die eingetragene Adresse. Ist <code><?= e($calledAs) ?></code> die Adresse, unter der Besucher die
+  Website sehen sollen, dort <code>'base_url' =&gt; '<?= e($calledAs) ?>'</code> eintragen.
 </div>
 <?php endif; ?>
 

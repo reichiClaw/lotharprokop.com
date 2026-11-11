@@ -99,7 +99,9 @@ if (in_array($method, ['GET', 'HEAD'], true) && Architektur::config('canonical_r
     $requestHost = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
     // Standardports weglassen, damit „example.org“ und „example.org:443“ gleich behandelt werden.
     $requestHost = (string) preg_replace('/:(80|443)$/', '', $requestHost);
-    if ($targetHost !== '' && $requestHost !== '' && $requestHost !== $targetHost) {
+    // Angemeldete Admins bleiben auf der Hauptdomain: nur dort gilt ihre Sitzung, und nur so ist die
+    // Vorschau unveröffentlichter Projekte erreichbar.
+    if ($targetHost !== '' && $requestHost !== '' && $requestHost !== $targetHost && !App\Auth::checkIfCookie()) {
         redirect($target . $canonicalPath . ($query !== '' ? '?' . $query : ''), 301);
     }
 }
