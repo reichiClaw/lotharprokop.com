@@ -15,7 +15,8 @@ muss das Webroot sein; der lokale Baum ist dist/release/htdocs (anderer Pfad üb
 
 Regeln (siehe „Updates per FTP“ in docs/INSTALL.md):
   - der Server wird zuerst gelistet und verglichen; `diff` und `--dry-run` schreiben nichts;
-  - gleich große Dateien werden per SHA-256 verglichen (heruntergeladen), eine unveränderte Datei
+  - gleich große Dateien werden per SHA-256 verglichen (heruntergeladen; ein gemerkter Wert gilt nur,
+    solange Größe und Änderungszeit auf dem Server gleich sind), eine unveränderte Datei
     wird nie erneut hochgeladen, eine gleich große Änderung trotzdem erkannt;
   - config/config.php, app-path.php, storage/ und die öffentlichen Bildordner (media/) werden nie
     geschrieben, egal was lokal liegt (gilt für beide Installationsvarianten);
@@ -220,21 +221,28 @@ def local_tree():
 
 
 def server_tree(ftp):
-    files, dirs = {}, set()
-    for full, kind, size, _, _ in ftp.walk("/", skip_dirs=PROTECTED_DIRS):
+    """-> (files {rel: size}, dirs, modified {rel: MLSD modify time})"""
+    files, dirs, modified = {}, set(), {}
+    for full, kind, size, modify, _ in ftp.walk("/", skip_dirs=PROTECTED_DIRS):
         if kind == "dir":
             dirs.add(full)
         else:
             files[full] = size
-    return files, dirs
+            modified[full] = modify
+    return files, dirs, modified
 
 
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def compare(ftp, local, server, cache):
-    """-> (to_upload [(rel, reason)], identical [rel], server_only [rel])"""
+def compare(ftp, local, server, cache, modified):
+    """-> (to_upload [(rel, reason)], identical [rel], server_only [rel])
+
+    A cached server hash counts only while size and modification time on the server are unchanged;
+    without a modification time from the server the file is downloaded every time. Otherwise a
+    same-size change made outside this tool would be compared against a stale hash.
+    """
     to_upload, identical = [], []
     for rel in sorted(local):
         if is_protected(rel):
@@ -244,8 +252,10 @@ def compare(ftp, local, server, cache):
         elif server[rel] != os.path.getsize(local[rel]):
             to_upload.append((rel, "size"))
         else:
-            if cache.get(rel, {}).get("size") != server[rel]:
-                cache[rel] = {"size": server[rel], "sha256": sha256(ftp.download_bytes(rel))}
+            known = cache.get(rel, {})
+            stamp = modified.get(rel)
+            if stamp is None or known.get("size") != server[rel] or known.get("modify") != stamp:
+                cache[rel] = {"size": server[rel], "modify": stamp, "sha256": sha256(ftp.download_bytes(rel))}
             with open(local[rel], "rb") as fh:
                 if cache[rel]["sha256"] == sha256(fh.read()):
                     identical.append(rel)
@@ -285,7 +295,7 @@ def report(to_upload, identical, server_only, local, server):
 def cmd_diff(args, do_upload=False):
     ftp = connect(args.verbose)
     local = local_tree()
-    server, dirs = server_tree(ftp)
+    server, dirs, modified = server_tree(ftp)
     print(f"# local files: {len(local)}, server files: {len(server)}")
     cache_file = os.path.join(ROOT, "dist", ".deploy-ftp-cache.json")
     cache = {}
@@ -293,7 +303,7 @@ def cmd_diff(args, do_upload=False):
         with open(cache_file) as fh:
             cache = json.load(fh)
     try:
-        to_upload, identical, server_only = compare(ftp, local, server, cache)
+        to_upload, identical, server_only = compare(ftp, local, server, cache, modified)
     finally:
         with open(cache_file, "w") as fh:
             json.dump(cache, fh)

@@ -561,7 +561,27 @@ Geprüft mit den lokal vorhandenen Daten am Album „eta“ (Kategorien Produkt 
 | Ausblenden über den Admin der Hauptdomain: Projektseite unter der eigenen Domain ohne die Bilder; Ordner in `architektur/media/` **und** `public/architektur/media/` entfernt (Abruf 404), `public/media/` unverändert (200); „Sichtbarkeit aller Bilder abgleichen“ lässt sie draußen | ok |
 | Alle ausblenden / alle zeigen wie oben; kein neuer Eintrag im PHP-Fehlerprotokoll | ok |
 
-Nicht getestet: auf dem Live-Server; andere Browser als Chrome; Bedienung auf Touchgeräten.
+### Live eingespielt und nachgeprüft (11.11.2026, 16:06–16:30 Uhr Wiener Zeit)
+
+Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release des Stands `7eb1b1b`: 15 Dateien abweichend – genau die geänderten –, alle anderen identisch. Hochgeladen in der neuen Reihenfolge des Werkzeugs (Dokumentation und statische Dateien, `app/Database.php`, übriger Code, Template, `public/index.php`); nach `app/Database.php` wurden drei Seiten abgerufen (200), erst dann folgte der übrige Code. `config/config.php`, `storage/` und die Bildordner wurden nicht geschrieben.
+
+| Prüfung (lesend, direkt am neuen Server) | Ergebnis |
+|---|---|
+| Dateigrößen aller 15 Dateien nach dem Upload | ok |
+| Schnappschuss vor und nach dem Upload: 15 Seiten beider Domains 200 ohne PHP-Meldung; je Projekt der Architekturseite (9 Projekte, 100 Bilder) Titelbild der Karte, Bildfolge, Umfang und `og:image`; Zähler; 20 Sitemap-Einträge – vorher und nachher identisch | ok |
+| Migration 6 gelaufen (die Seiten der Architekturseite lesen die neue Spalte und antworten fehlerfrei) | ok |
+| Neue Adresse `…/bilder/{id}/architektur`: abgemeldet → Anmeldeseite, GET 405, auf der Architektur-Domain 404; Galerie im Admin abgemeldet → Anmeldeseite | ok |
+| `admin.css` und `admin.js` enthalten die neuen Teile, Versionskennung 16 | ok |
+| `app/Database.php`, `config/config.php`, `storage/database.sqlite`, `/admin/setup` weiterhin 404 | ok |
+| Abschließender Vergleich ohne gemerkte Werte: alle 144 Programmdateien frisch heruntergeladen und per SHA-256 identisch mit dem Release (offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
+
+Dabei aufgefallen und behoben: `tools/deploy-ftp.py` merkte sich die Prüfsumme einer Serverdatei nur zusammen mit ihrer Größe. Nach dem Upload meldete es deshalb `app/View.php` (gleiche Größe, anderer Inhalt) fälschlich als abweichend; direkt heruntergeladen war die Datei identisch. Umgekehrt hätte eine gleich große Änderung außerhalb des Werkzeugs unbemerkt bleiben können – das betrifft auch die früheren Abschlussvergleiche in dieser Datei, soweit Dateien ihre Größe nicht geändert hatten. Der gemerkte Wert gilt jetzt nur noch bei gleicher Größe und gleicher Änderungszeit auf dem Server; der Vergleich oben lief ohne gemerkte Werte.
+
+Beobachtung ohne Bezug zur Änderung: Ein POST ganz ohne Inhalt beantwortet der Hoster bei allen Admin-Adressen mit 405 (lokal 302). Die Formulare und Skripte der Verwaltung senden immer mindestens das CSRF-Token.
+
+Live nicht ausgeführt: keine Anmeldung, kein Bild ausgeblendet – der Schalter selbst ist auf dem Live-Server ungeprüft.
+
+Nicht getestet: der Schalter auf dem Live-Server; andere Browser als Chrome; Bedienung auf Touchgeräten.
 
 ## Nicht getestet
 
