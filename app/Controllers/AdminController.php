@@ -169,6 +169,7 @@ final class AdminController
             'counts' => $counts,
             'recent' => $recent,
             'slides' => HeroSlides::all(),
+            'calledAs' => Config::baseUrlMismatch(),
             'meta' => ['title' => 'Übersicht'],
         ]);
     }
@@ -504,7 +505,11 @@ final class AdminController
     {
         Auth::requireLogin();
         $storage = Config::storage();
+        $calledAs = Config::baseUrlMismatch();
         $checks = [
+            'Adresse laut config.php (base_url)' => $calledAs === null
+                ? Config::baseUrl()
+                : 'NEIN – eingetragen ist ' . (Config::baseUrl() ?: 'nichts') . ', aufgerufen wird die Website über ' . $calledAs . '. Bitte in config/config.php anpassen.',
             'PHP-Version' => PHP_VERSION,
             'Bildbibliothek' => ImageProcessor::backend() . (class_exists('Imagick') ? ' (' . \Imagick::getVersion()['versionString'] . ')' : ''),
             'WebP-Ausgabe' => ImageProcessor::supportsWebp() ? 'ja' : 'nein',

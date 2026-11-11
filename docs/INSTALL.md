@@ -52,7 +52,7 @@ Die Website braucht auf dem Server weder Kommandozeile noch Composer. Alles, was
 Auf dem eigenen Rechner (PHP 8.1+ vorhanden) im Projektordner:
 
 ```bash
-php bin/build-release.php --with-content --base-url=https://lotharprokop.com
+php bin/build-release.php --with-content --base-url=https://www.lotharprokop.com
 # Varianten:
 #   --layout=single   alles in einem Ordner (siehe Variante B)
 #   --zip             zusätzlich ein ZIP-Archiv erzeugen
@@ -106,7 +106,7 @@ Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot 
 1. Repository-Inhalt auf den Server laden, z. B. nach `/home/kunde/lotharprokop/`.
 2. Document Root der Domain auf `/home/kunde/lotharprokop/public` setzen.
 3. `config/config.example.php` nach `config/config.php` kopieren und anpassen:
-   - `base_url` (z. B. `https://lotharprokop.com`)
+   - `base_url`: genau die Adresse, unter der die Website im Browser steht (z. B. `https://www.lotharprokop.com` – mit `www`, wenn der Hoster dorthin umleitet). Daraus entstehen Canonical-Angaben, `sitemap.xml`, `robots.txt` und Vorschaubilder; nach einem Domainwechsel anpassen. Weicht der Eintrag von der aufgerufenen Adresse ab, warnt die Admin-Übersicht.
    - `mail.enabled` nur auf `true`, wenn `mail()` auf dem Server nachweislich zustellt; `mail.from` muss zur Domain passen.
    - `setup_key`: langer zufälliger Wert, wenn das Adminkonto über den Browser angelegt werden soll (siehe unten).
 4. Schreibrechte: `storage/` und `public/media/` müssen für PHP beschreibbar sein.

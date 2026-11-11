@@ -5,7 +5,7 @@
  */
 return [
     // Öffentliche Basis-URL ohne abschließenden Schrägstrich (für Canonical, Sitemap, Social-Vorschau).
-    'base_url' => 'https://lotharprokop.com',
+    'base_url' => 'https://www.lotharprokop.com',
 
     // Anzeigename der Website
     'site_name' => 'Lothar Prokop Fotografie',

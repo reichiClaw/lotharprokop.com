@@ -2,6 +2,7 @@
 /** @var array $counts */
 /** @var array $recent */
 /** @var array $slides */
+/** @var string|null $calledAs */
 use App\Galleries;
 use App\Images;
 ?>
@@ -9,6 +10,15 @@ use App\Images;
   <h1 class="a-title">Übersicht</h1>
   <a class="a-btn" href="/admin/galerien/neu">Neue Galerie</a>
 </div>
+
+<?php if (!empty($calledAs)): ?>
+<div class="a-flash a-flash--warn" role="status">
+  <strong>Adresse in der Konfiguration prüfen:</strong> In <code>config/config.php</code> steht als <code>base_url</code>
+  <code><?= e(App\Config::baseUrl() ?: '(leer)') ?></code>, aufgerufen wird die Website aber über <code><?= e($calledAs) ?></code>.
+  Solange das nicht übereinstimmt, verweisen Canonical-Angaben, <code>sitemap.xml</code>, <code>robots.txt</code> und Vorschaubilder für
+  soziale Netzwerke auf die eingetragene Adresse. Abhilfe: <code>'base_url' =&gt; '<?= e($calledAs) ?>'</code> eintragen.
+</div>
+<?php endif; ?>
 
 <div class="a-stats">
   <a class="a-stat" href="/admin/galerien?status=published"><strong><?= $counts['published'] ?></strong><span>veröffentlichte Galerien</span></a>

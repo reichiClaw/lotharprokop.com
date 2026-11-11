@@ -8,7 +8,7 @@ declare(strict_types=1);
  *   php bin/build-release.php                       → dist/release/ (Variante „getrennt“, ohne Inhalte)
  *   php bin/build-release.php --with-content        → zusätzlich Datenbank, Originale und Bildvarianten
  *   php bin/build-release.php --layout=single       → alles in einem Ordner (wenn das Webroot nicht änderbar ist)
- *   php bin/build-release.php --base-url=https://lotharprokop.com
+ *   php bin/build-release.php --base-url=https://www.lotharprokop.com
  *   php bin/build-release.php --out=/pfad/ziel --zip
  *
  * Variante „getrennt“ (Standard, empfohlen):
@@ -44,7 +44,7 @@ if (!in_array($layout, ['split', 'single'], true)) {
     exit(1);
 }
 $out = rtrim((string) ($opts['out'] ?? APP_ROOT . '/dist/release'), '/');
-$baseUrl = rtrim((string) ($opts['base-url'] ?? 'https://lotharprokop.com'), '/');
+$baseUrl = rtrim((string) ($opts['base-url'] ?? 'https://www.lotharprokop.com'), '/');
 $appDirName = 'lotharprokop';
 
 function rrmdir(string $dir): void
