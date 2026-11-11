@@ -66,6 +66,7 @@ return [
         'subject_prefix' => '[lotharprokop.com] ',
         'min_seconds' => 4, // Formular schneller ausgefüllt = wahrscheinlich Bot
         'max_per_hour_per_ip' => 5,
+        'max_per_hour' => 30, // alle Absender zusammen
     ],
 
     // Architekturseite – zweiter Auftritt derselben Installation im Webroot-Unterordner public/architektur

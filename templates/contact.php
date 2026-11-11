@@ -41,7 +41,7 @@ $values = $state['values'];
       <h2 class="contact__form-title">Nachricht schreiben</h2>
       <?php if (!empty($errors['form'])): ?><div class="notice notice--error" role="alert"><p><?= e($errors['form']) ?></p></div><?php endif; ?>
       <form method="post" action="/kontakt" class="form" novalidate>
-        <input type="hidden" name="_t" value="<?= time() ?>">
+        <input type="hidden" name="_t" value="<?= e(App\ContactForm::stamp()) ?>">
         <p class="form__hp" aria-hidden="true"><label for="website">Website</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></p>
         <div class="form__field">
           <label for="name">Name</label>
