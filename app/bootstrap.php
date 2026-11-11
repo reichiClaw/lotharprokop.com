@@ -109,11 +109,14 @@ if (App\Architektur::enabled()) {
     // Das Porträt der Profilseite gehört seit diesem Stand zu den Bildern der Architekturseite.
     // Bestehende Installationen legen es einmalig in deren Bildordner (nur dieses eine Bild).
     $portraitMarker = App\Config::storage('cache') . '/architektur-portrait-synced';
-    if (!is_file($portraitMarker) && @file_put_contents($portraitMarker, date('c')) !== false) {
+    if (!is_file($portraitMarker)) {
         try {
             $portraitId = App\Settings::getInt('portrait_image_id');
             if ($portraitId > 0) {
                 App\Images::syncPublic($portraitId);
+            }
+            if (@file_put_contents($portraitMarker, date('c')) === false) {
+                error_log('Marker für das Porträt der Architekturseite konnte nicht geschrieben werden.');
             }
         } catch (\Throwable $e) {
             error_log('Abgleich des Porträts für die Architekturseite fehlgeschlagen: ' . $e->getMessage());
