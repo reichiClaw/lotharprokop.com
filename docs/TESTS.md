@@ -405,6 +405,68 @@ World4You weist eine Domain nur einem Ordner direkt im Webroot zu. `public/archi
 | `php -S` mit Document Root = `architektur/` neben `public/`: Startseite 200, eigenes CSS als Datei, `site.js` und eine Schrift aus `public/assets` durchgereicht, Favicon 200, keine PHP-Fehler, Links ohne Präfix `/architektur` | ok |
 | Unterordner `/architektur/` und Hauptseite danach unverändert 200 | ok |
 
+## Domainumzug auf lotharprokop.com: Verweise, Fehler, Sicherheit (11.11.2026)
+
+Anlass: Die Website ist unter `lotharprokop.com` erreichbar. Geprüft wurde der Live-Stand (nur lesend, `GET`/`HEAD`, keine Anmeldung, keine Formulare abgeschickt, nichts verändert) und der Code dieses Stands. Korrekturen wurden lokal geprüft – mit dem PHP-Entwicklungsserver und mit Apache 2.4.58 + mod_php (zwei virtuelle Hosts wie beim Hoster: Hauptdomain auf das Webroot der Variante „ein Ordner“, Architekturdomain auf dessen Ordner `architektur/`; Aufrufe mit `X-Forwarded-Proto: https`). Bilder lokal: neutrale Testbilder, keine Fotografien.
+
+### Live, lesend (11.11.2026, ca. 08:00–09:00 Uhr Wiener Zeit)
+
+| Prüfung | Ergebnis |
+|---|---|
+| `https://lotharprokop.com/…` → 301 → `https://www.lotharprokop.com/…`, `http://` → `https://`; Zertifikat gültig für `lotharprokop.com` und `*.lotharprokop.com` | ok |
+| Crawl `www.lotharprokop.com`: 76 Seiten, alle 200; 3867 Bild-, CSS-, JS-, Schrift- und PDF-Adressen aus diesen Seiten, alle 200; keine PHP-Meldungen im HTML; je Seite eine `h1`, keine doppelten Titel/Beschreibungen/IDs, kein Bild ohne `alt` | ok |
+| Crawl `www.architekturfotografie.net`: 23 Seiten, alle 200; 836 Dateien, davon 830 × 200 | 6 × 404: das Porträt auf `/profil` – behoben, siehe unten |
+| Interne Links im HTML sind relativ (`/…`) und funktionieren unter der neuen Domain | ok |
+| `<link rel="canonical">`, `og:url`, `og:image` auf allen 76 Seiten, `Sitemap:` in `robots.txt`, alle 72 `<loc>` in `sitemap.xml`; auf der Architekturseite die Rückverweise „Fotografie – lotharprokop.com“ | **zeigen auf `https://lothar.drve.at`** (nicht mehr erreichbar) – Ursache: `base_url` in der `config/config.php` auf dem Server; im Code steht die alte Adresse nirgends. Behebung: dort `https://www.lotharprokop.com` eintragen |
+| Alte WordPress-Adressen (`/works/`, `/portfolio/…`, `/kontaktneu/`, `/datenschutzerklaerung/` u. a.) | 301 bzw. 410 wie in [REDIRECTS.md](REDIRECTS.md) |
+| `//a//evil.example/` | **301 mit `Location: //evil.example`** – offene Weiterleitung, behoben, siehe unten |
+| `config/`, `storage/`, `app/`, `templates/`, `bin/`, `data/`, `docs/`, `.git`, `.htaccess`, `app-path.php` → 403/404; `check.php` und `/admin/setup` → 404; `wp-login.php`, `xmlrpc.php` → 410; `TRACE` → 403 | ok |
+| Sitzungscookie der Anmeldeseite: `Secure; HttpOnly; SameSite=Lax`; Adminseiten `Cache-Control: no-store`; CSP, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` vorhanden | ok; es fehlten HSTS und `nosniff` auf Bild-/CSS-/JS-Antworten – ergänzt |
+| Einzelne Verbindungen (rund 1–2 %) erreichten noch den früheren Server (89.22.104.110, nginx, WordPress), der `www` auf die Adresse ohne `www` zurückleitet | Übergang der DNS-Umstellung, kein Fehler der Anwendung |
+| Externe Verweise: Google-Maps-Kurzlink, Google-Datenschutz, Vimeo-Datenschutz erreichbar | ok; Instagram, Facebook, LinkedIn antworten automatischen Abrufen mit Anmelde-/Sperrseiten und ließen sich so nicht prüfen |
+
+### Korrekturen, lokal geprüft
+
+| Prüfung | Ergebnis |
+|---|---|
+| Weiterleitungen: `//a//evil.example/`, `//evil.example/`, `/\evil.example/`, `//a/\evil.example/`, `///`, `/%5Cevil.example/`, `/%2F%2Fevil.example/` – jeweils Hauptseite und Architekturseite, Entwicklungsserver und Apache | ok – Ziel immer lokal (`/a/evil.example`, `/evil.example`, `/`), nie `//…` oder `/\…`; die kodierten Varianten bleiben kodiert (lokaler Pfad) bzw. beantwortet Apache mit 404 |
+| Alte WordPress-Adressen mit Schrägstrich am Ende weiterhin in einem Schritt (`/works/` → `/fotografie`, `/portfolio/<slug>/` → `/projekte/<slug>`); neu `/portfolio` → `/fotografie`; unbekanntes und unveröffentlichtes Projekt unter `/portfolio/…` gleichermaßen 410 | ok |
+| Canonical und `og:url` ohne Query-Anhang; `/fotografie?kategorie=…` behält den Filter im Canonical; unbekannter Filter und `?kategorie[]=x` → Seite ohne Filter, keine PHP-Meldung; leere Kategorie `noindex, follow` | ok |
+| `og:image` bei Installation im Unterordner ohne doppelten Basis-Pfad | ok |
+| Header: `X-Content-Type-Options: nosniff` genau einmal – auf PHP-Antworten und auf Dateien (Apache); `Strict-Transport-Security` nur bei HTTPS, nicht bei `http://` | ok |
+| Porträt der Profilseite: nach dem Einspielen kopiert der erste Seitenaufruf die Varianten in den Bildordner der Architekturseite (Marker `architektur-portrait-synced`); Porträt in den Einstellungen ersetzen: neues sofort auf beiden Domains 200, das alte entfernt (404) | ok |
+| Hinweis im Admin, wenn `base_url` nicht zur aufgerufenen Adresse passt (Übersicht und Systemseite), verschwindet nach der Korrektur; in Chrome (headless) angesehen | ok |
+| Kontaktformular, 11 Fälle mit einem Ersatz-`sendmail`, das in eine Datei schreibt: ohne/mit gefälschtem/zu frischem Zeitstempel abgelehnt, gültig angenommen, 6. Nachricht derselben Adresse und 31. Nachricht insgesamt je Stunde abgelehnt, ausgefüllter Honeypot ohne Versand, Architekturformular, Zeilenumbruch im E-Mail-Feld abgelehnt, kein `X-Mailer`, Absender `website@lotharprokop.com` bei leerem `mail.from` | ok |
+| Anmeldung: Antwortzeit bekannter/unbekannter Benutzername im Median 351 ms / 352 ms (je 8 Versuche); Sperre nach 5 Fehlversuchen, gilt auch im Formular „Passwort ändern“ (429); Passwortwechsel beendet eine zweite Sitzung desselben Kontos, die eigene bleibt; vor dem Update begonnene Sitzung bleibt gültig; Rücksprungziel nach der Anmeldung nur `/admin…` | ok |
+| Entwurf und nicht vorhandenes Projekt für Besucher nicht unterscheidbar (beide 404, kein `Set-Cookie`); angemeldet Vorschau 200 | ok |
+| Architekturseite: Entwurf über die Hauptdomain – unangemeldet 301 auf die eigene Domain (dort 404), angemeldet 200 mit Bildern aus `/admin/media/…`; diese Bilder unangemeldet 403 | ok |
+| `check.php`: ohne Adminkonto 200; mit Adminkonto 404, mit falschem Schlüssel 404, mit `?key=<setup_key>` 200 | ok |
+| Fehlendes oder falsches CSRF-Token: 403 mit Meldung (unter Apache vorher 500, weil der Server den Code 419 nicht kennt); JSON-Variante 403; Abmelden ohne Token wirkungslos | ok |
+| Admin: Galerie ohne Bilder lässt sich nicht veröffentlichen; nach dem Entfernen des letzten Bildes zurück auf „Entwurf“; Reihenfolge der Hervorhebungen lässt Entwürfe unberührt; Bildfolge der Startseite behält den Verweis auf ein vorübergehend unveröffentlichtes Projekt; Kategorie ändern/löschen gleicht die Bildordner ab; abgelehnter Film hinterlässt kein hochgeladenes Vorschaubild; „Zuletzt bearbeitet“ nach Änderungsdatum | ok |
+| Apache, frische Installation aus dem Release: Einrichtung, danach `/admin/setup` 404; alle Adminseiten 200 ohne PHP-Meldung, abgemeldet 302; geschützte Pfade 403/404; `TRACE`, `OPTIONS`, `PUT`, `DELETE` 405 | ok |
+| Apache, Crawl des Release mit `base_url` `https://www.lotharprokop.com`: Hauptseite 76 Seiten, 75 interne Links, 3867 Dateien – alle 200; Architekturseite 23 Seiten, 23 Links, 813 Dateien – alle 200; Canonical, `og:url`, `og:image`, `robots.txt`, `sitemap.xml` auf dem jeweils richtigen Host; keine Adresse mit `lothar.drve.at` | ok |
+| `php -l` aller PHP-Dateien | ok |
+
+### Einspielen in eine bestehende Installation (Apache, nachgestellt)
+
+Der Stand, der live läuft (Commit `28279fb`, Variante „ein Ordner“, `base_url` `https://lothar.drve.at`, Adminkonto angelegt, `check.php` gelöscht), wurde lokal aufgebaut; darüber wurden nur die Programmdateien kopiert (ohne `config/config.php`, `storage/`, Bildordner, `check.php`).
+
+| Prüfung | Ergebnis |
+|---|---|
+| Vorher: Canonical `https://lothar.drve.at/`, `//a//evil.example/` → `Location: //evil.example`, Porträt auf der Architekturdomain 404 | wie live |
+| Danach: `config/config.php` unverändert (Prüfsumme), Seiten 200, bestehende Sitzung bleibt angemeldet, Anmeldung mit dem bestehenden Konto, `check.php` und `/admin/setup` 404 | ok |
+| Porträt nach dem ersten Seitenaufruf 200; `//a//evil.example/` → `/a/evil.example` | ok |
+| Übersicht zeigt den Hinweis „`base_url` `https://lothar.drve.at`, aufgerufen wird … `https://www.lotharprokop.com`“ | ok |
+| Nach dem Ändern von `base_url` in `config/config.php`: Crawl beider Hosts ohne Befund (Zahlen wie oben), Rückverweis der Architekturseite `https://www.lotharprokop.com`, Hinweis verschwunden. Die Änderung wirkte erst nach rund zwei Sekunden (OPcache des lokalen Apache) | ok |
+
+### Nicht getestet (11.11.2026)
+
+- Die Korrekturen auf dem Live-Server – sie sind dort nicht eingespielt; live wurde nichts verändert
+- Angemeldeter Adminbereich und Kontaktformular live (keine Anmeldung, kein Formular abgeschickt; das Formular ist live derzeit abgeschaltet)
+- Echter Mailversand (nur mit Ersatz-`sendmail` in eine Datei)
+- Verhalten hinter dem Proxy/OPcache des Hosters, PHP-FPM
+- Browser außer Chrome (headless, nur der Admin-Hinweis); Screenreader; Ladezeiten
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft
@@ -414,7 +476,6 @@ World4You weist eine Domain nur einem Ordner direkt im Webroot zu. `public/archi
 
 - Echter Mailversand des Kontaktformulars
 - nginx-Konfiguration (nur als Beispiel dokumentiert)
-- Secure-Cookie-Flag unter HTTPS (nur im Code, nicht im Betrieb geprüft)
 - Safari/Firefox, iOS/Android auf echten Geräten (nur Chrome, davon mobile Größe per Viewport-Emulation)
 - Wirkung des Redesigns mit den echten Fotografien (lokal standen nur neutrale Testbilder zur Verfügung)
 - Ladezeiten, Core Web Vitals oder sonstige Performancewerte (nicht gemessen)

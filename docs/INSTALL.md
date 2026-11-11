@@ -167,6 +167,12 @@ python3 tools/deploy-ftp.py deploy --dry-run  # zeigen, was hochgeladen würde
 python3 tools/deploy-ftp.py deploy            # hochladen und prüfen
 ```
 
+### Domain wechseln
+
+Die Adresse der Website steht an genau einer Stelle: `'base_url'` in `config/config.php` (für die Architekturseite zusätzlich `architektur.base_url`). Daraus entstehen Canonical-Angaben, `og:url`/`og:image`, `sitemap.xml`, die `Sitemap:`-Zeile der `robots.txt`, die Verweise zwischen beiden Auftritten und – wenn `mail.from` leer ist – der Absender des Kontaktformulars. Links innerhalb der Seiten sind relativ und funktionieren unter jeder Domain.
+
+Nach einem Umzug also `'base_url' => 'https://www.NEUE-DOMAIN'` eintragen – genau so, wie Besucher die Website am Ende sehen (mit oder ohne `www`, je nachdem, wohin der Hoster umleitet). Steht in älteren Konfigurationen bei `mail.from` noch eine Zeile mit der alten Adresse, dort die neue Absenderadresse eintragen oder den Wert leeren. Stimmt `base_url` nicht mit der aufgerufenen Adresse überein, weist die Übersicht im Admin darauf hin; die Systemseite zeigt denselben Punkt als Prüfung. Danach die Sitemap in der Search Console neu einreichen.
+
 ### Apache
 
 `public/.htaccess` enthält Rewrite-Regeln (alle Anfragen auf nicht existierende Dateien gehen an `index.php`), Cache-Header, PHP-Limits und die Sperre versteckter Dateien sowie von `app-path.php`. `public/media/.htaccess` verhindert jede Skriptausführung im Bildverzeichnis und liefert dort nur `.jpg`/`.webp` aus; sie enthält bewusst keine `Options`-Direktive, weil manche Hoster `Options` in `.htaccess` nicht erlauben und dann alle Bilder mit Fehler 500 beantworten (das Verzeichnislisting ist bereits in `public/.htaccess` abgeschaltet und wird vererbt). `app/`, `config/`, `storage/`, `templates/`, `bin/`, `data/` und `docs/` enthalten jeweils eine `.htaccess` mit `Require all denied` als zweite Verteidigungslinie, falls sie doch einmal im Webroot landen. Voraussetzung: `AllowOverride All` (bei Shared Hosting Standard).
@@ -268,10 +274,13 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 
 ## Sicherheit – Kurzüberblick
 
-- Server-seitige Anmeldung (bcrypt), Session-Cookie `HttpOnly`, `SameSite=Lax`, `Secure` bei HTTPS, Session-ID-Rotation beim Login, Leerlauf- und Absolut-Timeout, persistentes Rate-Limit
-- CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`)
+- Server-seitige Anmeldung (bcrypt), Session-Cookie `HttpOnly`, `SameSite=Lax`, `Secure` bei HTTPS, Session-ID-Rotation beim Login, Leerlauf- und Absolut-Timeout, persistentes Rate-Limit (5 Fehlversuche je Benutzername oder Adresse in 15 Minuten; gilt auch für das Formular „Passwort ändern“). Ein Passwortwechsel beendet alle anderen Sitzungen des Kontos. Unbekannte Benutzernamen kosten dieselbe Rechenzeit wie bekannte.
+- CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`); ohne gültiges Token Antwort 403
+- Kontaktformular: Honeypot, signierter Zeitstempel (Formular muss vom Server ausgegeben und mindestens einige Sekunden alt sein), höchstens 5 Nachrichten je Absenderadresse (IPv6: je /64-Netz) und `mail.max_per_hour` insgesamt pro Stunde, keine Zeilenumbrüche in Kopfzeilen
+- Weiterleitungen führen nie auf fremde Hosts: lokale Ziele werden bereinigt (`//host`, `/\host`), das Rücksprungziel nach der Anmeldung muss unter `/admin` liegen
+- Entwürfe sind für Besucher von nicht vorhandenen Seiten nicht zu unterscheiden; `check.php` antwortet nach dem Anlegen des Adminkontos nur noch mit Einrichtungsschlüssel
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis
 - HTTPS erzwungen: beide `.htaccess`-Varianten leiten `http://` dauerhaft (`301`) auf dieselbe Adresse unter `https://` um (Pfad und Query bleiben erhalten; `X-Forwarded-Proto` wird berücksichtigt, `/.well-known/acme-challenge/` ist ausgenommen). Voraussetzung ist ein gültiges Zertifikat beim Hoster.
-- Security-Header inkl. Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
+- Security-Header inkl. `Strict-Transport-Security` (bei HTTPS, 180 Tage, ohne `includeSubDomains`), `X-Content-Type-Options: nosniff` auch für Bild-, CSS- und JS-Dateien, Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
 - Kein Tracking, keine externen Ressourcen, Schriften lokal
