@@ -474,6 +474,7 @@ Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Se
 | `check.php`, `/admin/setup`, `config/config.php`, `storage/…` weiterhin 404 | ok |
 | Crawl `www.lotharprokop.com` nach der Änderung von `base_url`: 76 Seiten 200; 3943 Dateien (jetzt einschließlich der `og:image`-Adressen) – 3900 × 200, 43 × 301 vom früheren WordPress-Server (DNS-Übergang), alle 43 direkt am neuen Server nachgeprüft: 200; alle 72 Sitemap-Einträge, Canonical, `og:url`, `og:image` auf `https://www.lotharprokop.com`; keine Adresse mit `lothar.drve.at` mehr | ok |
 | Crawl `www.architekturfotografie.net`: 23 Seiten 200, 836 Dateien 200 (vorher 6 × 404), Rückverweise auf `https://www.lotharprokop.com` | ok |
+| Abschließend `tools/deploy-ftp.py diff`: alle Programmdateien auf dem Server per SHA-256 identisch mit dem Release dieses Stands (137 Dateien; offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
 
 ### Nicht getestet (11.11.2026)
 
