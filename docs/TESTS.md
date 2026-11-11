@@ -520,7 +520,7 @@ Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Se
 | `/admin/passwort-vergessen` 200 mit Hinweis auf das Konto ohne E-Mail-Adresse, `Referrer-Policy: no-referrer`; `/admin/passwort-schluessel` 200 mit den Feldern Schlüssel, E-Mail-Adresse, Passwort (vorher beide 404) | ok |
 | `/admin/passwort-neu` ohne und mit erfundenem Token 410 | ok |
 | `/admin` und `/admin/passwort` abgemeldet → `/admin/login`; `/admin/setup` weiterhin 404 | ok |
-| Startseite, Kontakt, Fotografie, Vita und `www.architekturfotografie.net` 200 ohne PHP-Meldung; `app/Auth.php`, `config/config.php`, `storage/database.sqlite` 404; Admin-Adressen auf der Architektur-Domain 404 | ok |
+| Startseite, Kontakt, Fotografie, Vita und `www.architekturfotografie.net` 200 ohne PHP-Meldung; `app/Auth.php`, `config/config.php`, `storage/database.sqlite` 404; `/admin/passwort-schluessel` auf der Architektur-Domain 404 | ok |
 | Migration 5 gelaufen (Seiten mit Datenbankzugriff antworten fehlerfrei, Datenbankdatei gewachsen) | ok |
 | Abschließend `tools/deploy-ftp.py diff`: alle Programmdateien auf dem Server per SHA-256 identisch mit dem Release dieses Stands (offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
 
