@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Architektur;
 use App\Auth;
 use App\Categories;
 use App\Csrf;
@@ -77,6 +78,10 @@ final class AdminGalleryController
             'usageCounts' => $usageCounts,
             'categories' => Categories::all(),
             'selected' => Galleries::categoryIds($gallery['id']),
+            // Auswahl je Bild nur anbieten, wenn die Galerie überhaupt auf der Architekturseite stehen kann.
+            'archScope' => Architektur::enabled() && Architektur::inScope($gallery),
+            // Entwürfe sind nur über die Hauptdomain als Vorschau erreichbar (dort gilt die Anmeldung).
+            'archUrl' => ($gallery['status'] === 'published' && Architektur::baseUrl() !== '' ? Architektur::baseUrl() : '/' . Architektur::DIR) . '/projekte/' . rawurlencode($gallery['slug']),
             'meta' => ['title' => 'Galerie: ' . $gallery['title']],
         ]);
     }

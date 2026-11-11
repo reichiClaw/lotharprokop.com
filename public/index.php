@@ -139,6 +139,7 @@ $router->post('/admin/galerien/{id:\d+}/bilder/sortieren', [AdminImageController
 $router->post('/admin/galerien/{id:\d+}/bilder/{image:\d+}/bewegen', [AdminImageController::class, 'move']);
 $router->post('/admin/galerien/{id:\d+}/bilder/{image:\d+}/entfernen', [AdminImageController::class, 'remove']);
 $router->post('/admin/galerien/{id:\d+}/bilder/{image:\d+}/titelbild', [AdminImageController::class, 'setCover']);
+$router->post('/admin/galerien/{id:\d+}/bilder/{image:\d+}/architektur', [AdminImageController::class, 'setArchitektur']);
 $router->get('/admin/bilder/{id:\d+}', [AdminImageController::class, 'edit']);
 $router->post('/admin/bilder/{id:\d+}', [AdminImageController::class, 'update']);
 $router->post('/admin/bilder/{id:\d+}/ersetzen', [AdminImageController::class, 'replace']);

@@ -92,9 +92,9 @@ final class AdminArchitekturController
                     AdminController::flash('error', $e->getMessage());
                 }
             } elseif ($galleryId !== null) {
-                $cover = AdminController::galleryCover($galleryId);
+                $cover = Architektur::cover($galleryId);
                 if ($cover === null) {
-                    AdminController::flash('error', 'Dieses Projekt hat noch kein Titelbild. Erst ein Bild zuweisen oder hier eine eigene Datei hochladen.');
+                    AdminController::flash('error', 'Dieses Projekt hat kein Bild, das auf der Architekturseite gezeigt wird. Erst ein Bild zuweisen oder hier eine eigene Datei hochladen.');
                 } else {
                     HeroSlides::add($cover['id'], $galleryId, self::SITE);
                     AdminController::flash('ok', 'Projekt in die Bildfolge aufgenommen.');

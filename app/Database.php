@@ -41,15 +41,22 @@ final class Database
             if ($number <= $version) {
                 continue;
             }
-            $pdo->beginTransaction();
+            // Schreibsperre vor der Prüfung: Treffen nach einem Update zwei Aufrufe gleichzeitig ein,
+            // wartet der zweite und findet die Migration dann schon eingetragen (ALTER TABLE ist nicht wiederholbar).
+            $pdo->exec('BEGIN IMMEDIATE');
             try {
-                foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
-                    $pdo->exec($statement);
+                $check = $pdo->prepare('SELECT 1 FROM schema_version WHERE version = ?');
+                $check->execute([$number]);
+                if (!$check->fetchColumn()) {
+                    foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
+                        $pdo->exec($statement);
+                    }
+                    $pdo->prepare('INSERT INTO schema_version (version) VALUES (?)')->execute([$number]);
                 }
-                $pdo->prepare('INSERT INTO schema_version (version) VALUES (?)')->execute([$number]);
-                $pdo->commit();
+                $check->closeCursor();
+                $pdo->exec('COMMIT');
             } catch (\Throwable $e) {
-                $pdo->rollBack();
+                $pdo->exec('ROLLBACK');
                 throw $e;
             }
         }
@@ -204,6 +211,11 @@ CREATE TABLE IF NOT EXISTS password_resets (
     used_at INTEGER
 );
 CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets (user_id, created_at)
+SQL,
+            // Gemischte Alben: einzelne Bilder einer Galerie auf der Architekturseite ausblenden.
+            // Gilt je Zuordnung Galerie–Bild; die Hauptseite zeigt weiterhin alle Bilder.
+            6 => <<<'SQL'
+ALTER TABLE gallery_images ADD COLUMN hide_architektur INTEGER NOT NULL DEFAULT 0
 SQL,
         ];
     }

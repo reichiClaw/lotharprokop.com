@@ -159,6 +159,44 @@
     });
   });
 
+  /* ---------- Gemischte Alben: Bild auf der Architekturseite ausblenden / zeigen ---------- */
+  document.querySelectorAll('form[data-arch-toggle]').forEach(function (form) {
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var input = form.querySelector('input[name="hidden"]');
+      var button = form.querySelector('button');
+      var item = form.closest('.a-image');
+      var section = form.closest('section') || document;
+      var state = section.querySelector('[data-savestate]');
+      var fd = new FormData();
+      fd.append('hidden', input.value);
+      button.disabled = true;
+      post(form.action, fd).then(function (data) {
+        button.disabled = false;
+        if (!data || !data.ok) {
+          // Die Statuszeile steht unter der Liste und ist bei langen Alben nicht im Blick.
+          window.alert((data && data.error) || 'Speichern fehlgeschlagen.');
+          return;
+        }
+        input.value = data.hidden ? '0' : '1';
+        button.textContent = data.hidden ? 'Auf Architekturseite zeigen' : 'Auf Architekturseite ausblenden';
+        if (item) {
+          item.classList.toggle('is-arch-hidden', data.hidden);
+          var badge = item.querySelector('[data-arch-badge]');
+          if (badge) badge.hidden = !data.hidden;
+        }
+        var count = section.querySelector('[data-arch-count]');
+        if (count) count.textContent = data.shown + ' von ' + data.total;
+        var empty = section.querySelector('[data-arch-empty]');
+        if (empty) empty.hidden = data.shown > 0;
+        setState(state, data.hidden ? 'Auf der Architekturseite ausgeblendet.' : 'Wird auf der Architekturseite gezeigt.', 'ok');
+      }).catch(function () {
+        button.disabled = false;
+        window.alert('Verbindungsfehler – bitte erneut versuchen.');
+      });
+    });
+  });
+
   /* ---------- Upload mit echtem Fortschritt (eine Datei pro Anfrage) ---------- */
   document.querySelectorAll('form[data-upload]').forEach(function (form) {
     var input = form.querySelector('[data-upload-input]');

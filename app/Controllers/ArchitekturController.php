@@ -7,7 +7,6 @@ use App\Architektur;
 use App\Auth;
 use App\Config;
 use App\ContactForm;
-use App\Galleries;
 use App\Images;
 use App\Picture;
 use App\Settings;
@@ -85,7 +84,7 @@ final class ArchitekturController
             $preview = true;
             header('Cache-Control: no-store');
         }
-        $images = Galleries::images($gallery['id']);
+        $images = Architektur::images($gallery['id']);
         $neighbours = $preview ? ['prev' => null, 'next' => null] : Architektur::neighbours($gallery);
         $cover = $gallery['cover'] ?? ($images[0] ?? null);
         // Nur Kategorien des Architektur-Umfangs anzeigen (ein Projekt kann auch andere tragen).
