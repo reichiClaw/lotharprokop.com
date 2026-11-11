@@ -20,7 +20,10 @@ Regeln (siehe „Updates per FTP“ in docs/INSTALL.md):
   - config/config.php, app-path.php, storage/ und die öffentlichen Bildordner (media/) werden nie
     geschrieben, egal was lokal liegt (gilt für beide Installationsvarianten);
   - es wird nie gelöscht – Dateien, die nur auf dem Server liegen, werden gemeldet;
-  - jeder Upload geht nach <name>.uploading~ und wird dann umbenannt.
+  - jeder Upload geht nach <name>.uploading~ und wird dann umbenannt;
+  - Reihenfolge: statische Dateien, dann app/Database.php (Migrationen laufen beim nächsten Aufruf,
+    bevor neuer Code das neue Schema liest), Bibliotheken, Controller, Templates, zuletzt die
+    Front-Controller – kein Zwischenstand ruft Code auf, der noch nicht auf dem Server liegt.
 
 Host quirks handled here (World4You, Pure-FTPd):
   - TLS 1.3 data connections are reset by the server, so TLS is capped at 1.2;
@@ -155,6 +158,36 @@ class NatPoolFTPS(FTP_TLS):
             self.close()
 
 
+def upload_order(rel, why=""):
+    """Sort key for uploads: the site keeps answering requests while files arrive one by one, so no
+    intermediate state may call code (or read a database column) that is not on the server yet.
+
+    0 static files and command-line scripts, 1 Database.php (the next request runs new migrations
+    before any code reads the new schema), 2 helpers, 3 libraries, 4 controllers, 5 bootstrap,
+    6 templates, 7 front controllers (they register the routes). New files go first within a rank.
+    """
+    parts = rel.strip("/").split("/")
+    name = parts[-1]
+    if not name.endswith(".php") or "bin" in parts[:-1] or "config" in parts[:-1]:
+        rank = 0
+    elif "app" in parts[:-1]:
+        if name == "Database.php":
+            rank = 1
+        elif name == "helpers.php":
+            rank = 2
+        elif "Controllers" in parts:
+            rank = 4
+        elif name == "bootstrap.php":
+            rank = 5
+        else:
+            rank = 3
+    elif "templates" in parts[:-1]:
+        rank = 6
+    else:
+        rank = 7
+    return (rank, why != "new", rel)
+
+
 def connect(verbose=False):
     try:
         host, user, password = (os.environ[ENV_PREFIX + k] for k in ("HOST", "USER", "PASS"))
@@ -271,9 +304,8 @@ def cmd_diff(args, do_upload=False):
         print("\n# nothing uploaded" + (" (dry run)" if do_upload else ""))
         return
 
-    # Static files first, PHP last, so a half-finished run never references missing assets.
     uploaded = []
-    for rel, why in sorted(to_upload, key=lambda x: (x[0].endswith(".php"), x[0])):
+    for rel, why in sorted(to_upload, key=lambda x: upload_order(x[0], x[1])):
         parent, parts = "", os.path.dirname(rel).strip("/").split("/")
         for part in [p for p in parts if p]:
             parent += "/" + part
