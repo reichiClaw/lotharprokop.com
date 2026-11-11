@@ -583,6 +583,95 @@ Live nicht ausgeführt: keine Anmeldung, kein Bild ausgeblendet – der Schalter
 
 Nicht getestet: der Schalter auf dem Live-Server; andere Browser als Chrome; Bedienung auf Touchgeräten.
 
+## Architekturseite: Kopfbild läuft ruhig (11.11.2026)
+
+Gemeldet: Das Bild im Kopfbereich der Architekturseite ruckelt. Geprüft und gemessen am Entwicklungsserver in Chrome 156 (headless, Fenster 1440×900, `hover` und feiner Zeiger eingeschaltet), Startseite mit drei Bildern und 7 s Wechselzeit wie auf dem Live-Server. Chrome zeichnet in dieser Umgebung ohne Grafikkarte; die Zahlen unten beschreiben deshalb, **was** der Browser je Frame tun muss und wo das Bild steht – nicht die Bildrate auf einem echten Gerät.
+
+Gefunden wurden vier Ursachen; alle vier sind behoben (`architektur.css`, `architektur.js`, Versionskennung 17).
+
+| Ursache | vorher (Stand `7f3a5a9`) | nachher |
+|---|---|---|
+| Kopfzeile wird ab 24 px Scrollweg flacher und zieht dabei den ganzen Inhalt nach. Sprung auf 30 bzw. 40 px oder 45 px mit dem Mausrad, 2,5 s beobachtet: Wechsel des Zustands „gescrollt“ | 130, 129 und 115 Wechsel – die Kopfzeile kippt hin und her, die Scrollposition wird zurückgezogen (30 → 23, 40 → 29, 45 → 27) | je 1 Wechsel, Position bleibt (30, 40, 45) |
+| dasselbe beim Durchscrollen (Mausrad-Geste über 1000 px): zusätzliche Verschiebung des Kopfbereichs | 21,61 px, die Geste kommt nur 978 px weit | 0,02 px, 1000 px |
+| Bild wird 14 s lang um 4 % vergrößert. 12 s bei stehender Seite, ein Bildwechsel eingeschlossen: Frames, in denen sich das Bild bewegt | 447 von 720, je Frame 0,036 px am Bildrand | 143 von 720 – nur rund um den Wechsel (Einsinken aus 3 %), sonst steht das Bild |
+| Fortschrittslinie im Plankopf animiert die Breite. Dieselben 12 s: Layout- und Zeichendurchläufe im Hauptthread | 719 Layout, 1447 Paint (jeder Frame); Chrome meldet für `hero-fill` „nicht auf dem Compositor: `width`“ | 3 Layout, 23 Paint; kein Befund mehr für `hero-fill` |
+| Versatz des Bildes beim Scrollen kommt aus einem Skript und ist auf ganze Pixel gerundet | in 130 von 130 Frames ganzzahlig (Stufen); beim Scrollen 198 Layout, 684 Paint | scrollgebundene CSS-Animation `kopfbild-versatz`, ohne Skript, ohne Compositor-Befund in der Aufzeichnung; Werte ungerundet (0 von 135 ganzzahlig), Verhältnis 0,22 wie bisher; 24 Layout, 166 Paint |
+
+| Weitere Prüfung (nachher) | Ergebnis |
+|---|---|
+| Schwelle der Kopfzeile auf Startseite, Projekte und Kontakt (1440 breit), Startseite 760 und 390 breit: Sprung auf 25, 30, 40, 60 px, Mausrad 45 px, zurück nach oben – je 1 Wechsel, Oberkante des Inhalts im Dokument unverändert (Abweichung höchstens 0,02 px) | ok |
+| Versatz Startseite an 7 Scrollpositionen: 0,22 × Scrollweg (Abweichung unter 0,5 px, weil der Abschnitt 1 px unter der Fensterkante beginnt), am Ende liegt die Bildoberkante auf der des Abschnitts (0 px); Text blendet bis 60 % der Höhe aus | ok |
+| Leistungsseite (`/leistungen/immobilienfotografie`): Versatz setzt mit dem ersten Scrollen ein, 0,22 × Scrollweg, endet bündig (0,01 px) | ok |
+| Plankopf: Weichzeichner über dem Bild, Bildschirmfoto vorher/nachher verglichen. Im ersten Anlauf lag das Ausblenden auf dem gemeinsamen Rahmen von Text und Plankopf – damit war der Weichzeichner weg (Raster und Bild schienen scharf durch). Korrigiert: auf der Startseite blendet nur der Textblock aus, der Plankopf bleibt stehen (Stand `3f029df`; der Weichzeichner ist im Abgleich unten entfallen) | ok |
+| Bildfolge: Wechsel nach 7 s, Sprung über den dritten Punkt, Pause (8 s unverändert), Fortsetzen; Plankopf und Punkte wechseln mit; Fortschrittslinie läuft, vergangene Punkte gefüllt; ruhende Folien stehen bei Faktor 1,03 bereit, die aktive endet bei 1 | ok |
+| Ausweichweg ohne scrollgebundene Animationen – nachgestellt (Chrome lässt sich die Technik nicht abschalten): `CSS.supports` meldet „nein“, die `@supports`-Regel ist entfernt. Das Skript setzt den Versatz ungerundet (119,68 px bei 544 px), Start- und Leistungsseite | ok |
+| `prefers-reduced-motion: reduce`: kein Versatz, keine Vergrößerung, keine Animation am Kopfbild | ok |
+| 390×844 ohne `hover`: kein Versatz (wie bisher), Einsinken beim Wechsel aktiv, Kopfzeile unverändert hoch | ok |
+| Sieben Seiten der Architekturseite und zwei der Hauptseite: 200, Versionskennung 17, keine PHP-Meldung; keine Konsolenfehler in den Mess- und Funktionsdurchläufen | ok |
+
+Sichtbare Änderungen gegenüber vorher: siehe Abgleich unten (endgültiger Stand).
+
+Beobachtung: Die Hauptseite hat denselben Mechanismus in der Kopfzeile (84 → 64 px). Gleiche Probe auf `/` und `/fotografie`: 146 und 137 bzw. 146 und 138 Wechsel bei 30 und 40 px, Scrollposition zurückgezogen. Im Abgleich unten behoben.
+
+### Abgleich mit der Hauptseite: gleicher Lösungsweg auf beiden Seiten (11.11.2026, 18:00–18:30 Uhr Wiener Zeit)
+
+Anlass: Auf der Hauptseite hat die Überblendung früher ebenfalls geruckelt und läuft seit der Korrektur vom 05.10. ruhig. Frage: Was ist auf der Architekturseite anders, und lässt sich derselbe Weg auf beiden Seiten gehen? Beide Seiten teilen sich das Skript der Bildfolge (`site.js`); verschieden waren nur die Stylesheets. Verglichen am Entwicklungsserver, Chrome 156 headless, 1440×900, je drei Bilder. Die Zeichenarbeit stammt aus der Aufzeichnung des Software-Zeichners (keine Grafikkarte): sie zeigt, wie viel der Browser je Bild zusammensetzen muss, nicht die Bildrate auf einem echten Gerät. Der Kopfbereich der Architekturseite ist dabei rund 10 % größer (900 statt 816 px hoch).
+
+| Unterschied | Hauptseite | Architekturseite, Stand `3f029df` | Architekturseite jetzt |
+|---|---|---|---|
+| Verlauf der Überblendung | linear, 1,5 s: je Bild 1,1 % Deckkraft, nach der halben Zeit 49 % | Kurve mit schnellem Anfang, 1,4 s: größter Schritt 3,3 % je Bild, kleinster 0,02 %; nach einem Viertel der Zeit schon 59 %, nach der Hälfte 86 % – der Wechsel passiert fast ganz am Anfang | wie Hauptseite (gleiche Werte gemessen: 24 / 49 / 74 % bei ¼ / ½ / ¾) |
+| Einsinken des neuen Bildes | 2,2 s | 2,0 s | 2,2 s |
+| Zwischen zwei Wechseln (1,5 s beobachtet) | nichts zu zeichnen | jedes Bild neu: 90 Zeichenvorgänge, je 2,2 ms. Ursache: Die Fortschrittslinie läuft im Plankopf, und der hatte einen Weichzeichner (`backdrop-filter`) – der Bildausschnitt dahinter wurde bei jedem Schritt der Linie neu weichgezeichnet | 90 Zeichenvorgänge, je 0,14 ms (nur noch die Linie selbst) |
+| Zeichenarbeit in 2,6 s rund um einen Wechsel | 0,78 s | 1,34 s | 0,98–1,05 s (drei Läufe) |
+| Zwischenflächen, die je Bild zusätzlich zusammengesetzt werden (Mittel) | 3,3 | 4,5 | 2,6 |
+| Einzugsanimationen des Textes, die nach ihrem Ende wirksam bleiben (eigene Ebenen) | keine | 8 | 0 |
+| Kopfzeile kippt knapp über der Schwelle (Sprung auf 30 / 40 px) | 146 / 137 Wechsel, Position zurückgezogen | behoben (siehe oben) | – |
+
+Geändert:
+
+- **Architekturseite, Überblendung:** derselbe Regelblock wie auf der Hauptseite, Zeichen für Zeichen (verglichen per Skript), gleiche Dauern (`--dur-hero-fade` 1500 ms, `--dur-hero-settle` 2200 ms). Beide Stylesheets verweisen aufeinander.
+- **Architekturseite, Plankopf:** ohne Weichzeichner, dafür dunklere Fläche (Deckkraft 0,78 statt 0,55). Bildschirmfotos vorher/nachher verglichen: Schrift gleich gut lesbar, Kanten des Bildes dahinter minimal schärfer.
+- **Architekturseite, Einzug:** Füllmodus `backwards` statt `both`/`forwards`. Verlauf an fünf Zeitpunkten (0,15 bis 2,6 s) vorher und nachher gemessen: identische Werte für beide Titelwörter, Kicker, Einleitung, Verweise, Maßlinie und Plankopf; nach 4 s sind statt 13 nur noch 5 Animationen wirksam (Versatz Bild, Versatz und Deckkraft Text, Fortschrittslinie, Scroll-Hinweis).
+- **Hauptseite, Kopfbereich:** derselbe Ausgleich wie auf der Architekturseite (`--header-shrink`, 1,25rem).
+
+Verworfen nach Messung: Deckkraft beim Scrollen wieder auf den gemeinsamen Rahmen von Text und Plankopf zu legen (wie auf dem Live-Stand). Damit stieg die Arbeit zwischen den Wechseln wieder auf rund 2 ms je Bild, weil der Browser Text und Plankopf bei jedem Schritt der Fortschrittslinie erst zu einer Zwischenfläche zusammensetzt. Es bleibt dabei: nur der Textblock blendet aus.
+
+| Prüfung (nachher) | Ergebnis |
+|---|---|
+| Hauptseite, Schwelle des Kopfbereichs: `/`, `/fotografie`, `/kontakt` bei 1440 breit, dazu 760, 1024, 1920 und 390 breit – Sprung auf 25, 30, 40, 60 px, Mausrad 45 px, zurück nach oben: je 1 Wechsel, Position bleibt, Oberkante des Inhalts im Dokument unverändert (84 px, Abweichung 0,02 px); 390 breit: Kopfbereich bleibt gleich hoch, kein Ausgleich | ok |
+| Hauptseite: Kopfbereich 84 → 64 px, Innenabstand des Hauptbereichs 0 → 20 px, Dokumenthöhe unverändert; Überblendung vorher und nachher mit identischen Werten | ok |
+| Architekturseite: Bildfolge (Wechsel nach 7 s, Sprung über den dritten Punkt, Pause 8 s unverändert, Fortsetzen), Plankopf und Punkte wechseln mit | ok |
+| Architekturseite: Versatz an 7 Scrollpositionen wie zuvor (0,22 × Scrollweg, endet bündig), Plankopf bleibt deckend, Leistungsseite, Ausweichweg des Skripts (nachgestellt), `prefers-reduced-motion`, 390 breit ohne `hover` | ok |
+| Keine Konsolenfehler in diesen Durchläufen; `node --check architektur.js` | ok |
+
+Sichtbare Änderungen gegenüber dem Live-Stand, endgültig: (1) Das Bild der Architekturseite steht zwischen den Wechseln still. (2) Die Überblendung dort läuft gleichmäßig über 1,5 s statt fast ganz am Anfang. (3) Der Plankopf hat keinen Weichzeichner mehr und ist etwas dunkler. (4) Beim Scrollen blendet auf der Architektur-Startseite nur der Textblock aus, der Plankopf bleibt stehen. (5) Auf beiden Seiten zittert die Seite knapp unter der Oberkante nicht mehr.
+
+Bewusst belassen, weil es zur Gestaltung der Architekturseite gehört (einzeln abgeschaltet gemessen): Planraster über dem unteren Drittel (Maske) und Abdunkelung, je rund 0,8 ms je Bild während des Wechsels; Fortschrittslinie rund 0,1 ms.
+
+Nicht gemessen und nicht behauptet: dass die Überblendung auf einem bestimmten Gerät jetzt ohne Aussetzer läuft.
+
+### Live eingespielt und nachgeprüft (11.11.2026, 18:58–19:10 Uhr Wiener Zeit)
+
+Nach ausdrücklicher Freigabe, Stand `c75a141`. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release: 8 Dateien abweichend – genau die geänderten (`architektur.css` und `architektur.js` je zweimal, `public/assets/css/site.css`, `app/View.php`, zwei Dokumente) –, 136 identisch. Hochgeladen 19:06 Uhr in 33 s: zuerst Stylesheets, Skript und Dokumente, zuletzt `app/View.php` mit der neuen Versionskennung. `config/config.php`, `storage/` und die Bildordner wurden nicht angefasst, keine Änderung an der Datenbank.
+
+| Prüfung (lesend, direkt am Server) | Ergebnis |
+|---|---|
+| Dateigrößen aller 8 Dateien nach dem Upload; danach Startseiten beider Domains und `/projekte` 200 | ok |
+| `architektur.css`, `architektur.js`, `site.css` über die Domains abgerufen: SHA-256 gleich dem Release; `site.js` unverändert | ok |
+| Versionskennung 17 auf sechs Seiten beider Domains (einschließlich Anmeldeseite) | ok |
+| Schnappschuss vor und nach dem Upload (15 Seiten beider Domains 200 ohne PHP-Meldung, 9 Projekte, 92 Bilder, Zähler, 20 Sitemap-Einträge): identisch | ok |
+| `app/View.php`, `config/config.php`, `storage/database.sqlite`, `docs/TESTS.md`, `/admin/setup` weiterhin 404 | ok |
+| Chrome 156 headless gegen die Live-Seiten, 1440×900 – Kopfzeile: `/` und `/projekte` der Architekturseite, `/` und `/fotografie` der Hauptseite, Sprung auf 25/30/40/60 px, Mausrad 45 px, zurück nach oben: je 1 Wechsel, Position bleibt | ok |
+| dieselbe Umgebung – Überblendung auf beiden Startseiten: linear 1,5 s, 24 / 49–50 / 74 % bei ¼ / ½ / ¾, Einsinken bis 2,1 s, ruhende Folien bei 1,03 | ok, auf beiden Seiten gleich |
+| dieselbe Umgebung – Architektur-Startseite: Versatz an 7 Scrollpositionen 0,22 × Scrollweg (Abweichung höchstens 0,4 px), Plankopf bleibt deckend, alle Animationen des Kopfbereichs vom Browser als compositorfähig gemeldet, keine Konsolenfehler | ok |
+| Abschließender Vergleich mit `tools/deploy-ftp.py diff`: 144 identisch, 0 abweichend (die 8 hochgeladenen Dateien frisch heruntergeladen; für die übrigen gilt die gemerkte Prüfsumme nur bei gleicher Größe und gleicher Änderungszeit; offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
+
+Beobachtung: Der Schnappschuss zählt 92 Bilder in den 9 Projekten der Architekturseite, bei der Einspielung am Nachmittag waren es 100 – zwischen den beiden Einspielungen hat sich der Inhalt geändert, nicht durch diese Arbeit.
+
+Live nicht geprüft: Bildrate auf einem echten Gerät; andere Browser als Chrome; Touchgeräte.
+
+Nicht getestet: echte Geräte und Grafikkarten (keine Aussage zur Bildrate); Firefox und Safari (ob dort der CSS-Weg oder der Ausweichweg greift, ist ungeprüft); Touchgeräte.
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft

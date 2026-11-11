@@ -1,7 +1,8 @@
 /*
  * Lothar Prokop Architekturfotografie – seiteneigene Bewegung.
  * Ergänzt das gemeinsame assets/js/site.js (Kopfbild-Wechsel, Einblenden, Filter, Lightbox):
- *  - leichter Parallaxversatz des Kopfbilds und Ausblenden des Textblocks beim Scrollen,
+ *  - leichter Parallaxversatz des Kopfbilds und Ausblenden des Textblocks beim Scrollen – nur für Browser
+ *    ohne scrollgebundene CSS-Animationen; alle anderen bekommen den Versatz aus architektur.css,
  *  - Leistungsindex: beim Überfahren oder Fokussieren einer Zeile wechselt das Vorschaubild.
  * Die Fortschrittslinie im Plankopf läuft rein in CSS (Animation auf .hero__dot.is-active).
  * Kein Inline-Code, keine externen Abhängigkeiten; reduzierte Bewegung wird respektiert.
@@ -15,8 +16,12 @@
   function initParallax() {
     var media = document.querySelector('[data-parallax]');
     if (!media || reduceMotion) return;
+    // Scrollgebundene Animationen laufen im Takt des Scrollens; ein Skript kommt immer einen Moment später.
+    if (window.CSS && CSS.supports && CSS.supports('animation-timeline: view()')) return;
     var section = media.parentElement;
     var text = section.querySelector('.hero__inner, .service-head__inner');
+    // Auf der Startseite blendet nur der Textblock aus; der Plankopf daneben bleibt stehen (wie im Stylesheet).
+    var fade = section.querySelector('.hero__text') || text;
     var fine = window.matchMedia('(min-width: 860px) and (hover: hover)');
     var ticking = false;
     var active = false;
@@ -24,13 +29,12 @@
     function update() {
       ticking = false;
       var height = section.offsetHeight;
-      var y = window.scrollY || window.pageYOffset || 0;
-      if (y > height) return;
-      media.style.transform = 'translate3d(0,' + Math.round(y * 0.22) + 'px,0)';
+      var y = Math.min(height, Math.max(0, window.scrollY || window.pageYOffset || 0));
+      // Ungerundet: auf ganze Pixel gerundet bewegt sich das Bild in Stufen statt gleichmäßig.
+      media.style.transform = 'translate3d(0,' + (y * 0.22).toFixed(2) + 'px,0)';
       if (text) {
-        var progress = Math.min(1, y / (height * 0.6));
-        text.style.opacity = String(Math.max(0, 1 - progress));
-        text.style.transform = 'translate3d(0,' + Math.round(y * 0.08) + 'px,0)';
+        fade.style.opacity = (1 - Math.min(1, y / (height * 0.6))).toFixed(3);
+        text.style.transform = 'translate3d(0,' + (y * 0.08).toFixed(2) + 'px,0)';
       }
     }
 
@@ -50,7 +54,7 @@
         window.removeEventListener('scroll', onScroll);
         media.style.transform = '';
         if (text) {
-          text.style.opacity = '';
+          fade.style.opacity = '';
           text.style.transform = '';
         }
       }
