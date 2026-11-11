@@ -20,7 +20,7 @@
     if (window.CSS && CSS.supports && CSS.supports('animation-timeline: view()')) return;
     var section = media.parentElement;
     var text = section.querySelector('.hero__inner, .service-head__inner');
-    // Auf der Startseite blendet nur der Textblock aus; der Plankopf daneben behält seinen Weichzeichner.
+    // Auf der Startseite blendet nur der Textblock aus; der Plankopf daneben bleibt stehen (wie im Stylesheet).
     var fade = section.querySelector('.hero__text') || text;
     var fine = window.matchMedia('(min-width: 860px) and (hover: hover)');
     var ticking = false;
