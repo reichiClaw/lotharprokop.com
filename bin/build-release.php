@@ -170,7 +170,8 @@ return [
     'mail' => [
         'enabled' => false,
         'to' => 'office@lotharprokop.com',
-        'from' => 'website@' . preg_replace('~^https?://(www\\.)?~', '', '$baseUrl'),
+        // Absender: leer = website@<Domain aus base_url>. Muss zur Domain des Servers passen (SPF).
+        'from' => '',
     ],
 
     // Architekturseite (Webroot-Unterordner architektur/, siehe docs/ARCHITEKTUR.md).

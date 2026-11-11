@@ -6,8 +6,10 @@ declare(strict_types=1);
  * Importiert die Bestandsinhalte der alten WordPress-Website anhand des geprüften Manifests
  * data/legacy/projects.json: Kategorien, Galerien, Bilder, Startseitenauswahl, Filme, Texte.
  *
- *   php bin/import-legacy.php                       – Bilder von lotharprokop.com herunterladen
  *   php bin/import-legacy.php --from-dir=/pfad      – Bilder aus lokalem Ordner (Dateiname muss übereinstimmen)
+ *   php bin/import-legacy.php --download            – Bilder von den Adressen im Manifest laden. Nur sinnvoll,
+ *                                                     solange dort noch die alte WordPress-Website liegt: seit
+ *                                                     dem Relaunch antwortet lotharprokop.com/wp-content/… mit 410.
  *   php bin/import-legacy.php --only=texts          – nur Texte/Einstellungen (ohne Galerien)
  *   php bin/import-legacy.php --limit=3             – nur die ersten N Galerien (zum Testen)
  *   php bin/import-legacy.php --status=draft        – Galerien als Entwurf anlegen (Standard: published)
@@ -30,12 +32,20 @@ use App\HeroSlides;
 use App\Images;
 use App\Settings;
 
-$options = getopt('', ['from-dir::', 'only::', 'limit::', 'status::', 'no-youtube-posters']);
+$options = getopt('', ['from-dir::', 'download', 'only::', 'limit::', 'status::', 'no-youtube-posters']);
 $fromDir = isset($options['from-dir']) ? rtrim((string) $options['from-dir'], '/') : null;
 $only = $options['only'] ?? null;
 $limit = isset($options['limit']) ? (int) $options['limit'] : null;
 $status = in_array($options['status'] ?? 'published', ['draft', 'published'], true) ? (string) ($options['status'] ?? 'published') : 'published';
 $youtubePosters = !isset($options['no-youtube-posters']);
+
+if ($fromDir === null && !isset($options['download']) && $only !== 'texts') {
+    fwrite(STDERR, "Bildquelle fehlt: --from-dir=/pfad/zu/den/originalen angeben.\n"
+        . "Die Adressen im Manifest zeigen auf die alte WordPress-Website unter lotharprokop.com; dort liegt jetzt\n"
+        . "diese Website und beantwortet /wp-content/… mit 410. Wer die alten Dateien noch anderswo erreichbar hat,\n"
+        . "kann den Abruf mit --download erzwingen.\n");
+    exit(1);
+}
 
 $manifest = json_decode((string) file_get_contents(APP_ROOT . '/data/legacy/projects.json'), true);
 if (!is_array($manifest)) {

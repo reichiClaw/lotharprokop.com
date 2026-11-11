@@ -30,6 +30,17 @@ final class ContactForm
         return $age >= 0 && $age <= self::STAMP_MAX_AGE ? $age : null;
     }
 
+    /** Absenderadresse: eingetragen ('mail.from') oder aus der Domain von base_url abgeleitet (website@DOMAIN). */
+    public static function fromAddress(): string
+    {
+        $from = trim((string) Config::get('mail.from', ''));
+        if ($from !== '') {
+            return $from;
+        }
+        $host = (string) parse_url(Config::baseUrl(), PHP_URL_HOST);
+        return 'website@' . (preg_replace('~^www\.~i', '', $host) ?: 'localhost');
+    }
+
     /** Zufälliges Geheimnis dieser Installation, im privaten Speicher abgelegt (nie ausgeliefert). */
     private static function secret(): string
     {
@@ -103,7 +114,7 @@ final class ContactForm
         }
 
         $to = (string) Config::get('mail.to');
-        $from = (string) Config::get('mail.from');
+        $from = self::fromAddress();
         $subject = $subjectPrefix . 'Anfrage von ' . preg_replace('/[\r\n]+/', ' ', $values['name']);
         $body = "Name: {$values['name']}\nE-Mail: {$values['email']}\n\n{$values['message']}\n\n—\nGesendet über das {$origin}, IP " . client_ip();
         $headers = [
