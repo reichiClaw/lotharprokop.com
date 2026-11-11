@@ -205,10 +205,23 @@ final class Architektur
         return self::$categoryCache;
     }
 
-    /** Kategorien mit mindestens einer veröffentlichten Galerie (öffentlicher Filter). */
+    /** Kategorien mit mindestens einem hier gezeigten Projekt (öffentlicher Filter); der Zähler gilt für diesen Auftritt. */
     public static function categories(): array
     {
-        return array_values(array_filter(self::allCategories(), static fn($c) => (int) $c['published_count'] > 0));
+        $counts = [];
+        foreach (self::galleries() as $g) {
+            foreach ($g['categories'] as $c) {
+                $counts[(int) $c['id']] = ($counts[(int) $c['id']] ?? 0) + 1;
+            }
+        }
+        $out = [];
+        foreach (self::allCategories() as $c) {
+            if (($counts[(int) $c['id']] ?? 0) > 0) {
+                $c['published_count'] = $counts[(int) $c['id']];
+                $out[] = $c;
+            }
+        }
+        return $out;
     }
 
     /** @return int[] */
@@ -250,7 +263,72 @@ final class Architektur
         if ($categoryId !== null && !in_array($categoryId, $ids, true)) {
             return [];
         }
-        return Galleries::publishedInCategories($ids, $categoryId);
+        return self::visible(Galleries::publishedInCategories($ids, $categoryId));
+    }
+
+    /**
+     * Wendet die Auswahl „auf der Architekturseite ausblenden“ auf Galerien (mit Relationen) an:
+     * Bildanzahl ohne ausgeblendete Bilder; ist das Titelbild ausgeblendet, tritt das erste gezeigte Bild
+     * an seine Stelle. Eine Galerie, in der kein Bild mehr übrig ist, entfällt hier ganz.
+     */
+    public static function visible(array $galleries): array
+    {
+        if ($galleries === []) {
+            return [];
+        }
+        $ids = array_map(static fn($g) => (int) $g['id'], $galleries);
+        $in = implode(',', array_fill(0, count($ids), '?'));
+        $pdo = Database::pdo();
+        // Der Normalfall – nichts ausgeblendet – kostet nur diese eine Abfrage.
+        $stmt = $pdo->prepare("SELECT DISTINCT gallery_id FROM gallery_images WHERE hide_architektur = 1 AND gallery_id IN ($in)");
+        $stmt->execute($ids);
+        $affected = array_map('intval', $stmt->fetchAll(\PDO::FETCH_COLUMN));
+        if ($affected === []) {
+            return $galleries;
+        }
+        $in = implode(',', array_fill(0, count($affected), '?'));
+        $stmt = $pdo->prepare("SELECT gallery_id, image_id, hide_architektur FROM gallery_images WHERE gallery_id IN ($in) ORDER BY gallery_id, sort_order, image_id");
+        $stmt->execute($affected);
+        $shown = array_fill_keys($affected, []);
+        $hidden = [];
+        foreach ($stmt as $row) {
+            if ((int) $row['hide_architektur'] === 1) {
+                $hidden[(int) $row['gallery_id']][(int) $row['image_id']] = true;
+            } else {
+                $shown[(int) $row['gallery_id']][] = (int) $row['image_id'];
+            }
+        }
+        $out = [];
+        foreach ($galleries as $g) {
+            $id = (int) $g['id'];
+            if (isset($shown[$id])) {
+                if ($shown[$id] === []) {
+                    continue;
+                }
+                $g['image_count'] = count($shown[$id]);
+                if (!empty($g['cover']) && isset($hidden[$id][(int) $g['cover']['id']])) {
+                    $g['cover'] = Images::find($shown[$id][0]);
+                }
+            }
+            $out[] = $g;
+        }
+        return $out;
+    }
+
+    /** Bilder eines Projekts, wie sie die Architekturseite zeigt (ohne die dort ausgeblendeten). */
+    public static function images(int $galleryId): array
+    {
+        return array_values(array_filter(Galleries::images($galleryId), static fn($img) => $img['hide_architektur'] === 0));
+    }
+
+    /** Titelbild eines Projekts auf der Architekturseite (null, wenn dort kein Bild gezeigt wird). */
+    public static function cover(int $galleryId): ?array
+    {
+        $gallery = Galleries::find($galleryId);
+        if ($gallery === null) {
+            return null;
+        }
+        return self::visible(Galleries::withRelations([$gallery]))[0]['cover'] ?? null;
     }
 
     /** Hervorgehobene Projekte (Startseite); ohne Markierung die ersten Projekte. */
@@ -260,14 +338,17 @@ final class Architektur
         if ($ids === []) {
             return [];
         }
-        $featured = Galleries::publishedInCategories($ids, null, true);
+        $featured = self::visible(Galleries::publishedInCategories($ids, null, true));
         if ($featured === []) {
-            $featured = Galleries::publishedInCategories($ids);
+            $featured = self::galleries();
         }
         return array_slice($featured, 0, $limit);
     }
 
-    /** Projekt nach Slug – nur innerhalb des Umfangs (beliebiger Status; Vorschau regelt der Controller). */
+    /**
+     * Projekt nach Slug – nur innerhalb des Umfangs (beliebiger Status; Vorschau regelt der Controller)
+     * und nur, wenn hier mindestens ein Bild gezeigt wird.
+     */
     public static function findGallery(string $slug): ?array
     {
         $gallery = Galleries::findBySlug($slug);
@@ -275,7 +356,7 @@ final class Architektur
             return null;
         }
         $gallery = Galleries::withRelations([$gallery])[0];
-        return self::inScope($gallery) ? $gallery : null;
+        return self::inScope($gallery) ? (self::visible([$gallery])[0] ?? null) : null;
     }
 
     /**
@@ -354,8 +435,9 @@ final class Architektur
     }
 
     /**
-     * Soll ein Bild im media/-Ordner der Architekturseite liegen? Ja, wenn es zu einem veröffentlichten
-     * Projekt im Umfang gehört, in der Bildfolge des Kopfbereichs steht oder das Porträt der Profilseite ist.
+     * Soll ein Bild im media/-Ordner der Architekturseite liegen? Ja, wenn es in einem veröffentlichten
+     * Projekt im Umfang gezeigt wird (dort also nicht ausgeblendet ist), in der Bildfolge des Kopfbereichs
+     * steht oder das Porträt der Profilseite ist.
      */
     public static function shouldBePublic(int $imageId): bool
     {
@@ -370,7 +452,8 @@ final class Architektur
         $pdo = Database::pdo();
         $sql = "SELECT 1 FROM galleries g
                  WHERE g.status = 'published'
-                   AND (g.cover_image_id = ? OR EXISTS (SELECT 1 FROM gallery_images gi WHERE gi.gallery_id = g.id AND gi.image_id = ?))
+                   AND (EXISTS (SELECT 1 FROM gallery_images gi WHERE gi.gallery_id = g.id AND gi.image_id = ? AND gi.hide_architektur = 0)
+                        OR (g.cover_image_id = ? AND NOT EXISTS (SELECT 1 FROM gallery_images gi WHERE gi.gallery_id = g.id AND gi.image_id = g.cover_image_id)))
                    AND EXISTS (SELECT 1 FROM gallery_categories gc WHERE gc.gallery_id = g.id AND gc.category_id IN ($in))
                  LIMIT 1";
         $stmt = $pdo->prepare($sql);

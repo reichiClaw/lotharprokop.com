@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Architektur;
 use App\Auth;
 use App\Csrf;
 use App\FeaturedImages;
@@ -156,6 +157,33 @@ final class AdminImageController
         }
         AdminController::flash('ok', $message);
         redirect('/admin/galerien/' . $galleryId . '#bilder');
+    }
+
+    /**
+     * Gemischte Alben: ein Bild dieser Galerie auf der Architekturseite ausblenden oder wieder zeigen.
+     * Die Hauptseite zeigt die Galerie unverändert.
+     */
+    public static function setArchitektur(array $params): void
+    {
+        Auth::requireLogin();
+        Csrf::verify();
+        $galleryId = (int) $params['id'];
+        $imageId = (int) $params['image'];
+        if (!Architektur::enabled() || Galleries::find($galleryId) === null) {
+            self::fail('Galerie nicht gefunden.', 404);
+        }
+        $hidden = ($_POST['hidden'] ?? '') === '1';
+        if (!Galleries::setHiddenOnArchitektur($galleryId, $imageId, $hidden)) {
+            self::fail('Das Bild gehört nicht zu dieser Galerie.', 400);
+        }
+        $images = Galleries::images($galleryId);
+        $shown = count(array_filter($images, static fn($img) => $img['hide_architektur'] === 0));
+        if (Csrf::wantsJson()) {
+            json_response(['ok' => true, 'hidden' => $hidden, 'shown' => $shown, 'total' => count($images)]);
+        }
+        AdminController::flash('ok', ($hidden ? 'Bild auf der Architekturseite ausgeblendet.' : 'Bild wird auf der Architekturseite wieder gezeigt.')
+            . ($shown === 0 ? ' Dort ist jetzt kein Bild dieser Galerie mehr zu sehen – das Projekt erscheint auf der Architekturseite nicht.' : ''));
+        redirect('/admin/galerien/' . $galleryId . '#bild-' . $imageId);
     }
 
     public static function setCover(array $params): void

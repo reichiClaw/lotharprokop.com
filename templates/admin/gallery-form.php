@@ -4,6 +4,8 @@
 /** @var array $usageCounts */
 /** @var array $categories */
 /** @var int[] $selected */
+/** @var bool $archScope  Galerie trägt eine Kategorie der Architekturseite */
+/** @var string $archUrl  Adresse des Projekts auf der Architekturseite */
 use App\Config;
 use App\Csrf;
 use App\Galleries;
@@ -13,6 +15,8 @@ $isNew = $gallery === null;
 $g = $gallery ?? ['title' => '', 'slug' => '', 'description' => '', 'client' => '', 'year' => '', 'credits' => '', 'layout' => 'grid', 'status' => 'draft', 'featured' => 0, 'cover_image_id' => null];
 $maxBytes = min((int) Config::get('images.max_upload_bytes'), ini_bytes((string) ini_get('upload_max_filesize')));
 $usageCounts = $usageCounts ?? [];
+$archScope = !$isNew && !empty($archScope);
+$archShown = count(array_filter($images ?? [], static fn($img) => empty($img['hide_architektur'])));
 ?>
 <div class="a-head">
   <div>
@@ -123,9 +127,16 @@ $usageCounts = $usageCounts ?? [];
     <p class="a-help">Noch keine Bilder in dieser Galerie.</p>
   <?php else: ?>
   <p class="a-help">Reihenfolge per Ziehen oder mit den Pfeiltasten ändern. Änderungen werden sofort gespeichert.</p>
+  <?php if ($archScope): ?>
+  <div class="a-archnote" data-arch-summary>
+    <p><strong>Architekturseite:</strong> <span data-arch-count><?= $archShown ?> von <?= count($images) ?></span> Bildern werden dort gezeigt. <a href="<?= e($archUrl) ?>" target="_blank" rel="noopener"><?= $g['status'] === 'published' ? 'Dort ansehen' : 'Vorschau dort (nur angemeldet)' ?></a></p>
+    <p class="a-help">Für gemischte Alben: Bilder, die nichts mit Architektur zu tun haben, je Bild mit „Auf Architekturseite ausblenden“ abwählen. Auf dieser Website bleibt die Galerie vollständig. Ist das Titelbild ausgeblendet, steht auf der Architekturseite das erste gezeigte Bild an seiner Stelle. Neu hochgeladene Bilder werden dort zunächst gezeigt.</p>
+    <p class="a-warn" data-arch-empty <?= $archShown > 0 ? 'hidden' : '' ?>>Alle Bilder sind ausgeblendet – das Projekt erscheint auf der Architekturseite nicht.</p>
+  </div>
+  <?php endif; ?>
   <ol class="a-images" data-sortable="/admin/galerien/<?= $g['id'] ?>/bilder/sortieren" data-sortable-name="order">
-    <?php foreach ($images as $i => $img): $v = Images::variantFor($img, 480); $isCover = ($g['cover_image_id'] ?? null) === $img['id']; $multi = ($usageCounts[$img['id']] ?? 1) > 1; ?>
-    <li class="a-image <?= $isCover ? 'is-cover' : '' ?>" data-id="<?= $img['id'] ?>" id="bild-<?= $img['id'] ?>" draggable="true">
+    <?php foreach ($images as $i => $img): $v = Images::variantFor($img, 480); $isCover = ($g['cover_image_id'] ?? null) === $img['id']; $multi = ($usageCounts[$img['id']] ?? 1) > 1; $archHidden = $archScope && !empty($img['hide_architektur']); ?>
+    <li class="a-image <?= $isCover ? 'is-cover' : '' ?><?= $archHidden ? ' is-arch-hidden' : '' ?>" data-id="<?= $img['id'] ?>" id="bild-<?= $img['id'] ?>" draggable="true">
       <a class="a-image__media" href="/admin/bilder/<?= $img['id'] ?>?galerie=<?= $g['id'] ?>" title="Bild bearbeiten">
         <?php if ($v): ?><img src="<?= e(Images::variantUrl($img, $v, 'jpg', true)) ?>" alt="<?= e($img['alt']) ?>" width="<?= $v['w'] ?>" height="<?= $v['h'] ?>" loading="lazy"><?php else: ?><span class="a-image__missing">Datei fehlt</span><?php endif; ?>
       </a>
@@ -133,6 +144,7 @@ $usageCounts = $usageCounts ?? [];
         <div class="a-image__name" title="<?= e($img['original_name']) ?>"><?= e($img['original_name']) ?></div>
         <div class="a-muted"><?= $img['width'] ?>×<?= $img['height'] ?><?= $img['alt'] === '' ? ' · <span class="a-warn">kein Alternativtext</span>' : '' ?><?= $multi ? ' · in ' . $usageCounts[$img['id']] . ' Galerien' : '' ?></div>
         <?php if ($isCover): ?><span class="a-badge a-badge--featured">Titelbild</span><?php endif; ?>
+        <?php if ($archScope): ?><span class="a-badge a-badge--archoff" data-arch-badge <?= $archHidden ? '' : 'hidden' ?>>Nicht auf der Architekturseite</span><?php endif; ?>
       </div>
       <div class="a-image__actions">
         <span class="a-image__num"><?= $i + 1 ?></span>
@@ -140,6 +152,7 @@ $usageCounts = $usageCounts ?? [];
         <form method="post" action="/admin/galerien/<?= $g['id'] ?>/bilder/<?= $img['id'] ?>/bewegen" class="a-inline"><?= Csrf::field() ?><input type="hidden" name="direction" value="down"><button class="a-iconbtn" type="submit" aria-label="Nach hinten" <?= $i === count($images) - 1 ? 'disabled' : '' ?>>↓</button></form>
         <a class="a-btn a-btn--sm a-btn--ghost" href="/admin/bilder/<?= $img['id'] ?>?galerie=<?= $g['id'] ?>">Bearbeiten</a>
         <?php if (!$isCover): ?><form method="post" action="/admin/galerien/<?= $g['id'] ?>/bilder/<?= $img['id'] ?>/titelbild" class="a-inline"><?= Csrf::field() ?><button class="a-btn a-btn--sm a-btn--ghost" type="submit">Als Titelbild</button></form><?php endif; ?>
+        <?php if ($archScope): ?><form method="post" action="/admin/galerien/<?= $g['id'] ?>/bilder/<?= $img['id'] ?>/architektur" class="a-inline" data-arch-toggle><?= Csrf::field() ?><input type="hidden" name="hidden" value="<?= $archHidden ? '0' : '1' ?>"><button class="a-btn a-btn--sm a-btn--ghost" type="submit"><?= $archHidden ? 'Auf Architekturseite zeigen' : 'Auf Architekturseite ausblenden' ?></button></form><?php endif; ?>
         <form method="post" action="/admin/galerien/<?= $g['id'] ?>/bilder/<?= $img['id'] ?>/entfernen" class="a-inline" data-confirm="<?= $multi ? 'Bild aus dieser Galerie entfernen? Es bleibt in den anderen Galerien erhalten.' : 'Bild entfernen? Die Datei wird endgültig gelöscht, da sie nur hier verwendet wird.' ?>"><?= Csrf::field() ?><button class="a-btn a-btn--sm a-btn--danger" type="submit"><?= $multi ? 'Entfernen' : 'Löschen' ?></button></form>
       </div>
     </li>

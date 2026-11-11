@@ -175,12 +175,33 @@ final class Galleries
         return $galleries;
     }
 
-    /** Bilder einer Galerie in Reihenfolge. */
+    /** Bilder einer Galerie in Reihenfolge; 'hide_architektur' sagt, ob das Bild auf der Architekturseite fehlt. */
     public static function images(int $galleryId): array
     {
-        $stmt = Database::pdo()->prepare('SELECT i.* FROM gallery_images gi JOIN images i ON i.id = gi.image_id WHERE gi.gallery_id = ? ORDER BY gi.sort_order, gi.image_id');
+        $stmt = Database::pdo()->prepare('SELECT i.*, gi.hide_architektur FROM gallery_images gi JOIN images i ON i.id = gi.image_id WHERE gi.gallery_id = ? ORDER BY gi.sort_order, gi.image_id');
         $stmt->execute([$galleryId]);
-        return array_map([Images::class, 'hydrate'], $stmt->fetchAll());
+        return array_map(static function (array $row): array {
+            $row = Images::hydrate($row);
+            $row['hide_architektur'] = (int) $row['hide_architektur'];
+            return $row;
+        }, $stmt->fetchAll());
+    }
+
+    /**
+     * Blendet ein Bild dieser Galerie auf der Architekturseite aus oder wieder ein (Hauptseite unverändert).
+     * false, wenn das Bild nicht in der Galerie liegt.
+     */
+    public static function setHiddenOnArchitektur(int $galleryId, int $imageId, bool $hidden): bool
+    {
+        $stmt = Database::pdo()->prepare('SELECT 1 FROM gallery_images WHERE gallery_id = ? AND image_id = ?');
+        $stmt->execute([$galleryId, $imageId]);
+        if (!$stmt->fetchColumn()) {
+            return false;
+        }
+        Database::pdo()->prepare('UPDATE gallery_images SET hide_architektur = ? WHERE gallery_id = ? AND image_id = ?')->execute([$hidden ? 1 : 0, $galleryId, $imageId]);
+        self::touch($galleryId);
+        Images::syncPublic($imageId);
+        return true;
     }
 
     public static function categoryIds(int $galleryId): array

@@ -528,6 +528,61 @@ Live nicht ausgeführt: kein Formular abgeschickt – weder eine Anmeldung noch 
 
 Nicht getestet: ob E-Mails beim Hoster tatsächlich versendet werden und ankommen (lokal nur der Ersatz-`sendmail`); das Absenden der neuen Formulare auf dem Live-Server; andere Browser.
 
+## Architekturseite: Bilder eines Albums ausblenden (11.11.2026)
+
+Geprüft mit den lokal vorhandenen Daten am Album „eta“ (Kategorien Produkt und Architektur, 10 Bilder, Titelbild ist ein Produktfoto), wenn nicht anders vermerkt am Entwicklungsserver mit einem Skript.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ausgangslage: Architekturseite zeigt 10 Bilder, „10 Ansichten“, Titelbild wie auf der Hauptseite; Admin „10 von 10“, je Bild ein Schalter | ok |
+| Ein Bild ausblenden (Formularweg, Rückkehr zu `#bild-…` mit Meldung): fehlt auf der Projektseite, Nummerierung „09 / 09“, Umfang und Karte „9 Ansichten“; Hauptseite weiter 10 Bilder; Ordner des Bildes in `public/architektur/media/` entfernt, Datei dort 404, in `public/media/` weiter 200 | ok |
+| Titelbild ausblenden (JSON-Weg): Karte in Übersicht und Startseite, `og:image` und Bildstrecke nehmen das erste gezeigte Bild; das ausgeblendete Titelbild kommt auf Start-, Projekt-, Übersichts- und Leistungsseiten der Architekturseite nicht mehr vor; `cover_image_id` der Galerie unverändert | ok |
+| Fehlerfälle: ohne CSRF-Token 403; abgemeldet → Anmeldeseite; Bild aus anderer Galerie oder unbekanntes Bild 400; unbekannte Galerie 404; GET 405; Werte `abc`, Liste, fehlend = zeigen, ohne PHP-Meldung; andere Galerien unberührt | ok |
+| Dasselbe Bild zusätzlich in einem zweiten Projekt im Umfang (dort nicht ausgeblendet): bleibt im Bildordner, dort zu sehen, im ersten Projekt nicht; nach dem Entfernen aus dem zweiten wieder 404 | ok |
+| Ausgeblendetes Bild in der eigenen Bildfolge des Kopfbereichs: liegt im Bildordner und steht im Kopfbereich, nicht auf der Projektseite; nach Löschen der Auswahl wieder 404 | ok |
+| Vollständiger Abgleich aller 483 Bilder: ausgeblendete bleiben draußen, keine Fehler | ok |
+| Alle 10 ausblenden: Projektseite 404, keine Karte, nicht in der Sitemap, kein Verweis von Nachbarprojekten, Start- und Leistungsseite; Zähler 09 → 08; kein Bild des Albums im Bildordner der Architekturseite; Hauptseite unverändert; Admin „0 von 10“ mit Warnung | ok |
+| Alle wieder zeigen: Stand wie am Anfang (Bilder, Titelbild, Zähler, Sitemap, Ordner) | ok |
+| Galerie ohne Kategorie der Architekturseite: kein Schalter, keine Hinweiszeile | ok |
+| Bild aus der Galerie entfernen und neu zuordnen: Auswahl zurückgesetzt | ok |
+| Entwurf: Vorschau auf der Architekturseite für Angemeldete ohne das ausgeblendete Bild (9 Ansichten), sonst 404; Verweis im Admin führt bei Entwürfen auf die Hauptdomain, sonst auf die Adresse der Architekturseite; nach erneutem Veröffentlichen bleibt das Bild draußen | ok |
+| Layouts Raster, Einzelspalte, Editorial: je 9 Bilder, letzte Nummer „09 / 09“ | ok |
+| Chrome (headless): vier Produktfotos per Klick ausgeblendet – ohne Neuladen wechseln Schalter, Hinweis am Bild und Zeile („6 von 10“), nach Neuladen gleich; Architekturseite zeigt 6 Bilder ohne defekte Bilddatei, „6 Ansichten“; zurückgestellt → 10; keine Konsolenfehler | ok |
+
+**Migration.** Acht gleichzeitige erste Aufrufe (PHP-Prozesse mit gemeinsamem Startzeitpunkt) gegen eine Kopie der Datenbank im Stand 5, je drei Runden: mit dem bisherigen Ablauf scheitern sieben von acht an „duplicate column name“, mit der Schreibsperre vor der Prüfung laufen alle acht durch, Version 6 steht einmal in `schema_version`.
+
+**Einspielen in eine bestehende Installation** (lokale Apache-Instanz, Aufbau wie beim Hoster: eigene Domain für die Architekturseite, zwei Bildordner; Ausgangspunkt der Stand, der live läuft, Schema 5). Die 12 geänderten Dateien einzeln in der Reihenfolge von `tools/deploy-ftp.py` kopiert, nach jeder Datei neun Seiten beider Auftritte abgerufen:
+
+| Prüfung | Ergebnis |
+|---|---|
+| Nach `app/Database.php` allein: alle Seiten 200, Schema 6, nichts ausgeblendet | ok |
+| Nach jeder weiteren Datei: alle Seiten 200; am Ende Projektseite und Karte unverändert, Dateien identisch mit dem Release | ok |
+| Gegenprobe mit der früheren Reihenfolge (`app/Architektur.php` vor `app/Database.php`): Seiten der Architekturseite 500, bis `Database.php` folgt – deshalb lädt das Werkzeug `Database.php` jetzt zuerst | bestätigt |
+| Ausblenden über den Admin der Hauptdomain: Projektseite unter der eigenen Domain ohne die Bilder; Ordner in `architektur/media/` **und** `public/architektur/media/` entfernt (Abruf 404), `public/media/` unverändert (200); „Sichtbarkeit aller Bilder abgleichen“ lässt sie draußen | ok |
+| Alle ausblenden / alle zeigen wie oben; kein neuer Eintrag im PHP-Fehlerprotokoll | ok |
+
+### Live eingespielt und nachgeprüft (11.11.2026, 16:06–16:30 Uhr Wiener Zeit)
+
+Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release des Stands `7eb1b1b`: 15 Dateien abweichend – genau die geänderten –, alle anderen identisch. Hochgeladen in der neuen Reihenfolge des Werkzeugs (Dokumentation und statische Dateien, `app/Database.php`, übriger Code, Template, `public/index.php`); nach `app/Database.php` wurden drei Seiten abgerufen (200), erst dann folgte der übrige Code. `config/config.php`, `storage/` und die Bildordner wurden nicht geschrieben.
+
+| Prüfung (lesend, direkt am neuen Server) | Ergebnis |
+|---|---|
+| Dateigrößen aller 15 Dateien nach dem Upload | ok |
+| Schnappschuss vor und nach dem Upload: 15 Seiten beider Domains 200 ohne PHP-Meldung; je Projekt der Architekturseite (9 Projekte, 100 Bilder) Titelbild der Karte, Bildfolge, Umfang und `og:image`; Zähler; 20 Sitemap-Einträge – vorher und nachher identisch | ok |
+| Migration 6 gelaufen (die Seiten der Architekturseite lesen die neue Spalte und antworten fehlerfrei) | ok |
+| Neue Adresse `…/bilder/{id}/architektur`: abgemeldet → Anmeldeseite, GET 405, auf der Architektur-Domain 404; Galerie im Admin abgemeldet → Anmeldeseite | ok |
+| `admin.css` und `admin.js` enthalten die neuen Teile, Versionskennung 16 | ok |
+| `app/Database.php`, `config/config.php`, `storage/database.sqlite`, `/admin/setup` weiterhin 404 | ok |
+| Abschließender Vergleich ohne gemerkte Werte: alle 144 Programmdateien frisch heruntergeladen und per SHA-256 identisch mit dem Release (offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
+
+Dabei aufgefallen und behoben: `tools/deploy-ftp.py` merkte sich die Prüfsumme einer Serverdatei nur zusammen mit ihrer Größe. Nach dem Upload meldete es deshalb `app/View.php` (gleiche Größe, anderer Inhalt) fälschlich als abweichend; direkt heruntergeladen war die Datei identisch. Umgekehrt hätte eine gleich große Änderung außerhalb des Werkzeugs unbemerkt bleiben können – das betrifft auch die früheren Abschlussvergleiche in dieser Datei, soweit Dateien ihre Größe nicht geändert hatten. Der gemerkte Wert gilt jetzt nur noch bei gleicher Größe und gleicher Änderungszeit auf dem Server; der Vergleich oben lief ohne gemerkte Werte.
+
+Beobachtung ohne Bezug zur Änderung: Ein POST ganz ohne Inhalt beantwortet der Hoster bei allen Admin-Adressen mit 405 (lokal 302). Die Formulare und Skripte der Verwaltung senden immer mindestens das CSRF-Token.
+
+Live nicht ausgeführt: keine Anmeldung, kein Bild ausgeblendet – der Schalter selbst ist auf dem Live-Server ungeprüft.
+
+Nicht getestet: der Schalter auf dem Live-Server; andere Browser als Chrome; Bedienung auf Touchgeräten.
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft

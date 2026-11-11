@@ -8,6 +8,8 @@ Eigenständig wirkender Auftritt für Architekturfotografie – dunkel, mit klar
 
 **Umfang über Kategorien, nicht über eine zweite Datenhaltung.** Auf der Architekturseite erscheint eine Galerie genau dann, wenn sie veröffentlicht ist und mindestens eine der konfigurierten Kategorien trägt (Standard: `architektur`, `immobilien`, `baudokumentation`, `fertigstellung`). Alles andere – Porträts, Reportagen, Veranstaltungen – existiert dort nicht: nicht in Übersichten, nicht in der Sitemap, nicht per direkter URL (404), nicht als Bilddatei im `media/`-Ordner der Architekturseite.
 
+**Gemischte Alben: Auswahl je Bild.** Ein Album desselben Auftraggebers kann Architektur- und andere Aufnahmen enthalten (etwa Produktfotos) und trägt dann beide Kategorien. Für solche Alben lässt sich je Bild festlegen, dass es auf der Architekturseite fehlt (`gallery_images.hide_architektur`). Die Hauptseite zeigt das Album unverändert vollständig. Die Auswahl gilt für die Zuordnung Bild–Galerie, nicht für das Bild an sich.
+
 **Fünf feste Leistungen.** Die Leistungen sind bewusst im Code definiert (`App\Architektur::SERVICES`) und nicht frei erweiterbar, damit der Auftritt thematisch geschlossen bleibt:
 
 | Nr. | Leistung | Zugeordnete Kategorie |
@@ -67,6 +69,12 @@ Alle Texte des Auftritts (Untertitel, Einführung, Leitsatz, Profil, Kontakt-Ein
 
 1. **Kategorien anlegen** (Admin → Kategorien): `architektur`, `immobilien`, `baudokumentation`, `fertigstellung` – oder andere Slugs, dann die Liste in `config/config.php` anpassen. Das Dashboard zeigt, welche konfigurierten Kategorien noch fehlen.
 2. **Galerien zuordnen**: Eine Galerie erscheint auf der Architekturseite, sobald sie veröffentlicht ist und eine dieser Kategorien trägt. Eine Galerie kann gleichzeitig auf der Hauptseite stehen – dort gelten die bekannten Regeln.
+2a. **Gemischte Alben** (Admin → Galerien → Galerie → Bilder): Bei Galerien im Umfang steht über der Bilderliste, wie viele Bilder die Architekturseite zeigt, und jedes Bild hat den Schalter „Auf Architekturseite ausblenden“ / „Auf Architekturseite zeigen“ (wirkt sofort, ohne Speichern). Ausgeblendete Bilder sind in der Liste gestrichelt umrandet und tragen den Hinweis „Nicht auf der Architekturseite“. Auf der Architekturseite gilt dann:
+   - Bildstrecke, Nummerierung („Ansicht 03 / 07“) und Umfang zählen nur die gezeigten Bilder.
+   - Ist das Titelbild ausgeblendet, steht dort überall – Projektkarte, Kopfbereich (automatische Auswahl), Leistungsvorschau, Blättern, Vorschaubild für soziale Netze – das erste gezeigte Bild. Das Titelbild der Hauptseite bleibt, wie es ist.
+   - Sind alle Bilder ausgeblendet, erscheint das Projekt dort nicht (keine Karte, 404, nicht in der Sitemap, nicht im Zähler der Kategorie). Der Admin weist darauf hin.
+   - Neu hochgeladene Bilder werden zunächst gezeigt; wer ein Bild aus der Galerie entfernt und wieder zuordnet, setzt die Auswahl zurück.
+   - Ein ausgeblendetes Bild, das ausdrücklich in die Bildfolge des Kopfbereichs gewählt wurde (3a), bleibt dort zu sehen.
 3. **Hervorheben** steuert die Auswahl auf der Startseite (nur Galerien im Umfang) und – solange keine eigene Auswahl gesetzt ist – die Bildfolge im Kopfbereich.
 3a. **Kopfbereich gezielt** (Admin → Architekturseite): Bilder aus der gesamten Bibliothek wählen (Galerien im Umfang zuerst), einzeln hochladen oder das Titelbild eines Projekts übernehmen; Reihenfolge per Ziehen, je Bild ein Projektverweis (nur Projekte im Umfang; „automatisch“ nimmt die Galerie im Umfang, in der das Bild liegt), Wechselzeit in Sekunden (überschreibt `hero_interval` aus der Konfiguration). „Diese Auswahl übernehmen und bearbeiten“ kopiert die automatische Folge als Ausgangspunkt; „Eigene Auswahl löschen“ kehrt zur Automatik zurück. Ein Bild in der Bildfolge liegt immer im eigenen Bildordner der Architekturseite, auch wenn seine Galerie nicht im Umfang ist.
 4. **Projektfakten**: Auftraggeber und Jahr der Galerie werden als Fakten gezeigt; die Beschreibung steht neben den Fakten. Das Layout der Bildserie (Spalte, editorial, Raster) wird aus der Galerie übernommen.
@@ -74,7 +82,7 @@ Alle Texte des Auftritts (Untertitel, Einführung, Leitsatz, Profil, Kontakt-Ein
 
 ## Bilder: öffentliche Ordner
 
-Bildvarianten werden pro Auftritt in einen eigenen öffentlichen Ordner synchronisiert: `public/media/` für die Hauptseite, `public/architektur/media/` für die Architekturseite. Letzterer enthält ausschließlich Bilder veröffentlichter Galerien im Umfang der Architekturseite, die eigens gewählten Bilder der Bildfolge und das Porträt der Profilseite – auch unter eigener Domain ist über diesen Ordner nichts erreichbar, was dort nicht gezeigt wird. Der Abgleich läuft bei jeder Änderung im Admin automatisch; vollständig neu abgleichen: Admin → System → „Sichtbarkeit abgleichen“ oder `php bin/reprocess-images.php`. Es werden Hardlinks genutzt, wo das Dateisystem es erlaubt, sonst Kopien.
+Bildvarianten werden pro Auftritt in einen eigenen öffentlichen Ordner synchronisiert: `public/media/` für die Hauptseite, `public/architektur/media/` für die Architekturseite. Letzterer enthält ausschließlich Bilder veröffentlichter Galerien im Umfang der Architekturseite – ohne die dort ausgeblendeten (ein Bild, das in einem zweiten Projekt im Umfang gezeigt wird, bleibt) –, die eigens gewählten Bilder der Bildfolge und das Porträt der Profilseite – auch unter eigener Domain ist über diesen Ordner nichts erreichbar, was dort nicht gezeigt wird. Der Abgleich läuft bei jeder Änderung im Admin automatisch; vollständig neu abgleichen: Admin → System → „Sichtbarkeit abgleichen“ oder `php bin/reprocess-images.php`. Es werden Hardlinks genutzt, wo das Dateisystem es erlaubt, sonst Kopien.
 
 ## Gemeinsame Dateien
 

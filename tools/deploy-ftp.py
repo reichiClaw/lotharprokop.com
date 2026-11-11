@@ -15,12 +15,16 @@ muss das Webroot sein; der lokale Baum ist dist/release/htdocs (anderer Pfad üb
 
 Regeln (siehe „Updates per FTP“ in docs/INSTALL.md):
   - der Server wird zuerst gelistet und verglichen; `diff` und `--dry-run` schreiben nichts;
-  - gleich große Dateien werden per SHA-256 verglichen (heruntergeladen), eine unveränderte Datei
+  - gleich große Dateien werden per SHA-256 verglichen (heruntergeladen; ein gemerkter Wert gilt nur,
+    solange Größe und Änderungszeit auf dem Server gleich sind), eine unveränderte Datei
     wird nie erneut hochgeladen, eine gleich große Änderung trotzdem erkannt;
   - config/config.php, app-path.php, storage/ und die öffentlichen Bildordner (media/) werden nie
     geschrieben, egal was lokal liegt (gilt für beide Installationsvarianten);
   - es wird nie gelöscht – Dateien, die nur auf dem Server liegen, werden gemeldet;
-  - jeder Upload geht nach <name>.uploading~ und wird dann umbenannt.
+  - jeder Upload geht nach <name>.uploading~ und wird dann umbenannt;
+  - Reihenfolge: statische Dateien, dann app/Database.php (Migrationen laufen beim nächsten Aufruf,
+    bevor neuer Code das neue Schema liest), Bibliotheken, Controller, Templates, zuletzt die
+    Front-Controller – kein Zwischenstand ruft Code auf, der noch nicht auf dem Server liegt.
 
 Host quirks handled here (World4You, Pure-FTPd):
   - TLS 1.3 data connections are reset by the server, so TLS is capped at 1.2;
@@ -155,6 +159,36 @@ class NatPoolFTPS(FTP_TLS):
             self.close()
 
 
+def upload_order(rel, why=""):
+    """Sort key for uploads: the site keeps answering requests while files arrive one by one, so no
+    intermediate state may call code (or read a database column) that is not on the server yet.
+
+    0 static files and command-line scripts, 1 Database.php (the next request runs new migrations
+    before any code reads the new schema), 2 helpers, 3 libraries, 4 controllers, 5 bootstrap,
+    6 templates, 7 front controllers (they register the routes). New files go first within a rank.
+    """
+    parts = rel.strip("/").split("/")
+    name = parts[-1]
+    if not name.endswith(".php") or "bin" in parts[:-1] or "config" in parts[:-1]:
+        rank = 0
+    elif "app" in parts[:-1]:
+        if name == "Database.php":
+            rank = 1
+        elif name == "helpers.php":
+            rank = 2
+        elif "Controllers" in parts:
+            rank = 4
+        elif name == "bootstrap.php":
+            rank = 5
+        else:
+            rank = 3
+    elif "templates" in parts[:-1]:
+        rank = 6
+    else:
+        rank = 7
+    return (rank, why != "new", rel)
+
+
 def connect(verbose=False):
     try:
         host, user, password = (os.environ[ENV_PREFIX + k] for k in ("HOST", "USER", "PASS"))
@@ -187,21 +221,28 @@ def local_tree():
 
 
 def server_tree(ftp):
-    files, dirs = {}, set()
-    for full, kind, size, _, _ in ftp.walk("/", skip_dirs=PROTECTED_DIRS):
+    """-> (files {rel: size}, dirs, modified {rel: MLSD modify time})"""
+    files, dirs, modified = {}, set(), {}
+    for full, kind, size, modify, _ in ftp.walk("/", skip_dirs=PROTECTED_DIRS):
         if kind == "dir":
             dirs.add(full)
         else:
             files[full] = size
-    return files, dirs
+            modified[full] = modify
+    return files, dirs, modified
 
 
 def sha256(data):
     return hashlib.sha256(data).hexdigest()
 
 
-def compare(ftp, local, server, cache):
-    """-> (to_upload [(rel, reason)], identical [rel], server_only [rel])"""
+def compare(ftp, local, server, cache, modified):
+    """-> (to_upload [(rel, reason)], identical [rel], server_only [rel])
+
+    A cached server hash counts only while size and modification time on the server are unchanged;
+    without a modification time from the server the file is downloaded every time. Otherwise a
+    same-size change made outside this tool would be compared against a stale hash.
+    """
     to_upload, identical = [], []
     for rel in sorted(local):
         if is_protected(rel):
@@ -211,8 +252,10 @@ def compare(ftp, local, server, cache):
         elif server[rel] != os.path.getsize(local[rel]):
             to_upload.append((rel, "size"))
         else:
-            if cache.get(rel, {}).get("size") != server[rel]:
-                cache[rel] = {"size": server[rel], "sha256": sha256(ftp.download_bytes(rel))}
+            known = cache.get(rel, {})
+            stamp = modified.get(rel)
+            if stamp is None or known.get("size") != server[rel] or known.get("modify") != stamp:
+                cache[rel] = {"size": server[rel], "modify": stamp, "sha256": sha256(ftp.download_bytes(rel))}
             with open(local[rel], "rb") as fh:
                 if cache[rel]["sha256"] == sha256(fh.read()):
                     identical.append(rel)
@@ -252,7 +295,7 @@ def report(to_upload, identical, server_only, local, server):
 def cmd_diff(args, do_upload=False):
     ftp = connect(args.verbose)
     local = local_tree()
-    server, dirs = server_tree(ftp)
+    server, dirs, modified = server_tree(ftp)
     print(f"# local files: {len(local)}, server files: {len(server)}")
     cache_file = os.path.join(ROOT, "dist", ".deploy-ftp-cache.json")
     cache = {}
@@ -260,7 +303,7 @@ def cmd_diff(args, do_upload=False):
         with open(cache_file) as fh:
             cache = json.load(fh)
     try:
-        to_upload, identical, server_only = compare(ftp, local, server, cache)
+        to_upload, identical, server_only = compare(ftp, local, server, cache, modified)
     finally:
         with open(cache_file, "w") as fh:
             json.dump(cache, fh)
@@ -271,9 +314,8 @@ def cmd_diff(args, do_upload=False):
         print("\n# nothing uploaded" + (" (dry run)" if do_upload else ""))
         return
 
-    # Static files first, PHP last, so a half-finished run never references missing assets.
     uploaded = []
-    for rel, why in sorted(to_upload, key=lambda x: (x[0].endswith(".php"), x[0])):
+    for rel, why in sorted(to_upload, key=lambda x: upload_order(x[0], x[1])):
         parent, parts = "", os.path.dirname(rel).strip("/").split("/")
         for part in [p for p in parts if p]:
             parent += "/" + part
