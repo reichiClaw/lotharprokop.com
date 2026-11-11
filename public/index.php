@@ -88,6 +88,7 @@ $router->get('/robots.txt', [PublicController::class, 'robots']);
 // Weiterleitungen alter WordPress-URLs (siehe docs/REDIRECTS.md)
 $router->get('/works', [RedirectController::class, 'works']);
 $router->get('/works/page/{n:\d+}', [RedirectController::class, 'works']);
+$router->get('/portfolio', [RedirectController::class, 'works']);
 $router->get('/portfolio/{slug}', [RedirectController::class, 'portfolio']);
 $router->get('/project-type/{slug}', [RedirectController::class, 'projectType']);
 $router->get('/project-tag/{slug}', [RedirectController::class, 'works']);

@@ -62,7 +62,7 @@ $serviceCount = count($services);
       <div class="hero__controls" style="--hero-interval: <?= (int) $heroInterval * 1000 ?>ms">
         <ol class="hero__dots" aria-label="Bild wählen">
           <?php foreach ($heroSlides as $i => $slide): ?>
-          <li><button type="button" class="hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>"<?= $i === 0 ? ' aria-current="true"' : '' ?> aria-label="Bild <?= $i + 1 ?> von <?= $slideCount ?>: <?= e($slide['gallery']['title']) ?>"></button></li>
+          <li><button type="button" class="hero__dot<?= $i === 0 ? ' is-active' : '' ?>" data-hero-dot="<?= $i ?>"<?= $i === 0 ? ' aria-current="true"' : '' ?> aria-label="Bild <?= $i + 1 ?> von <?= $slideCount ?><?= $slide['gallery'] !== null ? ': ' . e($slide['gallery']['title']) : '' ?>"></button></li>
           <?php endforeach; ?>
         </ol>
         <button type="button" class="hero__toggle" data-hero-toggle aria-label="Bildwechsel anhalten">

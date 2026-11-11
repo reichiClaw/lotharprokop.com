@@ -33,7 +33,7 @@ final class ArchitekturController
             'meta' => [
                 'title' => '',
                 'description' => Architektur::text('architektur_meta_description'),
-                'image' => $slides !== [] ? url(Picture::largestUrl($slides[0]['image']) ?? '') : null,
+                'image' => $slides !== [] ? Picture::absoluteUrl($slides[0]['image']) : null,
             ],
         ]);
     }
@@ -41,7 +41,7 @@ final class ArchitekturController
     public static function projects(array $params): void
     {
         $categories = Architektur::categories();
-        $activeSlug = trim((string) ($_GET['kategorie'] ?? ''));
+        $activeSlug = is_string($_GET['kategorie'] ?? null) ? trim($_GET['kategorie']) : '';
         $active = null;
         if ($activeSlug !== '') {
             $active = Architektur::findCategory($activeSlug);
@@ -63,6 +63,7 @@ final class ArchitekturController
                     ? 'Architekturfotografie von Lothar Prokop im Bereich ' . $active['name'] . '.'
                     : 'Referenzprojekte der Architekturfotografie von Lothar Prokop: Gebäude, Immobilien, Baudokumentation und Fertigstellungsaufnahmen.',
                 'canonical' => url('/projekte' . ($active ? '?kategorie=' . eurl($active['slug']) : '')),
+                'robots' => $active && $galleries === [] ? 'noindex, follow' : 'index, follow',
             ],
         ]);
     }
@@ -101,7 +102,7 @@ final class ArchitekturController
             'meta' => [
                 'title' => $gallery['title'],
                 'description' => $gallery['description'] !== '' ? excerpt($gallery['description']) : $gallery['title'] . ' – Architekturfotografie von Lothar Prokop.',
-                'image' => $cover && !$preview ? url(Picture::largestUrl($cover) ?? '') : null,
+                'image' => $cover && !$preview ? Picture::absoluteUrl($cover) : null,
                 'robots' => $preview ? 'noindex, nofollow' : 'index, follow',
                 'type' => 'article',
             ],
@@ -145,7 +146,7 @@ final class ArchitekturController
             'meta' => [
                 'title' => $service['title'],
                 'description' => excerpt($service['short'], 155),
-                'image' => $related !== [] && !empty($related[0]['cover']) ? url(Picture::largestUrl($related[0]['cover']) ?? '') : null,
+                'image' => $related !== [] && !empty($related[0]['cover']) ? Picture::absoluteUrl($related[0]['cover']) : null,
             ],
         ]);
     }

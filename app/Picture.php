@@ -79,6 +79,17 @@ final class Picture
         return Images::variantUrl($image, $v, $format, $admin);
     }
 
+    /**
+     * Absolute Adresse der größten JPEG-Variante (og:image). null ohne Bild oder ohne Varianten.
+     * Die Bildadresse enthält den Basis-Pfad des Auftritts bereits; url() setzt ihn erneut davor,
+     * deshalb wird er hier erst abgetrennt.
+     */
+    public static function absoluteUrl(?array $image): ?string
+    {
+        $local = $image !== null ? self::largestUrl($image) : null;
+        return $local === null ? null : url(Site::stripBasePath($local));
+    }
+
     /** srcset-Zeichenkette für die Lightbox (WebP bevorzugt). */
     public static function srcset(array $image, string $format = 'webp', bool $admin = false): string
     {
