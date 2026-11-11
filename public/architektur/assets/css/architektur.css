@@ -97,6 +97,9 @@
   --dur: 360ms;
   --dur-slow: 800ms;
   --dur-hero-fade: 1400ms;
+  --dur-hero-settle: 2000ms;
+  /* Um so viel wird die Kopfzeile nach dem ersten Scrollen flacher (4.75rem → 3.4rem). */
+  --header-shrink: 1.35rem;
 }
 
 /* ---------- Grundlagen ---------- */
@@ -255,7 +258,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
   gap: var(--s-3);
   transition: min-height var(--dur) var(--ease);
 }
-.is-scrolled .site-header__inner { min-height: 3.4rem; }
+.is-scrolled .site-header__inner { min-height: calc(var(--header-h) - var(--header-shrink)); }
 .brand { display: flex; align-items: center; gap: 0.8rem; }
 .brand__mark { width: 0.65rem; height: 0.65rem; background: var(--accent); flex: none; transition: transform var(--dur-slow) var(--ease); }
 .brand:hover .brand__mark { transform: rotate(90deg); }
@@ -285,7 +288,7 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .site-nav__list a[aria-current="page"]::after { background: var(--accent); }
 .site-nav__list a[aria-current="page"]::after, .site-nav__list a:hover::after { transform: scaleX(1); }
 @media (max-width: 620px) {
-  :root { --header-h: 6.4rem; }
+  :root { --header-h: 6.4rem; --header-shrink: 0rem; }
   .site-header__inner { flex-direction: column; align-items: flex-start; justify-content: center; gap: 0.6rem; padding: 0.9rem 0; }
   .is-scrolled .site-header__inner { min-height: var(--header-h); }
   .is-scrolled .brand__field { opacity: 1; max-height: 1.4rem; }
@@ -295,7 +298,10 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 }
 
 /* ---------- Allgemeine Bausteine ---------- */
-.site-main { display: block; }
+/* Die Kopfzeile steht im Seitenfluss. Wird sie flacher, rückt der Inhalt nicht nach: der Hauptbereich nimmt
+   den frei werdenden Platz im selben Takt auf, damit beim Anscrollen nichts springt. */
+.site-main { display: block; transition: padding-top var(--dur) var(--ease); }
+.is-scrolled .site-main { padding-top: var(--header-shrink); }
 .site-main:focus { outline: none; }
 .wrap, .page-head, .section-head, .grid-lines, .statement__inner, .cta__inner, .project__head, .project__body,
 .service-list, .service-page__body, .profile__body, .contact__body, .legal__body, .error-page, .others, .related, .empty,
@@ -455,11 +461,61 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero__slide.is-active { opacity: 1; pointer-events: auto; }
 .hero__link, .hero__media picture, .hero__media img { display: block; width: 100%; height: 100%; }
 .hero__media img { object-fit: cover; }
+/* Überblenden: ein- und ausgehende Folie liegen auf eigenen Compositor-Ebenen. */
 .js .hero__slide { transition: opacity var(--dur-hero-fade) var(--ease); }
+.js .hero__slide.is-active, .js .hero__slide.is-leaving { will-change: opacity; }
 @media (prefers-reduced-motion: no-preference) {
-  .js .hero__media[data-hero] .hero__slide img { transition: transform 14s linear; }
-  .js .hero__media[data-hero] .hero__slide.is-active img { transform: scale(1.04); }
+  /* Bewegung nur während der Überblendung: das neue Bild sinkt aus leichter Vergrößerung in seine Ruhelage
+     und steht danach still. Eine über Sekunden kriechende Vergrößerung verschiebt das Bild pro Frame nur um
+     Bruchteile eines Pixels – feine Linien und Raster flimmern dann sichtbar. Deshalb keine Dauerbewegung. */
+  .js .hero__media[data-hero] .hero__slide img { transform: scale(1.03); backface-visibility: hidden; }
+  .js .hero__media[data-hero] .hero__slide.is-active img,
+  .js .hero__media[data-hero] .hero__slide.is-leaving img { will-change: transform; }
+  .js .hero__media[data-hero] .hero__slide.is-active img { transition: transform var(--dur-hero-settle) cubic-bezier(0.16, 0.6, 0.2, 1); }
+  /* .is-running setzt site.js nach dem ersten gezeichneten Bild – so sinkt auch das erste Bild weich ein. */
+  .js .hero__media[data-hero].is-running .hero__slide.is-active img { transform: scale(1); }
+  /* Die ausgehende Folie bleibt stehen (bzw. beendet ein noch laufendes Einsinken während des Ausblendens). */
+  .js .hero__media[data-hero] .hero__slide.is-leaving img { transform: scale(1); transition: transform var(--dur-hero-fade) ease-out; }
 }
+/* Versatz beim Scrollen: das Bild wandert langsamer als die Seite, der Textblock blendet aus. Als
+   scrollgebundene Animation läuft das im Takt des Scrollens, ohne Skript. Browser ohne diese Technik
+   bekommen denselben Versatz aus architektur.js. */
+@supports (animation-timeline: view()) {
+  @media (min-width: 860px) and (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .hero--media, .service-head--media { view-timeline: --kopfbild block; }
+    /* Die Leistungsseite beginnt unter der Kopfzeile: der Versatz setzt dort mit dem ersten Scrollen ein. */
+    .service-head--media { view-timeline-inset: calc(var(--header-h) + 1px) 0px; }
+    .hero__media[data-parallax], .service-head__media[data-parallax] {
+      animation: kopfbild-versatz linear both;
+      animation-timeline: --kopfbild;
+      animation-range: exit-crossing 0% exit-crossing 100%;
+    }
+    /* Startseite: nur der Textblock blendet aus. Der Plankopf behält seine Deckkraft – läge die Deckkraft auf
+       dem gemeinsamen Rahmen, verlöre er seinen Weichzeichner (backdrop-filter) über dem Bild. */
+    .hero--media .hero__inner {
+      animation: kopftext-versatz linear both;
+      animation-timeline: --kopfbild;
+      animation-range: exit-crossing 0% exit-crossing 100%;
+    }
+    .hero--media .hero__text {
+      animation: kopftext-aus linear both;
+      animation-timeline: --kopfbild;
+      animation-range: exit-crossing 0% exit-crossing 60%;
+    }
+    .service-head--media .service-head__inner {
+      animation: kopftext-aus linear both, kopftext-versatz linear both;
+      animation-timeline: --kopfbild, --kopfbild;
+      animation-range: exit-crossing 0% exit-crossing 60%, exit-crossing 0% exit-crossing 100%;
+    }
+    .hero--media .hero__inner { --kopftext-weg: 8svh; }
+    .service-head--media .service-head__inner { --kopftext-weg: calc(0.08 * clamp(28rem, 72vh, 46rem)); }
+  }
+}
+/* Das Bild ist um 22 % der Abschnittshöhe nach oben verlängert (top: -22 %); 18,0328 % seiner eigenen Höhe
+   sind genau diese 22 % – am Ende des Wegs liegt seine Oberkante auf der des Abschnitts. */
+@keyframes kopfbild-versatz { to { transform: translate3d(0, 18.0328%, 0); } }
+@keyframes kopftext-aus { to { opacity: 0; } }
+@keyframes kopftext-versatz { to { transform: translate3d(0, var(--kopftext-weg, 4rem), 0); } }
 /* Abdunkelung von unten und links – die Fotografien sind oft hell. */
 .hero--media::after {
   content: '';
@@ -534,13 +590,14 @@ button { font: inherit; color: inherit; background: none; border: 0; padding: 0;
 .hero__dots li { flex: 1 1 0; min-width: 0; }
 .hero__dot { position: relative; display: block; width: 100%; padding: 0.75rem 0; }
 .hero__dot::before { content: ''; display: block; height: 2px; background: rgba(236, 236, 234, 0.22); }
-.hero__dot::after { content: ''; position: absolute; left: 0; top: 0.75rem; height: 2px; width: 0; background: var(--accent); }
+/* Fortschrittslinie: wird über transform gestreckt, nicht über die Breite – so rechnet der Browser dafür kein Layout. */
+.hero__dot::after { content: ''; position: absolute; left: 0; top: 0.75rem; height: 2px; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left center; }
 .hero__dot.is-active::after { animation: hero-fill var(--hero-interval, 7000ms) linear forwards; }
-.hero__dots li:has(~ li .hero__dot.is-active) .hero__dot::after { width: 100%; background: rgba(236, 236, 234, 0.6); animation: none; }
+.hero__dots li:has(~ li .hero__dot.is-active) .hero__dot::after { transform: scaleX(1); background: rgba(236, 236, 234, 0.6); animation: none; }
 .hero__controls:has(.hero__toggle.is-paused) .hero__dot.is-active::after { animation-play-state: paused; }
 .hero__dot:hover::before { background: rgba(236, 236, 234, 0.5); }
-@keyframes hero-fill { from { width: 0; } to { width: 100%; } }
-@media (prefers-reduced-motion: reduce) { .hero__dot.is-active::after { animation: none; width: 100%; } }
+@keyframes hero-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce) { .hero__dot.is-active::after { animation: none; transform: scaleX(1); } }
 .hero__toggle { appearance: none; padding: 0.6rem; margin: 0 -0.5rem 0 0; opacity: 0.6; transition: opacity var(--dur) var(--ease); color: var(--fg); }
 .hero__toggle:hover, .hero__toggle:focus-visible { opacity: 1; }
 .hero__icon { width: 0.9rem; height: 0.9rem; fill: none; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; }
