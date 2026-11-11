@@ -460,10 +460,24 @@ Der Stand, der live läuft (Commit `28279fb`, Variante „ein Ordner“, `base_u
 | Übersicht zeigt den Hinweis „`base_url` `https://lothar.drve.at`, aufgerufen wird … `https://www.lotharprokop.com`“ | ok |
 | Nach dem Ändern von `base_url` in `config/config.php`: Crawl beider Hosts ohne Befund (Zahlen wie oben), Rückverweis der Architekturseite `https://www.lotharprokop.com`, Hinweis verschwunden. Die Änderung wirkte erst nach rund zwei Sekunden (OPcache des lokalen Apache) | ok |
 
+### Live eingespielt und nachgeprüft (11.11.2026, 09:58–10:15 Uhr Wiener Zeit)
+
+Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release: 100 Dateien per SHA-256 identisch, 38 abweichend – genau die geänderten; ihre Größen auf dem Server entsprachen dem Stand `28279fb`. Hochgeladen wurden diese 38 Dateien in einer Reihenfolge, bei der kein Zwischenstand Code aufruft, der noch fehlt (Nicht-PHP, `helpers.php`, Bibliotheken, Controller, `bootstrap.php`, Templates, zuletzt die Front-Controller), jede über eine temporäre Datei mit Umbenennen. Diese Reihenfolge war zuvor unter dem lokalen Apache Datei für Datei durchgespielt worden: nach jeder der 38 Dateien 15 Seiten beider Auftritte abgerufen, kein Zwischenstand mit Fehler. Danach wurde in `config/config.php` auf dem Server an zwei Stellen `https://lothar.drve.at` durch `https://www.lotharprokop.com` ersetzt (`base_url` und die Adresse in `mail.from`); sonst blieb die Datei Byte für Byte gleich, alle übrigen Werte unverändert (vor dem Hochladen verglichen, danach zurückgelesen). `storage/` und die Bildordner wurden nicht angefasst.
+
+| Prüfung (lesend, direkt am neuen Server) | Ergebnis |
+|---|---|
+| Dateigrößen aller 38 Dateien nach dem Upload | ok |
+| 13 Seiten beider Domains 200 ohne PHP-Meldung | ok |
+| `//a//evil.example/` → `/a/evil.example`, `//evil.example/` → `/evil.example`, `//a/\evil.example/` → `/a/evil.example`; `/works/` und `/portfolio` → `/fotografie` | ok |
+| `Strict-Transport-Security: max-age=15552000`; `X-Content-Type-Options: nosniff` auf Seite und CSS-Datei | ok |
+| Porträt auf `www.architekturfotografie.net/profil`: alle 6 Varianten 200 | ok |
+| `check.php`, `/admin/setup`, `config/config.php`, `storage/…` weiterhin 404 | ok |
+| Crawl `www.lotharprokop.com` nach der Änderung von `base_url`: 76 Seiten 200; 3943 Dateien (jetzt einschließlich der `og:image`-Adressen) – 3900 × 200, 43 × 301 vom früheren WordPress-Server (DNS-Übergang), alle 43 direkt am neuen Server nachgeprüft: 200; alle 72 Sitemap-Einträge, Canonical, `og:url`, `og:image` auf `https://www.lotharprokop.com`; keine Adresse mit `lothar.drve.at` mehr | ok |
+| Crawl `www.architekturfotografie.net`: 23 Seiten 200, 836 Dateien 200 (vorher 6 × 404), Rückverweise auf `https://www.lotharprokop.com` | ok |
+
 ### Nicht getestet (11.11.2026)
 
-- Die Korrekturen auf dem Live-Server – sie sind dort nicht eingespielt; live wurde nichts verändert
-- Angemeldeter Adminbereich und Kontaktformular live (keine Anmeldung, kein Formular abgeschickt; das Formular ist live derzeit abgeschaltet)
+- Angemeldeter Adminbereich und Kontaktformular live (keine Anmeldung, kein Formular abgeschickt; das Formular ist live derzeit abgeschaltet) – damit live auch nicht gesehen: der Hinweis zu `base_url`, Passwortwechsel, Sperren, CSRF-Antwort
 - Echter Mailversand (nur mit Ersatz-`sendmail` in eine Datei)
 - Verhalten hinter dem Proxy/OPcache des Hosters, PHP-FPM
 - Browser außer Chrome (headless, nur der Admin-Hinweis); Screenreader; Ladezeiten
