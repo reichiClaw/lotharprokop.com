@@ -77,7 +77,7 @@ final class ArchitekturController
         $preview = false;
         if ($gallery['status'] !== 'published') {
             // Entwürfe nur für angemeldete Benutzer (Sitzung der Hauptseite, gleiche Domain).
-            if (!Auth::check()) {
+            if (!Auth::checkIfCookie()) {
                 View::notFound('Dieses Projekt gibt es hier nicht.');
                 return;
             }

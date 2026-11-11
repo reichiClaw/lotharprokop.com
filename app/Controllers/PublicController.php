@@ -94,7 +94,7 @@ final class PublicController
         $preview = false;
         if ($gallery['status'] !== 'published') {
             // Entwürfe und archivierte Galerien nur für angemeldete Benutzer (Vorschau).
-            if (!Auth::check()) {
+            if (!Auth::checkIfCookie()) {
                 View::notFound('Dieses Projekt gibt es nicht.');
                 return;
             }

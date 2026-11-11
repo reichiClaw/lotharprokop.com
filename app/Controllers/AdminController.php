@@ -131,7 +131,17 @@ final class AdminController
         Csrf::verify();
         $current = (string) ($_POST['current'] ?? '');
         $new = (string) ($_POST['password'] ?? '');
-        if (!Auth::attempt(Auth::username(), $current)) {
+        $userId = (int) Auth::userId();
+        $username = Auth::username();
+        // Auch hier gilt die Sperre nach Fehlversuchen – sonst ließe sich das aktuelle Passwort
+        // mit einer übernommenen Sitzung unbegrenzt durchprobieren.
+        $locked = Auth::lockedFor($username);
+        if ($locked > 0) {
+            http_response_code(429);
+            self::render('password', ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($locked / 60) . ' Minuten erneut versuchen.', 'meta' => ['title' => 'Passwort ändern']]);
+            return;
+        }
+        if (!Auth::attempt($username, $current)) {
             self::render('password', ['error' => 'Das aktuelle Passwort ist falsch.', 'meta' => ['title' => 'Passwort ändern']]);
             return;
         }
@@ -140,7 +150,7 @@ final class AdminController
             return;
         }
         try {
-            Auth::changePassword((int) Auth::userId(), $new);
+            Auth::changePassword($userId, $new);
         } catch (\InvalidArgumentException $e) {
             self::render('password', ['error' => $e->getMessage(), 'meta' => ['title' => 'Passwort ändern']]);
             return;

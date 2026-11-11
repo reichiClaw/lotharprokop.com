@@ -27,8 +27,7 @@ Alle Regeln liegen in `public/index.php` (Routen) und `app/Controllers/RedirectC
 Der alte Slug wird zuerst als `legacy_slug`, dann als aktueller Slug gesucht.
 
 - Projekt veröffentlicht → 301 auf `/fotografie/<neuer-slug>`
-- Projekt vorhanden, aber Entwurf/archiviert → 410 („derzeit nicht öffentlich“) – bewusst kein Redirect auf die Startseite
-- Projekt unbekannt → 410 („aus dem Portfolio entfernt“)
+- Projekt vorhanden, aber Entwurf/archiviert, oder Projekt unbekannt → 410 („nicht mehr Teil des Portfolios“) – bewusst kein Redirect auf die Startseite, und für beide Fälle dieselbe Antwort (Entwürfe sollen sich nicht über ihre Adresse erraten lassen)
 
 Geänderte Slugs (alle anderen 45 Projekte behalten ihren Slug):
 

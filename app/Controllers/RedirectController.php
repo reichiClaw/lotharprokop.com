@@ -74,12 +74,9 @@ final class RedirectController
         if ($gallery !== null && $gallery['status'] === 'published') {
             redirect('/fotografie/' . eurl($gallery['slug']), 301);
         }
-        if ($gallery !== null) {
-            // Projekt existiert, ist aber nicht (mehr) öffentlich: bewusst kein Redirect auf die Startseite.
-            View::gone('Dieses Projekt ist derzeit nicht öffentlich.');
-            return;
-        }
-        View::gone('Dieses Projekt wurde aus dem Portfolio entfernt.');
+        // Unbekannt oder nicht (mehr) öffentlich: bewusst kein Redirect auf die Startseite – und dieselbe
+        // Antwort für beide Fälle, damit sich Entwürfe nicht über ihre Adresse erraten lassen.
+        View::gone('Dieses Projekt ist nicht mehr Teil des Portfolios.');
     }
 
     public static function projectType(array $params): void
