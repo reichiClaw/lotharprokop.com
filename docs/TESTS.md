@@ -663,7 +663,7 @@ Nach ausdrücklicher Freigabe, Stand `c75a141`. Vorher verglich `tools/deploy-ft
 | `app/View.php`, `config/config.php`, `storage/database.sqlite`, `docs/TESTS.md`, `/admin/setup` weiterhin 404 | ok |
 | Chrome 156 headless gegen die Live-Seiten, 1440×900 – Kopfzeile: `/` und `/projekte` der Architekturseite, `/` und `/fotografie` der Hauptseite, Sprung auf 25/30/40/60 px, Mausrad 45 px, zurück nach oben: je 1 Wechsel, Position bleibt | ok |
 | dieselbe Umgebung – Überblendung auf beiden Startseiten: linear 1,5 s, 24 / 49–50 / 74 % bei ¼ / ½ / ¾, Einsinken bis 2,1 s, ruhende Folien bei 1,03 | ok, auf beiden Seiten gleich |
-| dieselbe Umgebung – Architektur-Startseite: Versatz an 7 Scrollpositionen wie lokal, Plankopf bleibt deckend, keine Compositor-Befunde, keine Konsolenfehler | ok |
+| dieselbe Umgebung – Architektur-Startseite: Versatz an 7 Scrollpositionen 0,22 × Scrollweg (Abweichung höchstens 0,4 px), Plankopf bleibt deckend, alle Animationen des Kopfbereichs vom Browser als compositorfähig gemeldet, keine Konsolenfehler | ok |
 | Abschließender Vergleich mit `tools/deploy-ftp.py diff`: 144 identisch, 0 abweichend (die 8 hochgeladenen Dateien frisch heruntergeladen; für die übrigen gilt die gemerkte Prüfsumme nur bei gleicher Größe und gleicher Änderungszeit; offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
 
 Beobachtung: Der Schnappschuss zählt 92 Bilder in den 9 Projekten der Architekturseite, bei der Einspielung am Nachmittag waren es 100 – zwischen den beiden Einspielungen hat sich der Inhalt geändert, nicht durch diese Arbeit.
