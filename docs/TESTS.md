@@ -509,7 +509,24 @@ Geprüft an der lokalen Apache-Instanz (2.4.58 + mod_php, Aufbau wie beim Hoster
 | Kontaktformular nach dem Umbau des Versands (11 Fälle wie oben, Entwicklungsserver): unverändert; Kopfzeilen `From`, `Reply-To`, jetzt zusätzlich `MIME-Version` und `Content-Transfer-Encoding` | ok |
 | Chrome (headless), Entwicklungsserver, Konto mit Benutzernamen: Anmeldeseite → „Passwort vergessen?“ → Hinweis → Schlüssel-Seite mit E-Mail-Adresse → Anmeldeseite; Link angefordert, Adresse aus der Datei-E-Mail geöffnet, neues Passwort gesetzt, angemeldet, Kontoseite zeigt die Adresse; derselbe Link danach ungültig | ok |
 
-Nicht getestet: auf dem Live-Server; ob E-Mails beim Hoster tatsächlich versendet werden und ankommen (lokal nur der Ersatz-`sendmail`); andere Browser.
+### Live eingespielt und nachgeprüft (11.11.2026, 14:20–14:36 Uhr Wiener Zeit)
+
+Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release des Stands `5791762`: 124 Dateien per SHA-256 identisch oder geschützt, 20 abweichend – genau die geänderten (14 vorhandene, 6 neue). Hochgeladen wurden diese 20 Dateien in einer Reihenfolge, bei der kein Zwischenstand Code aufruft, der noch fehlt (neue Bibliotheken vor den Dateien, die sie benutzen; `public/index.php` zuletzt). `config/config.php`, `storage/` und die Bildordner wurden nicht geschrieben.
+
+| Prüfung (lesend, direkt am neuen Server) | Ergebnis |
+|---|---|
+| Dateigrößen aller 20 Dateien nach dem Upload | ok |
+| `/admin/login` 200, Feld „E-Mail-Adresse oder Benutzername“, Verweis „Passwort vergessen?“ | ok |
+| `/admin/passwort-vergessen` 200 mit Hinweis auf das Konto ohne E-Mail-Adresse, `Referrer-Policy: no-referrer`; `/admin/passwort-schluessel` 200 mit den Feldern Schlüssel, E-Mail-Adresse, Passwort (vorher beide 404) | ok |
+| `/admin/passwort-neu` ohne und mit erfundenem Token 410 | ok |
+| `/admin` und `/admin/passwort` abgemeldet → `/admin/login`; `/admin/setup` weiterhin 404 | ok |
+| Startseite, Kontakt, Fotografie, Vita und `www.architekturfotografie.net` 200 ohne PHP-Meldung; `app/Auth.php`, `config/config.php`, `storage/database.sqlite` 404; Admin-Adressen auf der Architektur-Domain 404 | ok |
+| Migration 5 gelaufen (Seiten mit Datenbankzugriff antworten fehlerfrei, Datenbankdatei gewachsen) | ok |
+| Abschließend `tools/deploy-ftp.py diff`: alle Programmdateien auf dem Server per SHA-256 identisch mit dem Release dieses Stands (offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
+
+Live nicht ausgeführt: kein Formular abgeschickt – weder eine Anmeldung noch eine Link-Anforderung noch das Zurücksetzen mit dem Schlüssel. Ob der Server E-Mails tatsächlich versendet und ob sie ankommen, ist damit weiterhin ungeprüft.
+
+Nicht getestet: ob E-Mails beim Hoster tatsächlich versendet werden und ankommen (lokal nur der Ersatz-`sendmail`); das Absenden der neuen Formulare auf dem Live-Server; andere Browser.
 
 ## Nicht getestet
 
