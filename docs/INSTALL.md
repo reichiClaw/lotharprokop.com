@@ -52,7 +52,7 @@ Die Website braucht auf dem Server weder Kommandozeile noch Composer. Alles, was
 Auf dem eigenen Rechner (PHP 8.1+ vorhanden) im Projektordner:
 
 ```bash
-php bin/build-release.php --with-content --base-url=https://lotharprokop.com
+php bin/build-release.php --with-content --base-url=https://www.lotharprokop.com
 # Varianten:
 #   --layout=single   alles in einem Ordner (siehe Variante B)
 #   --zip             zusätzlich ein ZIP-Archiv erzeugen
@@ -106,7 +106,7 @@ Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot 
 1. Repository-Inhalt auf den Server laden, z. B. nach `/home/kunde/lotharprokop/`.
 2. Document Root der Domain auf `/home/kunde/lotharprokop/public` setzen.
 3. `config/config.example.php` nach `config/config.php` kopieren und anpassen:
-   - `base_url` (z. B. `https://lotharprokop.com`)
+   - `base_url`: genau die Adresse, unter der die Website im Browser steht (z. B. `https://www.lotharprokop.com` – mit `www`, wenn der Hoster dorthin umleitet). Daraus entstehen Canonical-Angaben, `sitemap.xml`, `robots.txt` und Vorschaubilder; nach einem Domainwechsel anpassen. Weicht der Eintrag von der aufgerufenen Adresse ab, warnt die Admin-Übersicht.
    - `mail.enabled` nur auf `true`, wenn `mail()` auf dem Server nachweislich zustellt; `mail.from` muss zur Domain passen.
    - `setup_key`: langer zufälliger Wert, wenn das Adminkonto über den Browser angelegt werden soll (siehe unten).
 4. Schreibrechte: `storage/` und `public/media/` müssen für PHP beschreibbar sein.
@@ -114,7 +114,7 @@ Nur wenn das Document Root nicht änderbar ist **und** nichts neben dem Webroot 
 
 ### Server-Check
 
-`public/check.php` ist ein eigenständiges Skript ohne Abhängigkeit zur Anwendung. Es prüft PHP ≥ 8.1, `pdo_sqlite`, `fileinfo`, `mbstring`, `json`, SQLite ≥ 3.27, Imagick oder GD (mit WebP), `exif`, `zip`, die Upload-Limits, `file_uploads`, `mod_rewrite` (soweit abfragbar), HTTPS, den Anwendungsordner (`app-path.php` bzw. automatische Suche), `config/config.php` (`base_url` passend zur Domain, `debug` aus, `setup_key`), die Schreibrechte in `storage/*` und `media/` sowie, ob private Ordner im Webroot liegen. Aufruf im Browser (`https://DOMAIN/check.php`) oder per Shell (`php public/check.php`, Exit-Code 1 bei fehlenden Voraussetzungen). Vor dem Upload eines Pakets lässt es sich auch allein hochladen, um den Hoster vorab zu prüfen. Als Auslieferungstest legt es `media/checkprobe/w1.jpg` an, das im Browser unter `/media/checkprobe/w1.jpg` ein Bild (nicht die 404-Seite) liefern muss. Nach der Prüfung `check.php` und den Ordner `media/checkprobe/` löschen.
+`public/check.php` ist ein eigenständiges Skript ohne Abhängigkeit zur Anwendung. Solange noch kein Adminkonto existiert, ist es im Browser offen; danach antwortet es nur noch mit dem Einrichtungsschlüssel (`/check.php?key=<setup_key>`), sonst mit 404 – die Ausgabe verrät Details zur Serverumgebung. Nach der Einrichtung trotzdem löschen. Es prüft PHP ≥ 8.1, `pdo_sqlite`, `fileinfo`, `mbstring`, `json`, SQLite ≥ 3.27, Imagick oder GD (mit WebP), `exif`, `zip`, die Upload-Limits, `file_uploads`, `mod_rewrite` (soweit abfragbar), HTTPS, den Anwendungsordner (`app-path.php` bzw. automatische Suche), `config/config.php` (`base_url` passend zur Domain, `debug` aus, `setup_key`), die Schreibrechte in `storage/*` und `media/` sowie, ob private Ordner im Webroot liegen. Aufruf im Browser (`https://DOMAIN/check.php`) oder per Shell (`php public/check.php`, Exit-Code 1 bei fehlenden Voraussetzungen). Vor dem Upload eines Pakets lässt es sich auch allein hochladen, um den Hoster vorab zu prüfen. Als Auslieferungstest legt es `media/checkprobe/w1.jpg` an, das im Browser unter `/media/checkprobe/w1.jpg` ein Bild (nicht die 404-Seite) liefern muss. Nach der Prüfung `check.php` und den Ordner `media/checkprobe/` löschen.
 
 ### PHP-Einstellungen beim Hoster
 
@@ -166,6 +166,12 @@ python3 tools/deploy-ftp.py diff              # nur vergleichen
 python3 tools/deploy-ftp.py deploy --dry-run  # zeigen, was hochgeladen würde
 python3 tools/deploy-ftp.py deploy            # hochladen und prüfen
 ```
+
+### Domain wechseln
+
+Die Adresse der Website steht an genau einer Stelle: `'base_url'` in `config/config.php` (für die Architekturseite zusätzlich `architektur.base_url`). Daraus entstehen Canonical-Angaben, `og:url`/`og:image`, `sitemap.xml`, die `Sitemap:`-Zeile der `robots.txt`, die Verweise zwischen beiden Auftritten und – wenn `mail.from` leer ist – der Absender des Kontaktformulars. Links innerhalb der Seiten sind relativ und funktionieren unter jeder Domain.
+
+Nach einem Umzug also `'base_url' => 'https://www.NEUE-DOMAIN'` eintragen – genau so, wie Besucher die Website am Ende sehen (mit oder ohne `www`, je nachdem, wohin der Hoster umleitet). Steht in älteren Konfigurationen bei `mail.from` noch eine Zeile mit der alten Adresse, dort die neue Absenderadresse eintragen oder den Wert leeren. Stimmt `base_url` nicht mit der aufgerufenen Adresse überein, weist die Übersicht im Admin darauf hin; die Systemseite zeigt denselben Punkt als Prüfung. Danach die Sitemap in der Search Console neu einreichen.
 
 ### Apache
 
@@ -268,10 +274,13 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 
 ## Sicherheit – Kurzüberblick
 
-- Server-seitige Anmeldung (bcrypt), Session-Cookie `HttpOnly`, `SameSite=Lax`, `Secure` bei HTTPS, Session-ID-Rotation beim Login, Leerlauf- und Absolut-Timeout, persistentes Rate-Limit
-- CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`)
+- Server-seitige Anmeldung (bcrypt), Session-Cookie `HttpOnly`, `SameSite=Lax`, `Secure` bei HTTPS, Session-ID-Rotation beim Login, Leerlauf- und Absolut-Timeout, persistentes Rate-Limit (5 Fehlversuche je Benutzername oder Adresse in 15 Minuten; gilt auch für das Formular „Passwort ändern“). Ein Passwortwechsel beendet alle anderen Sitzungen des Kontos. Unbekannte Benutzernamen kosten dieselbe Rechenzeit wie bekannte.
+- CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`); ohne gültiges Token Antwort 403
+- Kontaktformular: Honeypot, signierter Zeitstempel (Formular muss vom Server ausgegeben und mindestens einige Sekunden alt sein), höchstens 5 Nachrichten je Absenderadresse (IPv6: je /64-Netz) und `mail.max_per_hour` insgesamt pro Stunde, keine Zeilenumbrüche in Kopfzeilen
+- Weiterleitungen führen nie auf fremde Hosts: lokale Ziele werden bereinigt (`//host`, `/\host`), das Rücksprungziel nach der Anmeldung muss unter `/admin` liegen
+- Entwürfe sind für Besucher von nicht vorhandenen Seiten nicht zu unterscheiden; `check.php` antwortet nach dem Anlegen des Adminkontos nur noch mit Einrichtungsschlüssel
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis
 - HTTPS erzwungen: beide `.htaccess`-Varianten leiten `http://` dauerhaft (`301`) auf dieselbe Adresse unter `https://` um (Pfad und Query bleiben erhalten; `X-Forwarded-Proto` wird berücksichtigt, `/.well-known/acme-challenge/` ist ausgenommen). Voraussetzung ist ein gültiges Zertifikat beim Hoster.
-- Security-Header inkl. Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
+- Security-Header inkl. `Strict-Transport-Security` (bei HTTPS, 180 Tage, ohne `includeSubDomains`), `X-Content-Type-Options: nosniff` auch für Bild-, CSS- und JS-Dateien, Content-Security-Policy (`script-src 'self'` plus Hash des einzigen Inline-Skripts, `frame-src` nur youtube-nocookie/vimeo)
 - Kein Tracking, keine externen Ressourcen, Schriften lokal

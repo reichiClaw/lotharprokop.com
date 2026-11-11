@@ -101,15 +101,16 @@ final class AdminController
             self::render('login', ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($wait / 60) . ' Minuten erneut versuchen.', 'meta' => ['title' => 'Anmelden']]);
             return;
         }
+        // Vor attempt() lesen: eine erfolgreiche Anmeldung beginnt eine neue, leere Sitzung.
+        Auth::startSession();
+        $after = (string) ($_SESSION['after_login'] ?? '/admin');
         if (!Auth::attempt($username, $password)) {
             usleep(300000);
             http_response_code(401);
             self::render('login', ['error' => 'Benutzername oder Passwort ist falsch.', 'username' => $username, 'meta' => ['title' => 'Anmelden']]);
             return;
         }
-        $after = (string) ($_SESSION['after_login'] ?? '/admin');
-        unset($_SESSION['after_login']);
-        redirect(str_starts_with($after, '/admin') ? $after : '/admin');
+        redirect($after === '/admin' || str_starts_with($after, '/admin/') ? $after : '/admin');
     }
 
     public static function logout(array $params): void
@@ -131,7 +132,17 @@ final class AdminController
         Csrf::verify();
         $current = (string) ($_POST['current'] ?? '');
         $new = (string) ($_POST['password'] ?? '');
-        if (!Auth::attempt(Auth::username(), $current)) {
+        $userId = (int) Auth::userId();
+        $username = Auth::username();
+        // Auch hier gilt die Sperre nach Fehlversuchen – sonst ließe sich das aktuelle Passwort
+        // mit einer übernommenen Sitzung unbegrenzt durchprobieren.
+        $locked = Auth::lockedFor($username);
+        if ($locked > 0) {
+            http_response_code(429);
+            self::render('password', ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($locked / 60) . ' Minuten erneut versuchen.', 'meta' => ['title' => 'Passwort ändern']]);
+            return;
+        }
+        if (!Auth::attempt($username, $current)) {
             self::render('password', ['error' => 'Das aktuelle Passwort ist falsch.', 'meta' => ['title' => 'Passwort ändern']]);
             return;
         }
@@ -140,7 +151,7 @@ final class AdminController
             return;
         }
         try {
-            Auth::changePassword((int) Auth::userId(), $new);
+            Auth::changePassword($userId, $new);
         } catch (\InvalidArgumentException $e) {
             self::render('password', ['error' => $e->getMessage(), 'meta' => ['title' => 'Passwort ändern']]);
             return;
@@ -163,12 +174,14 @@ final class AdminController
             'films' => (int) $pdo->query("SELECT COUNT(*) FROM films WHERE status = 'published'")->fetchColumn(),
             'selection' => (int) $pdo->query('SELECT COUNT(*) FROM featured_images')->fetchColumn(),
         ];
-        $recent = array_slice(Galleries::all(), 0, 8);
+        $recent = Galleries::all();
         usort($recent, fn($a, $b) => strcmp($b['updated_at'], $a['updated_at']));
+        $recent = array_slice($recent, 0, 8);
         self::render('dashboard', [
             'counts' => $counts,
             'recent' => $recent,
             'slides' => HeroSlides::all(),
+            'calledAs' => Config::baseUrlMismatch(),
             'meta' => ['title' => 'Übersicht'],
         ]);
     }
@@ -193,11 +206,15 @@ final class AdminController
                     self::flash('ok', 'Kategorie angelegt.');
                     break;
                 case 'update':
+                    $affected = self::galleryIdsInCategory((int) $_POST['id']);
                     Categories::update((int) $_POST['id'], (string) ($_POST['name'] ?? ''), (string) ($_POST['slug'] ?? ''));
+                    self::syncAfterCategoryChange($affected);
                     self::flash('ok', 'Kategorie gespeichert.');
                     break;
                 case 'delete':
+                    $affected = self::galleryIdsInCategory((int) $_POST['id']);
                     Categories::delete((int) $_POST['id']);
+                    self::syncAfterCategoryChange($affected);
                     self::flash('ok', 'Kategorie gelöscht. Die Galerien selbst bleiben erhalten.');
                     break;
                 case 'reorder':
@@ -222,6 +239,30 @@ final class AdminController
             self::flash('error', $e->getMessage());
         }
         redirect('/admin/kategorien');
+    }
+
+    /** @return int[] */
+    private static function galleryIdsInCategory(int $categoryId): array
+    {
+        $stmt = Database::pdo()->prepare('SELECT gallery_id FROM gallery_categories WHERE category_id = ?');
+        $stmt->execute([$categoryId]);
+        return array_map('intval', $stmt->fetchAll(\PDO::FETCH_COLUMN));
+    }
+
+    /**
+     * Der Umfang der Architekturseite hängt an Kategorie-Slugs. Wird eine Kategorie umbenannt oder
+     * gelöscht, können Galerien dort neu erscheinen oder verschwinden – ihre Bilder müssen mit.
+     * @param int[] $galleryIds
+     */
+    private static function syncAfterCategoryChange(array $galleryIds): void
+    {
+        if (!\App\Architektur::enabled()) {
+            return;
+        }
+        \App\Architektur::forgetCategories();
+        foreach ($galleryIds as $galleryId) {
+            Images::syncGallery($galleryId);
+        }
     }
 
     /* ---------- Startseite ---------- */
@@ -386,19 +427,27 @@ final class AdminController
         Csrf::verify();
         $id = isset($params['id']) ? (int) $params['id'] : null;
         $data = $_POST;
+        $poster = null;
         try {
+            $previousPoster = $id !== null ? (int) (Films::find($id)['poster_image_id'] ?? 0) : 0;
             if (!empty($_FILES['poster']['name'])) {
                 $poster = Images::createFromUpload($_FILES['poster']);
                 Images::updateMeta($poster['id'], 'Vorschaubild ' . trim((string) ($data['title'] ?? '')), '', 0.5, 0.5);
                 $data['poster_image_id'] = $poster['id'];
             } elseif ($id !== null) {
-                $existing = Films::find($id);
-                $data['poster_image_id'] = $existing['poster_image_id'] ?? null;
+                $data['poster_image_id'] = $previousPoster > 0 ? $previousPoster : null;
             }
             $id = Films::save($id, $data);
+            if ($poster !== null && $previousPoster > 0 && $previousPoster !== $poster['id']) {
+                self::pruneImage($previousPoster);
+            }
             self::flash('ok', 'Film gespeichert.');
             redirect('/admin/filme/' . $id);
         } catch (\InvalidArgumentException | \RuntimeException $e) {
+            // Das gerade hochgeladene Vorschaubild gehört zu keinem Film – nicht als Waise liegen lassen.
+            if ($poster !== null) {
+                Images::delete($poster['id']);
+            }
             self::flash('error', $e->getMessage());
             redirect($id ? '/admin/filme/' . $id : '/admin/filme/neu');
         }
@@ -504,7 +553,11 @@ final class AdminController
     {
         Auth::requireLogin();
         $storage = Config::storage();
+        $calledAs = Config::baseUrlMismatch();
         $checks = [
+            'Adresse laut config.php (base_url)' => $calledAs === null
+                ? Config::baseUrl()
+                : 'NEIN – eingetragen ist ' . (Config::baseUrl() ?: 'nichts') . ', aufgerufen wird die Website über ' . $calledAs . '. Bitte in config/config.php anpassen.',
             'PHP-Version' => PHP_VERSION,
             'Bildbibliothek' => ImageProcessor::backend() . (class_exists('Imagick') ? ' (' . \Imagick::getVersion()['versionString'] . ')' : ''),
             'WebP-Ausgabe' => ImageProcessor::supportsWebp() ? 'ja' : 'nein',
@@ -521,7 +574,7 @@ final class AdminController
             'Originale' => human_bytes(self::dirSize(Config::storage('originals'))),
             'Öffentliche Varianten' => human_bytes(self::dirSize(Config::publicMedia())),
             'HTTPS' => is_https() ? 'ja' : 'nein',
-            'Kontaktformular' => Config::get('mail.enabled') ? 'aktiv → ' . Config::get('mail.to') : 'deaktiviert',
+            'Kontaktformular' => Config::get('mail.enabled') ? 'aktiv → ' . Config::get('mail.to') . ' (Absender ' . \App\ContactForm::fromAddress() . ')' : 'deaktiviert',
         ];
         $missing = self::imagesWithoutVariants();
         self::render('system', [

@@ -74,7 +74,7 @@ Alle Texte des Auftritts (Untertitel, Einführung, Leitsatz, Profil, Kontakt-Ein
 
 ## Bilder: öffentliche Ordner
 
-Bildvarianten werden pro Auftritt in einen eigenen öffentlichen Ordner synchronisiert: `public/media/` für die Hauptseite, `public/architektur/media/` für die Architekturseite. Letzterer enthält ausschließlich Bilder veröffentlichter Galerien im Umfang der Architekturseite – auch unter eigener Domain ist über diesen Ordner nichts erreichbar, was dort nicht gezeigt wird. Der Abgleich läuft bei jeder Änderung im Admin automatisch; vollständig neu abgleichen: Admin → System → „Sichtbarkeit abgleichen“ oder `php bin/reprocess-images.php`. Es werden Hardlinks genutzt, wo das Dateisystem es erlaubt, sonst Kopien.
+Bildvarianten werden pro Auftritt in einen eigenen öffentlichen Ordner synchronisiert: `public/media/` für die Hauptseite, `public/architektur/media/` für die Architekturseite. Letzterer enthält ausschließlich Bilder veröffentlichter Galerien im Umfang der Architekturseite, die eigens gewählten Bilder der Bildfolge und das Porträt der Profilseite – auch unter eigener Domain ist über diesen Ordner nichts erreichbar, was dort nicht gezeigt wird. Der Abgleich läuft bei jeder Änderung im Admin automatisch; vollständig neu abgleichen: Admin → System → „Sichtbarkeit abgleichen“ oder `php bin/reprocess-images.php`. Es werden Hardlinks genutzt, wo das Dateisystem es erlaubt, sonst Kopien.
 
 ## Gemeinsame Dateien
 
@@ -113,6 +113,7 @@ Prüfung nach dem Upload: `https://DOMAIN/architektur/` zeigt die dunkle Startse
    ```
 
 3. Prüfen: `https://NEUE-DOMAIN/` zeigt die Startseite, `https://NEUE-DOMAIN/sitemap.xml` enthält Adressen der neuen Domain, `https://HAUPTDOMAIN/architektur/` leitet per 301 auf die neue Domain um.
+   Ausnahme: Wer im Admin angemeldet ist, wird nicht umgeleitet. So bleibt die Vorschau von Entwürfen möglich – die Anmeldung gilt nur für die Hauptdomain, deshalb dort `https://HAUPTDOMAIN/architektur/projekte/<slug>` aufrufen.
 4. Die Sitemap der neuen Domain in der Search Console eintragen. Die `robots.txt` der Architekturseite verweist bereits auf ihre Sitemap.
 
 Ohne eigene Domain bleibt alles beim Alten: Die Seite läuft unter `https://HAUPTDOMAIN/architektur/`, Canonical und Sitemap nutzen diese Adressen.

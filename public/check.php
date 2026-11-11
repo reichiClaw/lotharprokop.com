@@ -5,13 +5,58 @@
  * Aufruf im Browser:  https://DOMAIN/check.php   (Datei liegt im Webroot neben index.php)
  * oder per Shell:     php public/check.php
  *
- * Eigenständig, benötigt weder Datenbank noch Anwendungscode. Nach der Prüfung löschen –
- * die Ausgabe verrät Details zur Serverumgebung.
+ * Eigenständig, benötigt keinen Anwendungscode. Die Ausgabe verrät Details zur Serverumgebung, deshalb:
+ * Sobald ein Adminkonto existiert, antwortet die Seite im Browser nur noch mit dem Einrichtungsschlüssel
+ * (https://DOMAIN/check.php?key=<setup_key aus config/config.php>), sonst mit 404. Nach der Einrichtung
+ * trotzdem löschen.
  */
 declare(strict_types=1);
 
 define('PUBLIC_ROOT', __DIR__);
 $cli = PHP_SAPI === 'cli';
+
+if (!$cli) {
+    $allowed = static function (): bool {
+        $root = is_file(__DIR__ . '/app-path.php') ? rtrim((string) require __DIR__ . '/app-path.php', '/') : null;
+        if ($root === null || !is_file($root . '/app/bootstrap.php')) {
+            $root = null;
+            foreach ([dirname(__DIR__), dirname(__DIR__) . '/lotharprokop', dirname(__DIR__) . '/lotharprokop-app'] as $c) {
+                if (is_file($c . '/app/bootstrap.php')) {
+                    $root = $c;
+                    break;
+                }
+            }
+        }
+        if ($root === null || !is_file($root . '/config/config.php') || !extension_loaded('pdo_sqlite')) {
+            return true;
+        }
+        try {
+            $cfg = (array) require $root . '/config/config.php';
+            $db = rtrim((string) ($cfg['paths']['storage'] ?? $root . '/storage'), '/') . '/database.sqlite';
+            if (!is_file($db)) {
+                return true;
+            }
+            $pdo = new PDO('sqlite:' . $db, null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+            $users = (int) $pdo->query('SELECT COUNT(*) FROM users')->fetchColumn();
+        } catch (Throwable) {
+            // Einrichtung unvollständig oder beschädigt – genau dafür gibt es diese Prüfung.
+            return true;
+        }
+        if ($users === 0) {
+            return true;
+        }
+        $key = (string) ($cfg['setup_key'] ?? '');
+        $given = $_GET['key'] ?? '';
+        return $key !== '' && is_string($given) && hash_equals($key, $given);
+    };
+    if (!$allowed()) {
+        http_response_code(404);
+        header('Content-Type: text/plain; charset=utf-8');
+        header('X-Robots-Tag: noindex');
+        exit("Nicht gefunden.\n");
+    }
+    unset($allowed);
+}
 $rows = [];   // [status, name, value]  status: ok | warn | fail | info
 $add = static function (string $status, string $name, string $value) use (&$rows): void {
     $rows[] = [$status, $name, $value];

@@ -45,8 +45,15 @@ final class AdminGalleryController
             AdminController::flash('error', 'Bitte einen Titel angeben.');
             redirect('/admin/galerien/neu');
         }
+        // Eine neue Galerie hat noch keine Bilder und bleibt deshalb Entwurf.
+        $wantedPublished = ($data['status'] ?? '') === 'published';
+        if ($wantedPublished) {
+            $data['status'] = 'draft';
+        }
         $id = Galleries::create($data);
-        AdminController::flash('ok', 'Galerie angelegt. Jetzt Bilder hochladen.');
+        AdminController::flash('ok', $wantedPublished
+            ? 'Galerie als Entwurf angelegt – veröffentlichen ist erst mit Bildern möglich. Jetzt Bilder hochladen.'
+            : 'Galerie angelegt. Jetzt Bilder hochladen.');
         redirect('/admin/galerien/' . $id);
     }
 
@@ -95,8 +102,14 @@ final class AdminGalleryController
                 $data['cover_image_id'] = null;
             }
         }
+        $keptDraft = ($data['status'] ?? '') === 'published' && Galleries::images($id) === [];
+        if ($keptDraft) {
+            $data['status'] = $gallery['status'] === 'published' ? 'draft' : $gallery['status'];
+        }
         Galleries::update($id, $data);
-        AdminController::flash('ok', 'Galerie gespeichert.');
+        AdminController::flash($keptDraft ? 'error' : 'ok', $keptDraft
+            ? 'Gespeichert, aber nicht veröffentlicht: Eine Galerie ohne Bilder kann nicht veröffentlicht werden.'
+            : 'Galerie gespeichert.');
         redirect('/admin/galerien/' . $id);
     }
 

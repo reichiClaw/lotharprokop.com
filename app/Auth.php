@@ -24,6 +24,9 @@ final class Auth
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
         ini_set('session.gc_maxlifetime', (string) Config::get('session.absolute_timeout', 43200));
+        // Eigener Sitzungsordner: abgelaufene Dateien selbst aufräumen (manche Hoster stellen das ab).
+        ini_set('session.gc_probability', '1');
+        ini_set('session.gc_divisor', '100');
         session_name((string) Config::get('session.name', 'lp_admin'));
         session_set_cookie_params([
             'lifetime' => 0,
@@ -54,7 +57,53 @@ final class Auth
     public static function check(): bool
     {
         self::startSession();
-        return isset($_SESSION['user_id']);
+        if (!isset($_SESSION['user_id'])) {
+            return false;
+        }
+        if (!self::passwordStillCurrent()) {
+            // Passwort wurde in einer anderen Sitzung geändert: diese Sitzung gilt nicht mehr.
+            self::logout();
+            self::startSession();
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Wie check(), aber ohne für anonyme Besucher eine Sitzung (und damit ein Cookie) zu beginnen.
+     * Für öffentliche Seiten, die Angemeldeten nur zusätzlich etwas zeigen (Vorschau von Entwürfen).
+     */
+    public static function checkIfCookie(): bool
+    {
+        $name = (string) Config::get('session.name', 'lp_admin');
+        return isset($_COOKIE[$name]) && self::check();
+    }
+
+    private static ?bool $passwordCurrent = null;
+
+    /** Passt der in der Sitzung vermerkte Stand des Passworts noch zum Benutzerkonto? */
+    private static function passwordStillCurrent(): bool
+    {
+        if (self::$passwordCurrent !== null) {
+            return self::$passwordCurrent;
+        }
+        $stmt = Database::pdo()->prepare('SELECT password_hash FROM users WHERE id = ?');
+        $stmt->execute([(int) $_SESSION['user_id']]);
+        $hash = $stmt->fetchColumn();
+        if ($hash === false) {
+            return self::$passwordCurrent = false;
+        }
+        $mark = self::passwordMark((string) $hash);
+        if (!isset($_SESSION['pw'])) {
+            // Sitzung aus der Zeit vor dieser Prüfung: einmalig übernehmen.
+            $_SESSION['pw'] = $mark;
+        }
+        return self::$passwordCurrent = hash_equals((string) $_SESSION['pw'], $mark);
+    }
+
+    private static function passwordMark(string $hash): string
+    {
+        return substr(hash('sha256', $hash), 0, 32);
     }
 
     public static function userId(): ?int
@@ -103,8 +152,13 @@ final class Auth
     public static function changePassword(int $userId, string $password): void
     {
         self::validatePassword($password);
-        Database::pdo()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')
-            ->execute([password_hash($password, PASSWORD_DEFAULT), $userId]);
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        Database::pdo()->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$hash, $userId]);
+        // Alle anderen Sitzungen dieses Kontos verlieren damit ihre Gültigkeit; die eigene bleibt.
+        if (self::userId() === $userId) {
+            $_SESSION['pw'] = self::passwordMark($hash);
+            self::$passwordCurrent = true;
+        }
     }
 
     /** Anzahl Sekunden bis zur Entsperrung oder 0, wenn Anmeldung erlaubt ist. */
@@ -134,9 +188,9 @@ final class Auth
         $stmt = $pdo->prepare('SELECT * FROM users WHERE username = ?');
         $stmt->execute([$username]);
         $user = $stmt->fetch();
-        // Konstante Laufzeit auch bei unbekanntem Benutzer.
-        $hash = $user['password_hash'] ?? '$2y$10$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalid';
-        $ok = $user && password_verify($password, $hash);
+        // Gleiche Laufzeit bei unbekanntem Benutzer: immer gegen einen echten Hash prüfen.
+        $hash = $user ? (string) $user['password_hash'] : self::dummyHash();
+        $ok = password_verify($password, $hash) && $user;
 
         $pdo->prepare('INSERT INTO login_attempts (ip, username, success, attempted_at) VALUES (?, ?, ?, ?)')
             ->execute([client_ip(), mb_strtolower($username), $ok ? 1 : 0, time()]);
@@ -154,14 +208,33 @@ final class Auth
             'csrf' => bin2hex(random_bytes(32)),
         ];
         if (password_needs_rehash($hash, PASSWORD_DEFAULT)) {
-            $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([password_hash($password, PASSWORD_DEFAULT), $user['id']]);
+            $hash = password_hash($password, PASSWORD_DEFAULT);
+            $pdo->prepare('UPDATE users SET password_hash = ? WHERE id = ?')->execute([$hash, $user['id']]);
         }
+        $_SESSION['pw'] = self::passwordMark($hash);
+        self::$passwordCurrent = true;
         $pdo->prepare('UPDATE users SET last_login_at = datetime(\'now\') WHERE id = ?')->execute([$user['id']]);
         return true;
     }
 
+    /**
+     * Hash eines verworfenen Zufallswerts mit denselben Kosten wie echte Konten – einmal erzeugt und
+     * im privaten Speicher abgelegt, damit die Prüfung unbekannter Benutzernamen gleich lang dauert.
+     */
+    private static function dummyHash(): string
+    {
+        $file = Config::storage('cache') . '/login-dummy-hash';
+        $hash = is_file($file) ? trim((string) @file_get_contents($file)) : '';
+        if ($hash === '' || password_get_info($hash)['algo'] === null || password_needs_rehash($hash, PASSWORD_DEFAULT)) {
+            $hash = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
+            @file_put_contents($file, $hash, LOCK_EX);
+        }
+        return $hash;
+    }
+
     public static function logout(): void
     {
+        self::$passwordCurrent = null;
         if (session_status() === PHP_SESSION_ACTIVE) {
             $_SESSION = [];
             $params = session_get_cookie_params();
@@ -180,7 +253,10 @@ final class Auth
     public static function requireLogin(): void
     {
         if (!self::check()) {
-            $_SESSION['after_login'] = View::currentPath();
+            // Nur Seitenaufrufe merken – ein abgelaufenes Formular (POST) lässt sich nicht per Weiterleitung wiederholen.
+            if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+                $_SESSION['after_login'] = View::currentPath();
+            }
             redirect('/admin/login');
         }
     }

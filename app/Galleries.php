@@ -249,13 +249,42 @@ final class Galleries
                 $data['legacy_slug'] ?? null,
             ]);
         $id = (int) $pdo->lastInsertId();
+        if (!empty($data['featured'])) {
+            self::appendToFeatured($id);
+        }
         self::setCategories($id, $data['categories'] ?? []);
         return $id;
+    }
+
+    /** Neu hervorgehobene Galerie hinter die bereits hervorgehobenen stellen (statt an die erste Stelle). */
+    private static function appendToFeatured(int $id): void
+    {
+        $pdo = Database::pdo();
+        $stmt = $pdo->prepare('SELECT COALESCE(MAX(featured_order), 0) FROM galleries WHERE featured = 1 AND id <> ?');
+        $stmt->execute([$id]);
+        $pdo->prepare('UPDATE galleries SET featured_order = ? WHERE id = ?')->execute([(int) $stmt->fetchColumn() + 1, $id]);
+    }
+
+    /** Setzt eine veröffentlichte Galerie ohne Bilder auf „Entwurf“ zurück. true, wenn das nötig war. */
+    public static function unpublishIfEmpty(int $id): bool
+    {
+        $gallery = self::find($id);
+        if ($gallery === null || $gallery['status'] !== 'published' || self::images($id) !== []) {
+            return false;
+        }
+        self::setStatus($id, 'draft');
+        return true;
+    }
+
+    private static function touch(int $id): void
+    {
+        Database::pdo()->prepare("UPDATE galleries SET updated_at = datetime('now') WHERE id = ?")->execute([$id]);
     }
 
     public static function update(int $id, array $data): void
     {
         $pdo = Database::pdo();
+        $before = self::find($id);
         $pdo->prepare('UPDATE galleries SET title = ?, slug = ?, description = ?, client = ?, year = ?, credits = ?, layout = ?, status = ?, featured = ?, cover_image_id = ?, updated_at = datetime(\'now\') WHERE id = ?')
             ->execute([
                 $data['title'],
@@ -270,6 +299,9 @@ final class Galleries
                 !empty($data['cover_image_id']) ? (int) $data['cover_image_id'] : null,
                 $id,
             ]);
+        if (!empty($data['featured']) && $before !== null && (int) $before['featured'] !== 1) {
+            self::appendToFeatured($id);
+        }
         self::setCategories($id, $data['categories'] ?? []);
         Images::syncGallery($id);
     }
@@ -325,7 +357,8 @@ final class Galleries
     {
         $pdo = Database::pdo();
         $pdo->beginTransaction();
-        $pdo->exec('UPDATE galleries SET featured = 0');
+        // Nur veröffentlichte Galerien stehen im Formular; Entwürfe behalten ihre Markierung.
+        $pdo->exec("UPDATE galleries SET featured = 0 WHERE status = 'published'");
         $stmt = $pdo->prepare('UPDATE galleries SET featured = 1, featured_order = ? WHERE id = ?');
         foreach (array_values($ids) as $i => $id) {
             $stmt->execute([$i + 1, (int) $id]);
@@ -344,6 +377,7 @@ final class Galleries
         if ($gallery && $gallery['cover_image_id'] === null) {
             $pdo->prepare('UPDATE galleries SET cover_image_id = ? WHERE id = ?')->execute([$imageId, $galleryId]);
         }
+        self::touch($galleryId);
         Images::syncPublic($imageId);
     }
 
@@ -352,6 +386,7 @@ final class Galleries
         $pdo = Database::pdo();
         $pdo->prepare('DELETE FROM gallery_images WHERE gallery_id = ? AND image_id = ?')->execute([$galleryId, $imageId]);
         $pdo->prepare('UPDATE galleries SET cover_image_id = (SELECT image_id FROM gallery_images WHERE gallery_id = ? ORDER BY sort_order LIMIT 1) WHERE id = ? AND cover_image_id = ?')->execute([$galleryId, $galleryId, $imageId]);
+        self::touch($galleryId);
         Images::syncPublic($imageId);
     }
 
@@ -364,6 +399,7 @@ final class Galleries
             $stmt->execute([$i + 1, $galleryId, (int) $imageId]);
         }
         $pdo->commit();
+        self::touch($galleryId);
     }
 
     public static function moveImage(int $galleryId, int $imageId, int $direction): void

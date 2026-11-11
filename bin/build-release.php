@@ -8,7 +8,7 @@ declare(strict_types=1);
  *   php bin/build-release.php                       → dist/release/ (Variante „getrennt“, ohne Inhalte)
  *   php bin/build-release.php --with-content        → zusätzlich Datenbank, Originale und Bildvarianten
  *   php bin/build-release.php --layout=single       → alles in einem Ordner (wenn das Webroot nicht änderbar ist)
- *   php bin/build-release.php --base-url=https://lotharprokop.com
+ *   php bin/build-release.php --base-url=https://www.lotharprokop.com
  *   php bin/build-release.php --out=/pfad/ziel --zip
  *
  * Variante „getrennt“ (Standard, empfohlen):
@@ -44,7 +44,7 @@ if (!in_array($layout, ['split', 'single'], true)) {
     exit(1);
 }
 $out = rtrim((string) ($opts['out'] ?? APP_ROOT . '/dist/release'), '/');
-$baseUrl = rtrim((string) ($opts['base-url'] ?? 'https://lotharprokop.com'), '/');
+$baseUrl = rtrim((string) ($opts['base-url'] ?? 'https://www.lotharprokop.com'), '/');
 $appDirName = 'lotharprokop';
 
 function rrmdir(string $dir): void
@@ -170,7 +170,8 @@ return [
     'mail' => [
         'enabled' => false,
         'to' => 'office@lotharprokop.com',
-        'from' => 'website@' . preg_replace('~^https?://(www\\.)?~', '', '$baseUrl'),
+        // Absender: leer = website@<Domain aus base_url>. Muss zur Domain des Servers passen (SPF).
+        'from' => '',
     ],
 
     // Architekturseite (Webroot-Unterordner architektur/, siehe docs/ARCHITEKTUR.md).
@@ -217,7 +218,7 @@ UPLOAD PER FTP – Variante „getrennt“ (empfohlen)
    Liegt der Ordner woanders, den Pfad in  htdocs/app-path.php  anpassen.
 3. https://DOMAIN/check.php aufrufen: zeigt, ob PHP-Version, Erweiterungen, Limits, Pfade und Schreibrechte passen.
    Falls „NICHT beschreibbar“: Ordner  $appDirName/storage  (mit Unterordnern) und  htdocs/media  für PHP beschreibbar machen (chmod 755/775).
-   Danach check.php vom Server LÖSCHEN.
+   Danach check.php vom Server LÖSCHEN (mit Adminkonto antwortet es ohnehin nur noch mit ?key=<setup_key>).
 4. https://DOMAIN/admin/setup aufrufen. Einrichtungsschlüssel: siehe  $appDirName/config/config.php  ('setup_key').
    Benutzername und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
 5. In  $appDirName/config/config.php  'base_url' prüfen (aktuell: $baseUrl).
@@ -233,7 +234,7 @@ UPLOAD PER FTP – Variante „ein Ordner“ (nur wenn das Webroot nicht änderb
    Wenn stattdessen Inhalte oder ein Download erscheinen, ist mod_rewrite/AllowOverride nicht aktiv → Variante „getrennt“ verwenden.
 3. https://DOMAIN/check.php aufrufen: zeigt, ob PHP-Version, Erweiterungen, Limits, Pfade und Schreibrechte passen.
    Falls „NICHT beschreibbar“: Ordner  storage  (mit Unterordnern) und  public/media  für PHP beschreibbar machen.
-   Danach public/check.php vom Server LÖSCHEN.
+   Danach public/check.php vom Server LÖSCHEN (mit Adminkonto antwortet es ohnehin nur noch mit ?key=<setup_key>).
 4. https://DOMAIN/admin/setup aufrufen. Einrichtungsschlüssel: siehe  config/config.php  ('setup_key').
    Benutzername und Passwort (mind. 12 Zeichen) festlegen. Danach den setup_key in der Datei leeren.
 5. In  config/config.php  'base_url' prüfen (aktuell: $baseUrl).

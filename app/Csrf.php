@@ -19,7 +19,10 @@ final class Csrf
         return '<input type="hidden" name="_token" value="' . e(self::token()) . '">';
     }
 
-    /** Prüft Token aus Formularfeld oder Header (X-CSRF-Token) – bei Fehler Abbruch. */
+    /**
+     * Prüft Token aus Formularfeld oder Header (X-CSRF-Token) – bei Fehler Abbruch mit 403.
+     * (Bewusst kein 419: Apache kennt den Code nicht und meldet stattdessen 500.)
+     */
     public static function verify(): void
     {
         Auth::startSession();
@@ -39,9 +42,9 @@ final class Csrf
         $valid = is_string($sent) && !empty($_SESSION['csrf']) && hash_equals($_SESSION['csrf'], $sent);
         if (!$valid) {
             if (self::wantsJson()) {
-                json_response(['ok' => false, 'error' => 'Sicherheitstoken ungültig. Seite neu laden und erneut versuchen.'], 419);
+                json_response(['ok' => false, 'error' => 'Sicherheitstoken ungültig. Seite neu laden und erneut versuchen.'], 403);
             }
-            http_response_code(419);
+            http_response_code(403);
             echo View::partial('admin/message', [
                 'title' => 'Sicherheitsprüfung fehlgeschlagen',
                 'text' => 'Das Formular-Token ist ungültig oder abgelaufen. Bitte gehen Sie zurück, laden Sie die Seite neu und versuchen Sie es erneut.',

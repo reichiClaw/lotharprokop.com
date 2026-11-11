@@ -187,6 +187,12 @@ final class Architektur
 
     private static ?array $categoryCache = null;
 
+    /** Nach Änderungen an Kategorien im selben Aufruf: Umfang neu bestimmen lassen. */
+    public static function forgetCategories(): void
+    {
+        self::$categoryCache = null;
+    }
+
     /** Alle Kategorien innerhalb des Umfangs (auch ohne veröffentlichte Galerien), mit Zählern. */
     public static function allCategories(): array
     {
@@ -349,11 +355,11 @@ final class Architektur
 
     /**
      * Soll ein Bild im media/-Ordner der Architekturseite liegen? Ja, wenn es zu einem veröffentlichten
-     * Projekt im Umfang gehört oder in der Bildfolge des Kopfbereichs steht.
+     * Projekt im Umfang gehört, in der Bildfolge des Kopfbereichs steht oder das Porträt der Profilseite ist.
      */
     public static function shouldBePublic(int $imageId): bool
     {
-        if (HeroSlides::usesImage($imageId, self::KEY) > 0) {
+        if (HeroSlides::usesImage($imageId, self::KEY) > 0 || Settings::getInt('portrait_image_id') === $imageId) {
             return true;
         }
         $ids = self::categoryIds();

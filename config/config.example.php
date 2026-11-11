@@ -5,7 +5,7 @@
  */
 return [
     // Öffentliche Basis-URL ohne abschließenden Schrägstrich (für Canonical, Sitemap, Social-Vorschau).
-    'base_url' => 'https://lotharprokop.com',
+    'base_url' => 'https://www.lotharprokop.com',
 
     // Anzeigename der Website
     'site_name' => 'Lothar Prokop Fotografie',
@@ -66,6 +66,7 @@ return [
         'subject_prefix' => '[lotharprokop.com] ',
         'min_seconds' => 4, // Formular schneller ausgefüllt = wahrscheinlich Bot
         'max_per_hour_per_ip' => 5,
+        'max_per_hour' => 30, // alle Absender zusammen
     ],
 
     // Architekturseite – zweiter Auftritt derselben Installation im Webroot-Unterordner public/architektur

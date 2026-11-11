@@ -38,7 +38,7 @@ Zweiter Auftritt derselben Installation, spezialisiert auf Architekturfotografie
 Kein Shell-Zugang nötig. Lokal einmal das Paket bauen, dann per FTP hochladen:
 
 ```bash
-php bin/build-release.php --with-content --base-url=https://lotharprokop.com
+php bin/build-release.php --with-content --base-url=https://www.lotharprokop.com
 # → dist/release/htdocs (Webroot) + dist/release/lotharprokop (daneben) + LIES-MICH.txt
 ```
 

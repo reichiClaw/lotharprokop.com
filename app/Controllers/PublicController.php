@@ -36,7 +36,7 @@ final class PublicController
             'meta' => [
                 'title' => '',
                 'description' => Settings::get('meta_description', ''),
-                'image' => $heroSlides !== [] ? url(Picture::largestUrl($heroSlides[0]['image']) ?? '') : null,
+                'image' => $heroSlides !== [] ? Picture::absoluteUrl($heroSlides[0]['image']) : null,
             ],
         ]);
     }
@@ -51,7 +51,7 @@ final class PublicController
             'meta' => [
                 'title' => 'Ausgewählte Fotografien',
                 'description' => 'Eine Auswahl fotografischer Arbeiten von Lothar Prokop, Ried im Innkreis – quer durch Werbung, Industrie, Porträt, Reportage und Landschaft.',
-                'image' => $images !== [] ? url(Picture::largestUrl($images[0]) ?? '') : null,
+                'image' => $images !== [] ? Picture::absoluteUrl($images[0]) : null,
             ],
         ]);
     }
@@ -59,7 +59,7 @@ final class PublicController
     public static function portfolio(array $params): void
     {
         $categories = Categories::withPublished();
-        $activeSlug = trim((string) ($_GET['kategorie'] ?? ''));
+        $activeSlug = is_string($_GET['kategorie'] ?? null) ? trim($_GET['kategorie']) : '';
         $active = null;
         if ($activeSlug !== '') {
             $active = Categories::findBySlug($activeSlug);
@@ -80,6 +80,8 @@ final class PublicController
                     ? 'Fotografische Arbeiten von Lothar Prokop im Bereich ' . $active['name'] . '.'
                     : 'Übersicht der fotografischen Projekte von Lothar Prokop: People, Produkt, Architektur, Industrie, Landwirtschaft, Food, Reportage und Konzert.',
                 'canonical' => url('/fotografie' . ($active ? '?kategorie=' . eurl($active['slug']) : '')),
+                // Kategorie ohne veröffentlichtes Projekt: Seite bleibt erreichbar, gehört aber nicht in den Suchindex.
+                'robots' => $active && $galleries === [] ? 'noindex, follow' : 'index, follow',
             ],
         ]);
     }
@@ -94,7 +96,7 @@ final class PublicController
         $preview = false;
         if ($gallery['status'] !== 'published') {
             // Entwürfe und archivierte Galerien nur für angemeldete Benutzer (Vorschau).
-            if (!Auth::check()) {
+            if (!Auth::checkIfCookie()) {
                 View::notFound('Dieses Projekt gibt es nicht.');
                 return;
             }
@@ -114,7 +116,7 @@ final class PublicController
             'meta' => [
                 'title' => $gallery['title'],
                 'description' => $gallery['description'] !== '' ? excerpt($gallery['description']) : $gallery['title'] . ' – fotografische Arbeit von Lothar Prokop' . ($gallery['categories'] ? ' (' . implode(', ', array_column($gallery['categories'], 'name')) . ')' : '') . '.',
-                'image' => $cover && !$preview ? url(Picture::largestUrl($cover) ?? '') : null,
+                'image' => $cover && !$preview ? Picture::absoluteUrl($cover) : null,
                 'robots' => $preview ? 'noindex, nofollow' : 'index, follow',
                 'type' => 'article',
             ],
@@ -171,7 +173,7 @@ final class PublicController
 
     public static function legal(array $params): void
     {
-        $path = trim(parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '', '/');
+        $path = trim(clean_path(request_path()), '/');
         $map = [
             'impressum' => ['key' => 'legal_impressum', 'title' => 'Impressum'],
             'datenschutz' => ['key' => 'legal_datenschutz', 'title' => 'Datenschutz'],

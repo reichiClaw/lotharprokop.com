@@ -38,6 +38,12 @@ final class RedirectController
         'Datenschutz.pdf' => '/datenschutz',
     ];
 
+    /** Beginnt der Pfad mit einem Bereich der alten Website, der hier nur noch weiterleitet oder 410 meldet? */
+    public static function isLegacyPath(string $path): bool
+    {
+        return preg_match('~^/(?:works|portfolio|project-type|project-tag|filme|kontaktneu|contact|datenschutzerklaerung)(?:/|$)~', $path) === 1;
+    }
+
     public static function document(array $params): void
     {
         // Der Router liefert den Dateinamen bereits URL-dekodiert; „ü“ kann als ein Zeichen oder als u + Trema kommen.
@@ -52,7 +58,7 @@ final class RedirectController
 
     public static function to(array $params): void
     {
-        $path = rtrim(parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/', '/');
+        $path = rtrim(clean_path(request_path()), '/');
         redirect(self::PAGES[$path] ?? '/', 301);
     }
 
@@ -68,12 +74,9 @@ final class RedirectController
         if ($gallery !== null && $gallery['status'] === 'published') {
             redirect('/fotografie/' . eurl($gallery['slug']), 301);
         }
-        if ($gallery !== null) {
-            // Projekt existiert, ist aber nicht (mehr) öffentlich: bewusst kein Redirect auf die Startseite.
-            View::gone('Dieses Projekt ist derzeit nicht öffentlich.');
-            return;
-        }
-        View::gone('Dieses Projekt wurde aus dem Portfolio entfernt.');
+        // Unbekannt oder nicht (mehr) öffentlich: bewusst kein Redirect auf die Startseite – und dieselbe
+        // Antwort für beide Fälle, damit sich Entwürfe nicht über ihre Adresse erraten lassen.
+        View::gone('Dieses Projekt ist nicht mehr Teil des Portfolios.');
     }
 
     public static function projectType(array $params): void

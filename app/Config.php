@@ -40,4 +40,25 @@ final class Config
     {
         return rtrim((string) self::get('base_url', ''), '/');
     }
+
+    /**
+     * Weicht die Adresse der laufenden Anfrage von 'base_url' ab (anderer Host, oder http statt https)?
+     * Dann zeigen Canonical, Sitemap, robots.txt und Open Graph auf die falsche Adresse.
+     * Rückgabe: die aufgerufene Adresse (Schema und Host), sonst null.
+     */
+    public static function baseUrlMismatch(): ?string
+    {
+        $host = strtolower((string) preg_replace('~:\d+$~', '', (string) ($_SERVER['HTTP_HOST'] ?? '')));
+        if ($host === '' || preg_match('~^[a-z0-9.-]+$~', $host) !== 1) {
+            return null;
+        }
+        $configured = parse_url(self::baseUrl());
+        $actualScheme = is_https() ? 'https' : 'http';
+        if (is_array($configured)
+            && strtolower((string) ($configured['host'] ?? '')) === $host
+            && strtolower((string) ($configured['scheme'] ?? '')) === $actualScheme) {
+            return null;
+        }
+        return $actualScheme . '://' . $host;
+    }
 }

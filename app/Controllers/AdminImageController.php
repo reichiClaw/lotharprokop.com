@@ -148,6 +148,9 @@ final class AdminImageController
         $message = $deleted
             ? 'Bild entfernt und Datei gelöscht.'
             : 'Bild aus dieser Galerie entfernt. Es wird weiterhin verwendet in: ' . implode(', ', array_merge(array_column($usage['galleries'], 'title'), $usage['other'])) . '.';
+        if (Galleries::unpublishIfEmpty($galleryId)) {
+            $message .= ' Die Galerie hat jetzt keine Bilder mehr und wurde auf „Entwurf“ gesetzt.';
+        }
         if (Csrf::wantsJson()) {
             json_response(['ok' => true, 'deleted' => $deleted, 'message' => $message]);
         }
@@ -257,7 +260,15 @@ final class AdminImageController
             redirect(self::backUrl($id));
         }
         Images::delete($id);
-        AdminController::flash('ok', 'Bild endgültig gelöscht.');
+        $emptied = [];
+        foreach ($usage['galleries'] as $g) {
+            if (Galleries::unpublishIfEmpty((int) $g['id'])) {
+                $emptied[] = $g['title'];
+            }
+        }
+        AdminController::flash('ok', 'Bild endgültig gelöscht.' . ($emptied !== []
+            ? ' Ohne Bilder und deshalb auf „Entwurf“ gesetzt: ' . implode(', ', $emptied) . '.'
+            : ''));
         $back = (string) ($_POST['galerie'] ?? '');
         redirect(ctype_digit($back) ? '/admin/galerien/' . $back . '#bilder' : '/admin/galerien');
     }
