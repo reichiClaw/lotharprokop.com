@@ -94,8 +94,7 @@ final class Site
      */
     public static function requestPath(): string
     {
-        $path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
-        return self::stripBasePath($path);
+        return self::stripBasePath(request_path());
     }
 
     /** Entfernt den Basis-Pfad vom Anfang eines Pfads. */
@@ -136,7 +135,7 @@ final class Site
         if ($dir === '') {
             return '';
         }
-        $request = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
+        $request = request_path();
         $segments = explode('/', ltrim($dir, '/'));
         while ($segments !== []) {
             $candidate = '/' . implode('/', $segments);

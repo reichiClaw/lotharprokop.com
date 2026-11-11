@@ -82,7 +82,10 @@ Site::init(
 );
 
 $method = (string) ($_SERVER['REQUEST_METHOD'] ?? 'GET');
-$path = Site::requestPath();
+$requestedPath = Site::requestPath();
+$path = clean_path($requestedPath);
+// Eine Adresse je Seite: ohne doppelte und ohne abschließende Schrägstriche (außer bei der Startseite).
+$canonicalPath = $path === '/' ? '/' : rtrim($path, '/');
 $query = (string) ($_SERVER['QUERY_STRING'] ?? '');
 
 // Sobald die eigene Domain eingetragen ist, leiten Aufrufe über die Hauptdomain dauerhaft dorthin um
@@ -97,15 +100,11 @@ if (in_array($method, ['GET', 'HEAD'], true) && Architektur::config('canonical_r
     // Standardports weglassen, damit „example.org“ und „example.org:443“ gleich behandelt werden.
     $requestHost = (string) preg_replace('/:(80|443)$/', '', $requestHost);
     if ($targetHost !== '' && $requestHost !== '' && $requestHost !== $targetHost) {
-        redirect($target . $path . ($query !== '' ? '?' . $query : ''), 301);
+        redirect($target . $canonicalPath . ($query !== '' ? '?' . $query : ''), 301);
     }
 }
 
-header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: SAMEORIGIN');
-header('Referrer-Policy: strict-origin-when-cross-origin');
-header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
-header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self' " . View::jsBootHash() . "; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'");
+send_security_headers();
 
 $router = new Router();
 $router->get('/', [ArchitekturController::class, 'home']);
@@ -122,9 +121,8 @@ $router->get('/robots.txt', [ArchitekturController::class, 'robots']);
 // Gemeinsame Assets aus dem Haupt-Webroot (nur, was hier nicht als Datei liegt).
 $router->get('/assets/{type:js|fonts|img}/{file:[a-z0-9.-]+}', [ArchitekturController::class, 'sharedAsset']);
 
-// Abschließende Schrägstriche vereinheitlichen (301), außer bei der Startseite.
-if ($path !== '/' && str_ends_with($path, '/') && $method === 'GET') {
-    redirect(path(rtrim($path, '/')) . ($query !== '' ? '?' . $query : ''), 301);
+if ($canonicalPath !== $requestedPath && in_array($method, ['GET', 'HEAD'], true)) {
+    redirect(path($canonicalPath) . ($query !== '' ? '?' . $query : ''), 301);
 }
 
 try {

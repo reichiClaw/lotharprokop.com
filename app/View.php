@@ -65,7 +65,9 @@ final class View
         $meta['title'] = $title;
         $meta['full_title'] = $title !== '' ? $title . ' – ' . $siteName : $siteName;
         $meta['description'] = $meta['description'] ?? (string) Settings::get(Site::is(Site::MAIN) ? 'meta_description' : Site::key() . '_meta_description', '');
-        $meta['canonical'] = $meta['canonical'] ?? url(self::currentPath());
+        // Ohne Query: Zusätze wie ?fbclid=… oder ?utm_source=… sind keine eigenen Seiten. Seiten, deren
+        // Query den Inhalt bestimmt (Kategoriefilter), setzen ihre Canonical-Adresse selbst.
+        $meta['canonical'] = $meta['canonical'] ?? url(Site::requestPath());
         $meta['image'] = $meta['image'] ?? null;
         $meta['robots'] = $meta['robots'] ?? 'index, follow';
         $meta['type'] = $meta['type'] ?? 'website';
@@ -75,10 +77,8 @@ final class View
     /** Aktueller Pfad samt Query, relativ zum Auftritt (ohne Basis-Pfad). */
     public static function currentPath(): string
     {
-        $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
-        $path = Site::stripBasePath(parse_url($uri, PHP_URL_PATH) ?: '/');
-        $query = parse_url($uri, PHP_URL_QUERY);
-        return $path . ($query ? '?' . $query : '');
+        $query = (string) ($_SERVER['QUERY_STRING'] ?? '');
+        return Site::requestPath() . ($query !== '' ? '?' . $query : '');
     }
 
     public static function notFound(string $message = 'Diese Seite gibt es nicht (mehr).'): void

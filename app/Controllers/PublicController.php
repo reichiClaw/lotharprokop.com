@@ -171,7 +171,7 @@ final class PublicController
 
     public static function legal(array $params): void
     {
-        $path = trim(parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '', '/');
+        $path = trim(clean_path(request_path()), '/');
         $map = [
             'impressum' => ['key' => 'legal_impressum', 'title' => 'Impressum'],
             'datenschutz' => ['key' => 'legal_datenschutz', 'title' => 'Datenschutz'],

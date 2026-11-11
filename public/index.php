@@ -65,11 +65,7 @@ use App\Controllers\RedirectController;
 use App\Router;
 use App\View;
 
-header('X-Content-Type-Options: nosniff');
-header('X-Frame-Options: SAMEORIGIN');
-header('Referrer-Policy: strict-origin-when-cross-origin');
-header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
-header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; media-src 'self'; frame-src https://www.youtube-nocookie.com https://player.vimeo.com; script-src 'self' " . View::jsBootHash() . "; style-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'");
+send_security_headers('https://www.youtube-nocookie.com https://player.vimeo.com');
 
 $router = new Router();
 
@@ -165,15 +161,19 @@ $router->post('/admin/system/sync', [AdminController::class, 'systemSync']);
 $router->post('/admin/system/reprocess', [AdminController::class, 'systemReprocess']);
 $router->post('/admin/system/backup', [AdminController::class, 'systemBackup']);
 
-$path = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH) ?: '/';
-// Abschließende Schrägstriche vereinheitlichen (301), außer bei der Startseite.
-if ($path !== '/' && str_ends_with($path, '/') && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+$method = (string) ($_SERVER['REQUEST_METHOD'] ?? 'GET');
+$path = clean_path(request_path());
+// Eine Adresse je Seite: doppelte Schrägstriche und abschließende Schrägstriche (außer bei der
+// Startseite) dauerhaft auf die bereinigte Form umleiten. Alte WordPress-Adressen (dort immer mit
+// Schrägstrich am Ende) sind ausgenommen: sie leiten ohne Zwischenschritt auf ihr neues Ziel weiter.
+$canonicalPath = $path === '/' ? '/' : rtrim($path, '/');
+if ($canonicalPath !== request_path() && in_array($method, ['GET', 'HEAD'], true) && !RedirectController::isLegacyPath($canonicalPath)) {
     $query = (string) ($_SERVER['QUERY_STRING'] ?? '');
-    redirect(rtrim($path, '/') . ($query !== '' ? '?' . $query : ''), 301);
+    redirect($canonicalPath . ($query !== '' ? '?' . $query : ''), 301);
 }
 
 try {
-    $router->dispatch((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'), $path);
+    $router->dispatch($method, $path);
 } catch (\Throwable $e) {
     error_log($e);
     if (!headers_sent()) {

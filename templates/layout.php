@@ -1,7 +1,7 @@
 <?php
 /** @var array $meta */
 /** @var string $content */
-$current = parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+$current = clean_path(request_path());
 $nav = [
     '/fotografie' => 'Fotografie',
     '/film' => 'Film',

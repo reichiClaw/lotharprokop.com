@@ -6,7 +6,7 @@ use App\Auth;
 use App\Csrf;
 
 $loggedIn = Auth::check();
-$current = parse_url((string) $_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
+$current = clean_path(request_path());
 $nav = [
     '/admin' => 'Übersicht',
     '/admin/galerien' => 'Galerien',

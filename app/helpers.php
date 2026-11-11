@@ -111,10 +111,57 @@ function is_https(): bool
         || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
 }
 
+/**
+ * Pfad der aktuellen Anfrage, ohne Query. Bewusst ohne parse_url(): das deutet eine Anfrage, die mit
+ * „//“ beginnt, als Host-Angabe („//beispiel.at/x“ → Host beispiel.at, Pfad /x) und liefert dann
+ * einen anderen Pfad, als tatsächlich angefragt wurde.
+ */
+function request_path(): string
+{
+    $uri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+    $path = preg_split('/[?#]/', $uri, 2)[0] ?? '';
+    // Absolute Form („GET https://host/pfad“) kommt nur über Proxys vor; Schema und Host abtrennen.
+    $path = preg_replace('~^[a-z][a-z0-9+.-]*://[^/]*~i', '', $path) ?? $path;
+    return $path === '' || $path[0] !== '/' ? '/' . $path : $path;
+}
+
+/** Fasst mehrfache Schrägstriche zusammen und behandelt „\“ wie „/“ (so lesen es auch Browser). */
+function clean_path(string $path): string
+{
+    $clean = preg_replace('~[/\\\\]+~', '/', $path) ?? $path;
+    return $clean === '' || $clean[0] !== '/' ? '/' . $clean : $clean;
+}
+
 function redirect(string $to, int $code = 302): never
 {
+    // Ein lokales Ziel darf nie mit „//“ oder „/\“ beginnen: Browser lesen das als fremden Host.
+    if ($to !== '' && ($to[0] === '/' || $to[0] === '\\')) {
+        $to = '/' . ltrim($to, '/\\');
+    }
     header('Location: ' . $to, true, $code);
     exit;
+}
+
+/**
+ * Sicherheits-Header für alle von PHP erzeugten Antworten beider Auftritte.
+ *
+ * @param string $frameSrc Erlaubte Quellen für eingebettete Rahmen (Filme), leer = keine
+ */
+function send_security_headers(string $frameSrc = ''): void
+{
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+    // Der Auftritt ist ausschließlich über HTTPS erreichbar (.htaccess leitet um); Browser sollen
+    // http-Aufrufe gar nicht erst senden. Ohne includeSubDomains, damit andere Subdomains frei bleiben.
+    if (is_https()) {
+        header('Strict-Transport-Security: max-age=15552000');
+    }
+    header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; media-src 'self'; "
+        . ($frameSrc !== '' ? 'frame-src ' . $frameSrc . '; ' : '')
+        . "script-src 'self' " . App\View::jsBootHash() . "; style-src 'self' 'unsafe-inline'; font-src 'self'; "
+        . "connect-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'self'; object-src 'none'");
 }
 
 function json_response(array $data, int $code = 200): never
