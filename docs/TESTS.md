@@ -650,7 +650,7 @@ Bewusst belassen, weil es zur Gestaltung der Architekturseite gehört (einzeln a
 
 Nicht gemessen und nicht behauptet: dass die Überblendung auf einem bestimmten Gerät jetzt ohne Aussetzer läuft.
 
-### Live eingespielt und nachgeprüft (11.11.2026, 19:00–19:20 Uhr Wiener Zeit)
+### Live eingespielt und nachgeprüft (11.11.2026, 18:58–19:10 Uhr Wiener Zeit)
 
 Nach ausdrücklicher Freigabe, Stand `c75a141`. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release: 8 Dateien abweichend – genau die geänderten (`architektur.css` und `architektur.js` je zweimal, `public/assets/css/site.css`, `app/View.php`, zwei Dokumente) –, 136 identisch. Hochgeladen 19:06 Uhr in 33 s: zuerst Stylesheets, Skript und Dokumente, zuletzt `app/View.php` mit der neuen Versionskennung. `config/config.php`, `storage/` und die Bildordner wurden nicht angefasst, keine Änderung an der Datenbank.
 
