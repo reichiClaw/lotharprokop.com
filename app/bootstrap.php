@@ -105,4 +105,20 @@ if (App\Architektur::enabled()) {
         }
     }
     unset($domainMedia, $domainMarker);
+
+    // Das Porträt der Profilseite gehört seit diesem Stand zu den Bildern der Architekturseite.
+    // Bestehende Installationen legen es einmalig in deren Bildordner (nur dieses eine Bild).
+    $portraitMarker = App\Config::storage('cache') . '/architektur-portrait-synced';
+    if (!is_file($portraitMarker) && @file_put_contents($portraitMarker, date('c')) !== false) {
+        try {
+            $portraitId = App\Settings::getInt('portrait_image_id');
+            if ($portraitId > 0) {
+                App\Images::syncPublic($portraitId);
+            }
+        } catch (\Throwable $e) {
+            error_log('Abgleich des Porträts für die Architekturseite fehlgeschlagen: ' . $e->getMessage());
+        }
+        unset($portraitId);
+    }
+    unset($portraitMarker);
 }
