@@ -650,7 +650,27 @@ Bewusst belassen, weil es zur Gestaltung der Architekturseite gehört (einzeln a
 
 Nicht gemessen und nicht behauptet: dass die Überblendung auf einem bestimmten Gerät jetzt ohne Aussetzer läuft.
 
-Nicht getestet: echte Geräte und Grafikkarten (keine Aussage zur Bildrate); Firefox und Safari (ob dort der CSS-Weg oder der Ausweichweg greift, ist ungeprüft); Touchgeräte; der Live-Server – die Änderung ist dort nicht eingespielt.
+### Live eingespielt und nachgeprüft (11.11.2026, 19:00–19:20 Uhr Wiener Zeit)
+
+Nach ausdrücklicher Freigabe, Stand `c75a141`. Vorher verglich `tools/deploy-ftp.py diff` den Server mit dem Release: 8 Dateien abweichend – genau die geänderten (`architektur.css` und `architektur.js` je zweimal, `public/assets/css/site.css`, `app/View.php`, zwei Dokumente) –, 136 identisch. Hochgeladen 19:06 Uhr in 33 s: zuerst Stylesheets, Skript und Dokumente, zuletzt `app/View.php` mit der neuen Versionskennung. `config/config.php`, `storage/` und die Bildordner wurden nicht angefasst, keine Änderung an der Datenbank.
+
+| Prüfung (lesend, direkt am Server) | Ergebnis |
+|---|---|
+| Dateigrößen aller 8 Dateien nach dem Upload; danach Startseiten beider Domains und `/projekte` 200 | ok |
+| `architektur.css`, `architektur.js`, `site.css` über die Domains abgerufen: SHA-256 gleich dem Release; `site.js` unverändert | ok |
+| Versionskennung 17 auf sechs Seiten beider Domains (einschließlich Anmeldeseite) | ok |
+| Schnappschuss vor und nach dem Upload (15 Seiten beider Domains 200 ohne PHP-Meldung, 9 Projekte, 92 Bilder, Zähler, 20 Sitemap-Einträge): identisch | ok |
+| `app/View.php`, `config/config.php`, `storage/database.sqlite`, `docs/TESTS.md`, `/admin/setup` weiterhin 404 | ok |
+| Chrome 156 headless gegen die Live-Seiten, 1440×900 – Kopfzeile: `/` und `/projekte` der Architekturseite, `/` und `/fotografie` der Hauptseite, Sprung auf 25/30/40/60 px, Mausrad 45 px, zurück nach oben: je 1 Wechsel, Position bleibt | ok |
+| dieselbe Umgebung – Überblendung auf beiden Startseiten: linear 1,5 s, 24 / 49–50 / 74 % bei ¼ / ½ / ¾, Einsinken bis 2,1 s, ruhende Folien bei 1,03 | ok, auf beiden Seiten gleich |
+| dieselbe Umgebung – Architektur-Startseite: Versatz an 7 Scrollpositionen wie lokal, Plankopf bleibt deckend, keine Compositor-Befunde, keine Konsolenfehler | ok |
+| Abschließender Vergleich mit `tools/deploy-ftp.py diff`: 144 identisch, 0 abweichend (die 8 hochgeladenen Dateien frisch heruntergeladen; für die übrigen gilt die gemerkte Prüfsumme nur bei gleicher Größe und gleicher Änderungszeit; offen nur diese Datei `docs/TESTS.md`, die danach nachgereicht wurde) | ok |
+
+Beobachtung: Der Schnappschuss zählt 92 Bilder in den 9 Projekten der Architekturseite, bei der Einspielung am Nachmittag waren es 100 – zwischen den beiden Einspielungen hat sich der Inhalt geändert, nicht durch diese Arbeit.
+
+Live nicht geprüft: Bildrate auf einem echten Gerät; andere Browser als Chrome; Touchgeräte.
+
+Nicht getestet: echte Geräte und Grafikkarten (keine Aussage zur Bildrate); Firefox und Safari (ob dort der CSS-Weg oder der Ausweichweg greift, ist ungeprüft); Touchgeräte.
 
 ## Nicht getestet
 
