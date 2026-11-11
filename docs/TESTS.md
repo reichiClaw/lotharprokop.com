@@ -483,6 +483,27 @@ Nach ausdrücklicher Freigabe. Vorher verglich `tools/deploy-ftp.py diff` den Se
 - Verhalten hinter dem Proxy/OPcache des Hosters, PHP-FPM
 - Browser außer Chrome (headless, nur der Admin-Hinweis); Screenreader; Ladezeiten
 
+## Passwort vergessen (11.11.2026)
+
+`/admin/passwort-vergessen`: neues Passwort mit dem Einrichtungsschlüssel aus `config/config.php`. Geprüft an der lokalen Apache-Instanz (2.4.58 + mod_php, Aufbau wie beim Hoster) mit einem Skript, dazu einmal im Browser.
+
+| Prüfung | Ergebnis |
+|---|---|
+| Ohne Adminkonto: Seite leitet auf `/admin/setup`, `POST` 404 | ok |
+| Anmeldeseite verlinkt „Passwort vergessen?“; Seite 200 mit `no-store` und `noindex`, ohne PHP-Meldung | ok |
+| Ohne CSRF-Token 403 | ok |
+| Falscher Schlüssel, leerer Schlüssel, Felder als Liste (`setup_key[]=…`): 403, dieselbe Meldung, keine PHP-Meldung, Passwort unverändert, Fehlversuch gezählt | ok |
+| `setup_key` in `config.php` leer (gesendet: leer bzw. der frühere Schlüssel) oder nur 19 Zeichen lang (gesendet: derselbe): 403 mit derselben Meldung, Passwort unverändert | ok |
+| Richtiger Schlüssel, Passwörter ungleich bzw. Passwort zu kurz: Meldung, Passwort unverändert | ok |
+| Ausgesperrt nach 5 falschen Anmeldungen (richtiges Passwort: 429): Zurücksetzen gelingt trotzdem (Schlüssel mit Leerzeichen und Zeilenumbruch drumherum eingefügt), Hinweis auf der Anmeldeseite nennt das Konto; Anmeldung mit dem neuen Passwort sofort möglich, mit dem alten 401 | ok |
+| Eine zweite, vorher angemeldete Sitzung ist danach abgemeldet; Eintrag in `php-error.log` mit Konto und Adresse | ok |
+| 5 falsche Schlüssel von einer Adresse: der 6. Versuch mit richtigem Schlüssel 429 | ok |
+| Angemeldet zurücksetzen: eigene Sitzung danach beendet, Hinweis auf der Anmeldeseite | ok |
+| Zwei Konten: Seite fragt nach dem Benutzernamen; ohne bzw. mit unbekanntem Namen Meldung mit den vorhandenen Namen (nur nach richtigem Schlüssel – mit falschem Schlüssel nennt die Meldung keine Namen); mit Namen wird nur dieses Konto geändert | ok |
+| Chrome (headless), Entwicklungsserver: Verweis auf der Anmeldeseite angeklickt, falscher Schlüssel → Meldung, richtiger Schlüssel → Anmeldeseite mit Hinweis, Anmeldung mit dem neuen Passwort → Übersicht | ok |
+
+Nicht getestet: auf dem Live-Server; andere Browser.
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft

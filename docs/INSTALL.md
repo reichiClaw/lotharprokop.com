@@ -139,6 +139,23 @@ LP_PASSWORD='…' php bin/create-user.php lothar   # nicht interaktiv
 
 Passwörter: mindestens 12 Zeichen, Speicherung mit `password_hash()` (bcrypt). Nach 5 Fehlversuchen innerhalb von 15 Minuten wird die Kombination IP/Benutzername 15 Minuten gesperrt (persistent in der Datenbank).
 
+### Passwort vergessen
+
+Auf der Anmeldeseite führt „Passwort vergessen?“ zu `/admin/passwort-vergessen`. Dort setzt der Einrichtungsschlüssel ein neues Passwort – der Nachweis ist also der Zugriff auf die Dateien des Servers, nicht eine E-Mail:
+
+1. Per FTP `config/config.php` herunterladen und den Wert bei `'setup_key'` kopieren. Ist er leer, einen eigenen Schlüssel aus mindestens 24 zufälligen Buchstaben und Ziffern eintragen und die Datei hochladen.
+2. Schlüssel und neues Passwort (mindestens 12 Zeichen) auf der Seite eingeben. Gibt es mehrere Konten, fragt die Seite zusätzlich nach dem Benutzernamen.
+3. Anmelden und den `setup_key` wieder leeren.
+
+Dabei gilt:
+
+- Ohne Schlüssel in `config.php` – oder mit einem kürzeren als 24 Zeichen – ändert die Seite nichts. Sie antwortet in allen Fällen mit derselben Meldung und verrät nicht, ob ein Schlüssel hinterlegt ist.
+- Das neue Passwort beendet alle bestehenden Sitzungen des Kontos und hebt die Sperre nach Fehlversuchen für dieses Konto und die eigene Adresse auf. Eine Sperre bei der Anmeldung verhindert das Zurücksetzen nicht.
+- Nach 5 falschen Schlüsseln von einer Adresse innerhalb von 15 Minuten ist das Zurücksetzen für diese Adresse 15 Minuten gesperrt.
+- Jedes Zurücksetzen wird mit Konto und Adresse in `storage/logs/php-error.log` vermerkt.
+
+Solange ein `setup_key` in `config.php` steht, kann jeder, der ihn kennt, das Passwort neu setzen. Die Datei ist nicht über HTTP erreichbar; sie steckt aber in jedem Backup-Archiv (siehe unten).
+
 ### Wartung ohne Kommandozeile
 
 Alles, was `bin/` per Shell erledigt, gibt es für FTP-Hosting auch im Browser unter `/admin` → **System**:
@@ -150,6 +167,7 @@ Alles, was `bin/` per Shell erledigt, gibt es für FTP-Hosting auch im Browser u
 | Datenbank sichern | „Datenbank herunterladen“ (konsistente Kopie per `VACUUM INTO`) | `php bin/backup.php` |
 | Originale sichern | per FTP `storage/originals/` herunterladen | in `bin/backup.php` enthalten |
 | Adminkonto anlegen | `/admin/setup` mit `setup_key` | `php bin/create-user.php` |
+| Passwort vergessen | `/admin/passwort-vergessen` mit `setup_key` | – |
 | Passwort ändern | `/admin/passwort` | – |
 
 Wird per FTP ein neuer `storage/`-Stand eingespielt (z. B. Backup), lässt sich eine leere Datei `storage/cache/needs-sync` anlegen: Beim nächsten Aufruf gleicht die Anwendung `media/` automatisch ab und löscht die Markierung.
@@ -278,6 +296,7 @@ Siehe `docs/REDIRECTS.md`. Die Regeln sind in `app/Controllers/RedirectControlle
 - CSRF-Token für jede schreibende Aktion (Formularfeld oder `X-CSRF-Token`); ohne gültiges Token Antwort 403
 - Kontaktformular: Honeypot, signierter Zeitstempel (Formular muss vom Server ausgegeben und mindestens einige Sekunden alt sein), höchstens 5 Nachrichten je Absenderadresse (IPv6: je /64-Netz) und `mail.max_per_hour` insgesamt pro Stunde, keine Zeilenumbrüche in Kopfzeilen
 - Weiterleitungen führen nie auf fremde Hosts: lokale Ziele werden bereinigt (`//host`, `/\host`), das Rücksprungziel nach der Anmeldung muss unter `/admin` liegen
+- Passwort vergessen: neues Passwort nur mit dem Einrichtungsschlüssel aus `config/config.php` (mindestens 24 Zeichen, Vergleich mit `hash_equals`, Sperre nach 5 Fehlversuchen je Adresse); ohne Schlüssel ist die Funktion aus
 - Entwürfe sind für Besucher von nicht vorhandenen Seiten nicht zu unterscheiden; `check.php` antwortet nach dem Anlegen des Adminkontos nur noch mit Einrichtungsschlüssel
 - Prepared Statements durchgehend, Ausgabe-Escaping in allen Templates
 - Uploads: Prüfung des echten MIME-Typs (`finfo`) und der Dekodierbarkeit, Größen- und Pixel-Limits, keine SVG/ausführbaren Dateien, serverseitig vergebene zufällige Dateinamen, kein Skript-Handler im Bildverzeichnis

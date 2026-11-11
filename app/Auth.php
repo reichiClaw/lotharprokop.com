@@ -161,6 +161,74 @@ final class Auth
         }
     }
 
+    /** Mindestlänge des Einrichtungsschlüssels, damit er das Zurücksetzen des Passworts freigibt. */
+    public const RESET_KEY_MIN = 24;
+
+    /** Kennung der Fehlversuche beim Zurücksetzen in login_attempts (kein gültiger Benutzername). */
+    private const RESET_MARK = '*reset';
+
+    /** @return string[] Benutzernamen aller Konten */
+    public static function usernames(): array
+    {
+        return Database::pdo()->query('SELECT username FROM users ORDER BY username')->fetchAll(\PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Prüft den Einrichtungsschlüssel für das Zurücksetzen. Ein leerer oder zu kurzer Schlüssel in
+     * config.php gibt nichts frei – so ist die Funktion abgeschaltet, solange dort kein Schlüssel steht.
+     */
+    public static function resetKeyMatches(string $sent): bool
+    {
+        $key = trim((string) Config::get('setup_key', ''));
+        return strlen($key) >= self::RESET_KEY_MIN && hash_equals($key, trim($sent));
+    }
+
+    /**
+     * Sekunden bis zum nächsten Versuch, das Passwort zurückzusetzen. Gezählt werden nur falsche
+     * Schlüssel von derselben Adresse – Fehlversuche bei der Anmeldung sperren das Zurücksetzen nicht,
+     * denn genau dann wird es gebraucht.
+     */
+    public static function resetLockedFor(): int
+    {
+        $window = (int) Config::get('login.window_seconds', 900);
+        $max = (int) Config::get('login.max_attempts', 5);
+        $lock = (int) Config::get('login.lock_seconds', 900);
+        $stmt = Database::pdo()->prepare('SELECT COUNT(*) AS n, MAX(attempted_at) AS last FROM login_attempts WHERE success = 0 AND attempted_at > ? AND ip = ? AND username = ?');
+        $stmt->execute([time() - $window, client_ip(), self::RESET_MARK]);
+        $row = $stmt->fetch();
+        return (int) $row['n'] >= $max ? max(0, (int) $row['last'] + $lock - time()) : 0;
+    }
+
+    public static function noteResetFailure(): void
+    {
+        Database::pdo()->prepare('INSERT INTO login_attempts (ip, username, success, attempted_at) VALUES (?, ?, 0, ?)')
+            ->execute([client_ip(), self::RESET_MARK, time()]);
+    }
+
+    /**
+     * Setzt das Passwort eines Kontos neu (nach geprüftem Einrichtungsschlüssel). Ohne Benutzernamen
+     * nur, wenn es genau ein Konto gibt. Hebt die Sperren nach Fehlversuchen für dieses Konto und die
+     * aufrufende Adresse auf; alle Sitzungen des Kontos werden durch das neue Passwort ungültig.
+     * @return string Benutzername des geänderten Kontos
+     */
+    public static function resetPassword(string $username, string $password): string
+    {
+        $names = self::usernames();
+        $username = trim($username);
+        if ($username === '' && count($names) === 1) {
+            $username = (string) $names[0];
+        }
+        if (!in_array($username, $names, true)) {
+            throw new \InvalidArgumentException(($username === '' ? 'Es gibt mehrere Konten. Bitte den Benutzernamen angeben' : 'Dieses Konto gibt es nicht')
+                . ' – vorhanden: ' . implode(', ', $names) . '.');
+        }
+        self::validatePassword($password);
+        $pdo = Database::pdo();
+        $pdo->prepare('UPDATE users SET password_hash = ? WHERE username = ?')->execute([password_hash($password, PASSWORD_DEFAULT), $username]);
+        $pdo->prepare('DELETE FROM login_attempts WHERE success = 0 AND (username = ? OR ip = ?)')->execute([mb_strtolower($username), client_ip()]);
+        return $username;
+    }
+
     /** Anzahl Sekunden bis zur Entsperrung oder 0, wenn Anmeldung erlaubt ist. */
     public static function lockedFor(string $username): int
     {

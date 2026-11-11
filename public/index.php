@@ -114,6 +114,8 @@ $router->post('/admin/login', [AdminController::class, 'login']);
 $router->post('/admin/logout', [AdminController::class, 'logout']);
 $router->get('/admin/setup', [AdminController::class, 'setupForm']);
 $router->post('/admin/setup', [AdminController::class, 'setup']);
+$router->get('/admin/passwort-vergessen', [AdminController::class, 'resetForm']);
+$router->post('/admin/passwort-vergessen', [AdminController::class, 'reset']);
 $router->get('/admin/passwort', [AdminController::class, 'passwordForm']);
 $router->post('/admin/passwort', [AdminController::class, 'password']);
 $router->get('/admin/media/{id:\d+}/{file:w\d+\.(?:jpg|webp)}', [AdminImageController::class, 'preview']);

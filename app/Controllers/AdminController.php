@@ -113,6 +113,60 @@ final class AdminController
         redirect($after === '/admin' || str_starts_with($after, '/admin/') ? $after : '/admin');
     }
 
+    /* Passwort vergessen: neues Passwort mit dem Einrichtungsschlüssel aus config/config.php setzen. */
+
+    public static function resetForm(array $params): void
+    {
+        if (!Auth::hasUsers()) {
+            redirect('/admin/setup');
+        }
+        self::render('reset', ['askUsername' => count(Auth::usernames()) > 1, 'meta' => ['title' => 'Passwort zurücksetzen']]);
+    }
+
+    public static function reset(array $params): void
+    {
+        if (!Auth::hasUsers()) {
+            View::notFound();
+            return;
+        }
+        Csrf::verify();
+        $field = static fn(string $name): string => is_string($_POST[$name] ?? null) ? $_POST[$name] : '';
+        $username = trim($field('username'));
+        $data = ['askUsername' => count(Auth::usernames()) > 1, 'username' => $username, 'meta' => ['title' => 'Passwort zurücksetzen']];
+        $wait = Auth::resetLockedFor();
+        if ($wait > 0) {
+            http_response_code(429);
+            self::render('reset', $data + ['error' => 'Zu viele Fehlversuche. Bitte in ' . (int) ceil($wait / 60) . ' Minuten erneut versuchen.']);
+            return;
+        }
+        if (!Auth::resetKeyMatches($field('setup_key'))) {
+            Auth::noteResetFailure();
+            usleep(500000);
+            http_response_code(403);
+            // Dieselbe Meldung für „falsch“, „nicht gesetzt“ und „zu kurz“ – die Seite verrät nicht, ob ein Schlüssel hinterlegt ist.
+            self::render('reset', $data + ['error' => 'Der Einrichtungsschlüssel stimmt nicht. Er muss genau so in config/config.php bei \'setup_key\' stehen und mindestens ' . Auth::RESET_KEY_MIN . ' Zeichen lang sein.']);
+            return;
+        }
+        $password = $field('password');
+        if ($password !== $field('password2')) {
+            self::render('reset', $data + ['error' => 'Die Passwörter stimmen nicht überein.']);
+            return;
+        }
+        try {
+            $name = Auth::resetPassword($username, $password);
+        } catch (\InvalidArgumentException $e) {
+            self::render('reset', $data + ['error' => $e->getMessage()]);
+            return;
+        }
+        error_log('Passwort für das Konto ' . $name . ' mit dem Einrichtungsschlüssel neu gesetzt (Adresse ' . client_ip() . ').');
+        // Eine eigene Sitzung mit dem alten Passwort ist jetzt ungültig – leeren und mit neuer Kennung fortsetzen.
+        Auth::startSession();
+        session_regenerate_id(true);
+        $_SESSION = [];
+        self::flash('ok', 'Das Passwort für „' . $name . '“ wurde neu gesetzt. Bitte anmelden – und danach den Wert setup_key in config/config.php leeren.');
+        redirect('/admin/login');
+    }
+
     public static function logout(array $params): void
     {
         Csrf::verify();

@@ -12,5 +12,5 @@ use App\Csrf;
     <div class="a-field"><label for="password">Passwort</label><input type="password" id="password" name="password" required autocomplete="current-password"></div>
     <button type="submit" class="a-btn">Anmelden</button>
   </form>
-  <p class="a-help"><a href="/">Zur Website</a></p>
+  <p class="a-help"><a href="/admin/passwort-vergessen">Passwort vergessen?</a> · <a href="/">Zur Website</a></p>
 </div>
