@@ -187,6 +187,12 @@ final class Architektur
 
     private static ?array $categoryCache = null;
 
+    /** Nach Änderungen an Kategorien im selben Aufruf: Umfang neu bestimmen lassen. */
+    public static function forgetCategories(): void
+    {
+        self::$categoryCache = null;
+    }
+
     /** Alle Kategorien innerhalb des Umfangs (auch ohne veröffentlichte Galerien), mit Zählern. */
     public static function allCategories(): array
     {

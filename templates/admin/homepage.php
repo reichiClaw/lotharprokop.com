@@ -37,8 +37,11 @@ use App\View;
           <label class="a-label" for="slide-gallery-<?= $slide['id'] ?>">Projekt</label>
           <select id="slide-gallery-<?= $slide['id'] ?>" name="slide_gallery[<?= $slide['id'] ?>]">
             <option value="0">– kein Verweis –</option>
+            <?php $linked = $slide['gallery']; if ($linked !== null && !in_array($linked['id'], array_column($galleries, 'id'), true)): ?>
+            <option value="<?= $linked['id'] ?>" selected><?= e($linked['title']) ?> (<?= e(App\Galleries::STATUSES[$linked['status']] ?? $linked['status']) ?> – wird derzeit nicht verlinkt)</option>
+            <?php endif; ?>
             <?php foreach ($galleries as $g): ?>
-            <option value="<?= $g['id'] ?>" <?= $slide['gallery'] !== null && $slide['gallery']['id'] === $g['id'] ? 'selected' : '' ?>><?= e($g['title']) ?></option>
+            <option value="<?= $g['id'] ?>" <?= $linked !== null && $linked['id'] === $g['id'] ? 'selected' : '' ?>><?= e($g['title']) ?></option>
             <?php endforeach; ?>
           </select>
           <p class="a-help"><?= $img['width'] ?> × <?= $img['height'] ?> px · <a href="/admin/bilder/<?= $img['id'] ?>">Fokuspunkt und Alternativtext</a></p>

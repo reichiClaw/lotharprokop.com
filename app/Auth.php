@@ -253,7 +253,10 @@ final class Auth
     public static function requireLogin(): void
     {
         if (!self::check()) {
-            $_SESSION['after_login'] = View::currentPath();
+            // Nur Seitenaufrufe merken – ein abgelaufenes Formular (POST) lässt sich nicht per Weiterleitung wiederholen.
+            if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+                $_SESSION['after_login'] = View::currentPath();
+            }
             redirect('/admin/login');
         }
     }
