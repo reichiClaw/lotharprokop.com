@@ -583,6 +583,38 @@ Live nicht ausgeführt: keine Anmeldung, kein Bild ausgeblendet – der Schalter
 
 Nicht getestet: der Schalter auf dem Live-Server; andere Browser als Chrome; Bedienung auf Touchgeräten.
 
+## Architekturseite: Kopfbild läuft ruhig (11.11.2026)
+
+Gemeldet: Das Bild im Kopfbereich der Architekturseite ruckelt. Geprüft und gemessen am Entwicklungsserver in Chrome 156 (headless, Fenster 1440×900, `hover` und feiner Zeiger eingeschaltet), Startseite mit drei Bildern und 7 s Wechselzeit wie auf dem Live-Server. Chrome zeichnet in dieser Umgebung ohne Grafikkarte; die Zahlen unten beschreiben deshalb, **was** der Browser je Frame tun muss und wo das Bild steht – nicht die Bildrate auf einem echten Gerät.
+
+Gefunden wurden vier Ursachen; alle vier sind behoben (`architektur.css`, `architektur.js`, Versionskennung 17).
+
+| Ursache | vorher (Stand `7f3a5a9`) | nachher |
+|---|---|---|
+| Kopfzeile wird ab 24 px Scrollweg flacher und zieht dabei den ganzen Inhalt nach. Sprung auf 30 bzw. 40 px oder 45 px mit dem Mausrad, 2,5 s beobachtet: Wechsel des Zustands „gescrollt“ | 130, 129 und 115 Wechsel – die Kopfzeile kippt hin und her, die Scrollposition wird zurückgezogen (30 → 23, 40 → 29, 45 → 27) | je 1 Wechsel, Position bleibt (30, 40, 45) |
+| dasselbe beim Durchscrollen (Mausrad-Geste über 1000 px): zusätzliche Verschiebung des Kopfbereichs | 21,61 px, die Geste kommt nur 978 px weit | 0,02 px, 1000 px |
+| Bild wird 14 s lang um 4 % vergrößert. 12 s bei stehender Seite, ein Bildwechsel eingeschlossen: Frames, in denen sich das Bild bewegt | 447 von 720, je Frame 0,036 px am Bildrand | 143 von 720 – nur rund um den Wechsel (Einsinken aus 3 %), sonst steht das Bild |
+| Fortschrittslinie im Plankopf animiert die Breite. Dieselben 12 s: Layout- und Zeichendurchläufe im Hauptthread | 719 Layout, 1447 Paint (jeder Frame); Chrome meldet für `hero-fill` „nicht auf dem Compositor: `width`“ | 3 Layout, 23 Paint; kein Befund mehr für `hero-fill` |
+| Versatz des Bildes beim Scrollen kommt aus einem Skript und ist auf ganze Pixel gerundet | in 130 von 130 Frames ganzzahlig (Stufen); beim Scrollen 198 Layout, 684 Paint | scrollgebundene CSS-Animation `kopfbild-versatz`, ohne Skript, ohne Compositor-Befund in der Aufzeichnung; Werte ungerundet (0 von 135 ganzzahlig), Verhältnis 0,22 wie bisher; 24 Layout, 166 Paint |
+
+| Weitere Prüfung (nachher) | Ergebnis |
+|---|---|
+| Schwelle der Kopfzeile auf Startseite, Projekte und Kontakt (1440 breit), Startseite 760 und 390 breit: Sprung auf 25, 30, 40, 60 px, Mausrad 45 px, zurück nach oben – je 1 Wechsel, Oberkante des Inhalts im Dokument unverändert (Abweichung höchstens 0,02 px) | ok |
+| Versatz Startseite an 7 Scrollpositionen: 0,22 × Scrollweg (Abweichung unter 0,5 px, weil der Abschnitt 1 px unter der Fensterkante beginnt), am Ende liegt die Bildoberkante auf der des Abschnitts (0 px); Text blendet bis 60 % der Höhe aus | ok |
+| Leistungsseite (`/leistungen/immobilienfotografie`): Versatz setzt mit dem ersten Scrollen ein, 0,22 × Scrollweg, endet bündig (0,01 px) | ok |
+| Plankopf: Weichzeichner über dem Bild, Bildschirmfoto vorher/nachher verglichen. Im ersten Anlauf lag das Ausblenden auf dem gemeinsamen Rahmen von Text und Plankopf – damit war der Weichzeichner weg (Raster und Bild schienen scharf durch). Korrigiert: auf der Startseite blendet nur der Textblock aus, der Plankopf bleibt stehen | ok |
+| Bildfolge: Wechsel nach 7 s, Sprung über den dritten Punkt, Pause (8 s unverändert), Fortsetzen; Plankopf und Punkte wechseln mit; Fortschrittslinie läuft, vergangene Punkte gefüllt; ruhende Folien stehen bei Faktor 1,03 bereit, die aktive endet bei 1 | ok |
+| Ausweichweg ohne scrollgebundene Animationen – nachgestellt (Chrome lässt sich die Technik nicht abschalten): `CSS.supports` meldet „nein“, die `@supports`-Regel ist entfernt. Das Skript setzt den Versatz ungerundet (119,68 px bei 544 px), Start- und Leistungsseite | ok |
+| `prefers-reduced-motion: reduce`: kein Versatz, keine Vergrößerung, keine Animation am Kopfbild | ok |
+| 390×844 ohne `hover`: kein Versatz (wie bisher), Einsinken beim Wechsel aktiv, Kopfzeile unverändert hoch | ok |
+| Sieben Seiten der Architekturseite und zwei der Hauptseite: 200, Versionskennung 17, keine PHP-Meldung; keine Konsolenfehler in den Mess- und Funktionsdurchläufen | ok |
+
+Sichtbare Änderungen gegenüber vorher: Das Bild steht zwischen den Wechseln still (keine Dauervergrößerung mehr). Beim Scrollen blendet auf der Startseite nur der Textblock aus; der Plankopf bleibt deckend – vorher verlor er mit dem ersten Scrollpixel seinen Weichzeichner.
+
+Beobachtung ohne Änderung: Die Hauptseite hat denselben Mechanismus in der Kopfzeile (84 → 64 px). Gleiche Probe auf `/` und `/fotografie`: 146 und 137 bzw. 146 und 138 Wechsel bei 30 und 40 px, Scrollposition zurückgezogen. Nicht angefasst, weil nur die Architekturseite gemeldet war.
+
+Nicht getestet: echte Geräte und Grafikkarten (keine Aussage zur Bildrate); Firefox und Safari (ob dort der CSS-Weg oder der Ausweichweg greift, ist ungeprüft); Touchgeräte; der Live-Server – die Änderung ist dort nicht eingespielt.
+
 ## Nicht getestet
 
 - HTTPS-Umleitung in der Variante „getrennt“ (`public/.htaccess` als Webroot) und hinter einem TLS-terminierenden Proxy (`X-Forwarded-Proto`) – nur die Variante „ein Ordner“ auf `lothar.drve.at` geprüft
